@@ -1,0 +1,37 @@
+/* Styling for Toggle Body Theme */
+* {
+    font-family: "Noto Sans", sans-serif !important;
+}
+
+/* light theme */
+:root {
+    --primary-body-background-color: white;
+    --primary-body-text-color: black;
+}
+
+/* dark theme */
+[data-theme=dark] {
+    --primary-body-background-color: #1e2123;
+    --primary-body-text-color: #EEF0F2;
+}
+
+body {
+    margin: 0px !important;
+    color: var(--primary-body-text-color);
+    background-color: var(--primary-body-background-color);
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+@media (min-width: 900px) and (max-width: 1250px) {
+    #postForm {
+        width: 100% !important;
+        height: 100vh !important;
+        z-index: 1500;
+        position: absolute;
+        top: 85px;
+        right: 0;
+    }
+}
