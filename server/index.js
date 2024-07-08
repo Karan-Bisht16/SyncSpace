@@ -21,7 +21,7 @@ app.use(express.static(__dirname + "/public"));
 
 // cors() must be present above routes
 const corsOptions = {
-    origin: [process.env.FRONT_END_DOMAIN_1, process.env.FRONT_END_DOMAIN_2, process.env.FRONT_END_DOMAIN_3],
+    origin: process.env.FRONT_END_DOMAIN_1,
 }
 app.use(cors(corsOptions))
 // app.use(cors());
