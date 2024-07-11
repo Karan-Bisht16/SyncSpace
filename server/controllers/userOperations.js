@@ -174,7 +174,8 @@ const updateProfile = async (req, res) => {
         } else {
             res.status(400).json({ message: "Username not available" });
         }
-    } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
+    // } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
+    } catch (error) { res.status(503).json({ message: error.message }) }
 }
 
 const changePassword = async (req, res) => {

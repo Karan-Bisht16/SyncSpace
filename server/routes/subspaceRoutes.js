@@ -4,8 +4,10 @@ import { createSubspace, joinSubspace, fetchAllSubspaceInfo, fetchSubspacePosts 
 
 const router = express.Router();
 
+// not working on deployment
 router.post("/", auth, createSubspace);
 router.get("/join", auth, joinSubspace);
+// working
 router.get("/info", fetchAllSubspaceInfo);
 router.get("/posts", fetchSubspacePosts);
 

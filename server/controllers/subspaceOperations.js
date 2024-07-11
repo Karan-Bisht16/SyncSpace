@@ -28,7 +28,8 @@ const createSubspace = async (req, res) => {
             req.session.user.subspacesJoined = updatedSubspacesJoined;
             res.status(200).json({ user: req.session.user });
         }
-    } catch (error) { res.status(409).json({ message: "Network error. Try again." }) }
+    // } catch (error) { res.status(409).json({ message: "Network error. Try again." }) }
+    } catch (error) { res.status(409).json({ message: error.message }) }
 }
 
 const joinSubspace = async (req, res) => {
@@ -74,7 +75,8 @@ const joinSubspace = async (req, res) => {
             );
             res.status(200).json({ user: req.session.user });
         }
-    } catch (error) { res.status(404).json({ message: "Network error. Try again." }) }
+    // } catch (error) { res.status(404).json({ message: "Network error. Try again." }) }
+    } catch (error) { res.status(404).json({ message: error.message }) }
 }
 
 const fetchAllSubspaceInfo = async (req, res) => {
