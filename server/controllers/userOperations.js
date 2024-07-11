@@ -5,7 +5,9 @@ import Post from "../models/post.js";
 const saltRounds = 10;
 
 const fetchUserSession = async (req, res) => {
-    res.status(200).json(req.session.user);
+    try {
+        res.status(200).json(req.session.user);
+    } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }
 
 const fetchUserInfo = async (req, res) => {
@@ -16,12 +18,9 @@ const fetchUserInfo = async (req, res) => {
             const { password, ...updatedUser } = user._doc;
             res.status(200).json(updatedUser);
         } else {
-            res.status(404).json({ message: "User not found." });
+            res.status(404).json({ message: "User not found" });
         }
-    } catch (error) {
-        console.log("User info retrival failed:" + error);
-        res.status(404).json({ message: "Network error. Try again." });
-    }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }
 
 const fetchUserPosts = async (req, res) => {
@@ -32,12 +31,9 @@ const fetchUserPosts = async (req, res) => {
         if (posts) {
             res.status(200).json(posts);
         } else {
-            res.status(404).json({ message: "No posts found." });
+            res.status(404).json({ message: "No posts found" });
         }
-    } catch (error) {
-        console.log("User posts retrival failed:" + error);
-        res.status(404).json({ message: "Network error. Try again." });
-    }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }
 
 const getGoogleUser = async (req, res) => {
@@ -45,7 +41,7 @@ const getGoogleUser = async (req, res) => {
         const { email, picture, sub } = jwt.decode(req.query.token);
         const isUserEmailUnique = await User.findOne({ email: email, googleId: { $ne: sub } });
         if (isUserEmailUnique) {
-            res.status(400).json({ message: "Email already registered. Sign In with password." });
+            res.status(400).json({ message: "Email already registered. Sign In with password" });
         } else {
             const checkIfLoginOrSignUp = await User.findOne({ googleId: sub });
             if (checkIfLoginOrSignUp) {
@@ -65,10 +61,7 @@ const getGoogleUser = async (req, res) => {
                 res.status(409).json({ message: "Unique username required" });
             }
         }
-    } catch (error) {
-        console.log("Login [google] failed:" + error);
-        res.status(404).json({ message: "Network error. Try again." });
-    }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }
 
 const createGoogleUser = async (req, res) => {
@@ -76,7 +69,7 @@ const createGoogleUser = async (req, res) => {
         const { name, token } = req.query;
         const isUserNameUnique = await User.findOne({ name: name });
         if (isUserNameUnique) {
-            res.status(400).json({ message: "Username not available." });
+            res.status(400).json({ message: "Username not available" });
         } else {
             const { email, picture, sub } = jwt.decode(token);
             const newUser = await User.create({
@@ -96,10 +89,7 @@ const createGoogleUser = async (req, res) => {
             };
             res.status(200).json({ user: req.session.user, token: token });
         }
-    } catch (error) {
-        console.log("Sign-up [google] failed: " + error);
-        res.status(409).json({ message: "Network error. Try again." });
-    }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }
 
 const signUp = async (req, res) => {
@@ -107,11 +97,11 @@ const signUp = async (req, res) => {
         const { userName, userEmail, userPassword } = req.body;
         const isUserNameUnique = await User.findOne({ name: userName });
         if (isUserNameUnique) {
-            res.status(400).json({ message: "Username not available." });
+            res.status(400).json({ message: "Username not available" });
         } else {
             const isUserEmailUnique = await User.findOne({ email: userEmail });
             if (isUserEmailUnique) {
-                res.status(400).json({ message: "Email already registered. Sign In." });
+                res.status(400).json({ message: "Email already registered. Sign In" });
             } else {
                 const hashedPassword = await bcrypt.hash(userPassword, saltRounds);
                 const newUser = await User.create({
@@ -132,10 +122,7 @@ const signUp = async (req, res) => {
                 res.status(200).json({ user: req.session.user, token });
             }
         }
-    } catch (error) {
-        console.log("Sign-up failed: " + error);
-        res.status(409).json({ message: "Network error. Try again." });
-    }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }
 
 const signIn = async (req, res) => {
@@ -143,7 +130,7 @@ const signIn = async (req, res) => {
         const { userEmail, userPassword } = req.body;
         const existingUser = await User.findOne({ email: userEmail });
         if (!existingUser) {
-            res.status(404).json({ message: "No such user found." });
+            res.status(404).json({ message: "No such user found" });
         } else {
             if (await bcrypt.compare(userPassword, existingUser.password)) {
                 const token = jwt.sign({ _id: existingUser._id, email: existingUser.email }, process.env.JWT_TOKEN_KEY, { expiresIn: 365 * 24 * 60 * 60 * 1000 });
@@ -160,10 +147,7 @@ const signIn = async (req, res) => {
                 res.status(400).json({ message: "Invalid credentials" });
             }
         }
-    } catch (error) {
-        console.log("Sign-in failed: " + error);
-        res.status(409).json({ message: "Network error. Try again." });
-    }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }
 
 const logout = async (req, res) => {
@@ -171,10 +155,54 @@ const logout = async (req, res) => {
         req.session.destroy();
         res.clearCookie("connect.sid");
         res.status(200).json({ message: "Logout successfull!" });
-    } catch (error) {
-        console.log("Logout failed: " + error);
-        res.status(500).json({ message: "Network error. Try again." });
-    }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }
 
-export { fetchUserSession, fetchUserInfo, fetchUserPosts, getGoogleUser, createGoogleUser, signUp, signIn, logout };
+const updateProfile = async (req, res) => {
+    try {
+        const { email } = jwt.decode(req.headers.authorization);
+        const { name, bio } = req.body;
+        const isUserNameUnique = await User.findOne({ name: name });
+        if (!isUserNameUnique) {
+            await User.findOneAndUpdate({ email: email }, { name: name, userName: name.replace(/ /g, "-"), bio: bio });
+            req.session.user.name = name;
+            req.session.user.userName = name.replace(/ /g, "-");
+            res.status(200).json({ user: req.session.user });
+        } else if (isUserNameUnique.email === email) {
+            await User.findByIdAndUpdate(isUserNameUnique._id, { bio: bio });
+            res.status(200).json({ user: req.session.user });
+        } else {
+            res.status(400).json({ message: "Username not available" });
+        }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
+}
+
+const changePassword = async (req, res) => {
+    try {
+        const { email, sub } = jwt.decode(req.headers.authorization);
+        if (!sub) {
+            const { currentPassword, newPassword } = req.body;
+            const existingUser = await User.findOne({ email: email });
+            if (await bcrypt.compare(currentPassword, existingUser.password)) {
+                const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+                await User.findByIdAndUpdate(existingUser._id, { password: hashedPassword });
+                res.sendStatus(200);
+            } else {
+                res.status(409).json({ message: "Provided password is incorrect" });
+            }
+        } else {
+            res.status(400).json({ message: "Invalid access" })
+        }
+
+    } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
+}
+
+const deleteProfile = async (req, res) => {
+    try {
+        const { email } = jwt.decode(req.headers.authorization);
+        await User.findOneAndDelete({ email: email });
+        res.sendStatus(200);
+    } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
+}
+
+export { fetchUserSession, fetchUserInfo, fetchUserPosts, getGoogleUser, createGoogleUser, signUp, signIn, logout, updateProfile, changePassword, deleteProfile };

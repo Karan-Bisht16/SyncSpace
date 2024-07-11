@@ -2,7 +2,7 @@ import React from "react";
 import { Box, TextField } from "@mui/material";
 
 function InputField(props) {
-    const { name, label, value, type, reference, handleChange, autoFocus, error, helperText, id } = props;
+    const { name, label, value, type, reference, handleChange, autoFocus, error, helperText, disabled, multiline, rows, id } = props;
     let { sx } = props;
     if (id === "password") {
         if (sx) {
@@ -25,6 +25,9 @@ function InputField(props) {
                 autoFocus={autoFocus}
                 error={error}
                 helperText={helperText}
+                disabled={disabled}
+                multiline={multiline}
+                rows={rows}
                 fullWidth
                 autoComplete="off"
                 sx={sx}

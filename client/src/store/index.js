@@ -3,7 +3,7 @@ import { createContext, useMemo, useState, useEffect } from "react";
 
 export const ColorModeContext = createContext({
     toggleMode: () => { },
-    mode: "light",
+    mode: "dark",
 });
 
 const getDesignTokens = (mode) => ({
@@ -59,7 +59,7 @@ const getDesignTokens = (mode) => ({
 });
 
 export const ColorContextProvider = ({ children }) => {
-    const [mode, setMode] = useState("light");
+    const [mode, setMode] = useState("dark");
     const [isInitialized, setIsInitialized] = useState(false);
     useEffect(() => {
         const selectedTheme = localStorage.getItem("selectedTheme");

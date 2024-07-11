@@ -9,31 +9,32 @@ function handleError(error) {
     }
 }
 
-export const fetchSubspaceInfo = () => async (dispatch) => {
-    try {
-        // const { data } = await api.fetchPosts();
-        // dispatch({ type: FETCH_ALL_POST, payload: data });
-    } catch (error) {
-        handleError(error);
-    }
-};
-
 export const createSubspace = (subspaceData) => async (dispatch) => {
     try {
         const { data } = await api.createSubspace(subspaceData);
-        dispatch({ type: JOIN_SUBSPACE, payload: data });
+        dispatch({ type: JOIN_SUBSPACE, payload: data.user });
         return { status: 200, result: data };
-    } catch (error) {
-        handleError(error);
-    }
+    } catch (error) { return handleError(error) }
 };
 
-export const joinSubspace = () => async () => {
+export const joinSubspace = (actionData) => async (dispatch) => {
     try {
-        const { data } = await api.joinSubspace();
+        const { data } = await api.joinSubspace(actionData);
+        dispatch({ type: JOIN_SUBSPACE, payload: data.user });
         return { status: 200, result: data };
-    } catch (error) {
-        console.log(error);
-        handleError(error);
-    }
+    } catch (error) { return handleError(error); }
 };
+
+export const fetchAllSubspaceInfo = (subspaceName) => async () => {
+    try {
+        const { data } = await api.fetchAllSubspaceInfo(subspaceName);
+        return { status: 200, result: data };
+    } catch (error) { return handleError(error) }
+};
+
+export const fetchSubspacePosts = (subspaceName) => async () => {
+    try {
+        const { data } = await api.fetchSubspacePosts(subspaceName);
+        return { status: 200, result: data };
+    } catch (error) { return handleError(error) }
+}

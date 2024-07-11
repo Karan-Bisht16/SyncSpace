@@ -1,4 +1,4 @@
-// Styling for ProfileBar.jsx
+// Styling for RealTimeProfileViewer.jsx 
 const styles = () => ({
     profileContainer: {
         maxHeight: "75vh",
@@ -7,7 +7,9 @@ const styles = () => ({
         borderRadius: "10px",
         bgcolor: "background.tertiary",
         boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
-        marginBottom: { xs: "20px", lg: "0" }
+        marginBottom: { xs: "20px", lg: "0" },
+        display: { xs: "none", lg: "block" },
+        position: "relative"
     },
     bioContainer: {
         height: "155px",
@@ -18,8 +20,7 @@ const styles = () => ({
         overflowWrap: "break-word",
         hyphens: "auto"
     },
-    mainContainer: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0" },
-    copyLinkBtn: { cursor: "pointer", padding: "4px 12px", borderRadius: "16px", bgcolor: "background.default" },
+    formDataContainer: { position: "absolute", transform: "translateY(-100%)" },
     gridItemBox: { padding: "8px 0" },
     gridItemTitle: { fontSize: "12px" }
 });

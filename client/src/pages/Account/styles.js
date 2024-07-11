@@ -1,8 +1,6 @@
-import { fontSize } from "@mui/system";
-
 // Styling for Account.jsx 
 const styles = () => ({
-    leftContainer: { height: { xs: "0vh", sm: "5vh" }, minWidth: { xs: "0", md: "275px" } },
+    leftContainer: { height: { xs: "0", md: "80vh" }, minWidth: { xs: "0", md: "275px" } },
     mainContainer: { width: "auto", minWidth: { xs: "99%", md: "65%", lg: "75%" }, margin: "0 auto", padding: "32px 16px" },
     flexContainer: { display: "flex" },
     heading: { display: "flex", justifyContent: "space-between", alignItems: "center" },
@@ -31,9 +29,12 @@ const styles = () => ({
         boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px"
     },
     loadingScreenStyling: { height: "80vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" },
-    progressBar: { width: { xs: "80%", md: "500px" }, color: "#0090c1", marginTop: "7.5px" },
     titleFont: { fontSize: { xs: "24px", md: "36px" } },
-    noContentContainer: { display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }
+    progressBar: { width: { xs: "80%", md: "500px" }, color: "#0090c1", marginTop: "7.5px" },
+    noContentContainer: { display: "flex", justifyContent: "center", alignItems: "center", height: "100%" },
+    titleField: { marginBottom: "4px" },
+    clearBtn: { color: "#0090c1", marginBottom: "16px" },
+    updateBtn: { bgcolor: "#0090c1", color: "#ffffff", marginLeft: "8px", marginBottom: "16px" }
 });
 
 export default styles;

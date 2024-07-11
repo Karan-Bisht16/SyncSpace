@@ -1,26 +1,26 @@
+import jwt from "jsonwebtoken";
 import Post from "../models/post.js";
+import User from "../models/user.js";
 
+let globalCount = 1;
 const getPosts = async (req, res) => {
     try {
         const posts = await Post.find({});
-        // console.log("All posts: " + posts);
+        console.log(`${globalCount} All posts: ${posts.length}`);
+        globalCount++;
         res.status(200).json(posts);
-    } catch (error) {
-        console.log("Error retriving posts:" + error);
-        res.status(404).json({ message: "Network error. Try again." });
-    }
+    } catch (error) { res.status(404).json({ message: "Network error. Try again." }) }
 }
 const createPost = async (req, res) => {
+    console.log(req.body);
+    const { email } = jwt.decode(req.headers.authorization);
     const post = req.body;
     const newPost = new Post(post);
     try {
-        // console.log(post);
         await newPost.save();
-        res.status(201).json(newPost);
-    } catch (error) {
-        console.log("Error adding new post: " + error);
-        res.status(409).json({ message: "Network error. Try again." });
-    }
+        await User.findOneAndUpdate({ email: email }, { $inc: { postsCount: 1 } });
+        res.status(200).json(newPost);
+    } catch (error) { res.status(409).json({ message: "Network error. Try again." }) }
 }
 
 export { getPosts, createPost };

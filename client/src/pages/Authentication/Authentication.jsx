@@ -60,6 +60,7 @@ function Authentication() {
         setIsSignUp(prevIsSignUp => {
             return !prevIsSignUp;
         });
+        emailField.current.focus();
     }
     const [uniqueUserNameError, setUniqueUserNameError] = useState(false);
     function handleChange(event) {

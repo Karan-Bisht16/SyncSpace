@@ -3,7 +3,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 
 function ConfirmationDialog(props) {
     const { dialog, closeDialog, handleDialog, linearProgressBar, dialogValue } = props;
-    const { title, message, cancelBtnText, submitBtnText } = dialogValue;
+    const { title, message, cancelBtnText, submitBtnText, type } = dialogValue;
 
     return (
         <Dialog
@@ -18,8 +18,17 @@ function ConfirmationDialog(props) {
                 <DialogContentText id="alert-dialog-description">{message}</DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={closeDialog}>{cancelBtnText}</Button>
-                <Button id="focusPostBtn" variant="contained" onClick={handleDialog}>{submitBtnText}</Button>
+                {type === "error" ?
+                    <>
+                        <Button onClick={closeDialog} color="error">{cancelBtnText}</Button>
+                        <Button id="focusPostBtn" variant="contained" color="error" onClick={handleDialog}>{submitBtnText}</Button>
+                    </>
+                    :
+                    <>
+                        <Button onClick={closeDialog}>{cancelBtnText}</Button>
+                        <Button id="focusPostBtn" variant="contained" onClick={handleDialog}>{submitBtnText}</Button>
+                    </>
+                }
             </DialogActions>
         </Dialog>
     );

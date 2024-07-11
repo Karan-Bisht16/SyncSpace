@@ -1,11 +1,11 @@
 import React from "react";
-import { Box, Typography, List, ListItem, ListItemButton, ListItemText, ListItemIcon, Divider, Collapse } from "@mui/material"
+import { Avatar, Box, Typography, List, ListItem, ListItemButton, ListItemText, ListItemIcon, Divider, Collapse } from "@mui/material"
 import { TrendingUpRounded, ExpandLess, ExpandMore, ForumTwoTone, GroupAddOutlined, PersonAddAlt1 } from "@mui/icons-material";
 import { NavLink, useNavigate } from "react-router-dom";
 // Importing styling
 import styles from "./styles";
 // Importing images
-import SyncSpaceLogo from "../../../images/img-syncspace-logo.avif";
+import SyncSpaceLogo from "../../../assets/img-syncspace-logo.avif";
 import { hatch } from "ldrs"
 
 function CustomDrawer(props) {
@@ -14,7 +14,7 @@ function CustomDrawer(props) {
     const navigate = useNavigate();
     hatch.register("l-all")
 
-    const mainSubspaces = [{ name: "Universe", _id: "668b9ea1b0513a230dcdea79" }, { name: "Trending", _id: "668b9eceb0513a230dcdea7f" }];
+    const mainSubspaces = [{ name: "Universe" }, { name: "Trending" }];
     const [open, setOpen] = React.useState(true);
     function handleClick() {
         setOpen(!open);
@@ -27,9 +27,9 @@ function CustomDrawer(props) {
         handleDrawerClose();
         navigate("/authentication");
     }
-    function handleSubspace(id, name) {
+    function handleSubspace(name) {
         handleDrawerClose();
-        navigate("/subspace/" + id, { state: { subspaceName: name } });
+        navigate("/ss/" + name.replace(/ /g, "-"));
     }
 
     return (
@@ -45,7 +45,7 @@ function CustomDrawer(props) {
             <Divider />
             <List>
                 {mainSubspaces.map((subspace, index) => (
-                    <ListItem key={index} disablePadding name={subspace.name} _id={subspace._id} onClick={() => handleSubspace(subspace._id, subspace.name)}>
+                    <ListItem key={index} disablePadding onClick={() => handleSubspace(subspace.name)}>
                         <ListItemButton>
                             <ListItemIcon>
                                 {index % 2 === 0 ?
@@ -77,11 +77,11 @@ function CustomDrawer(props) {
                     </List>
                     {user ?
                         <>
-                            {user.subspacesJoined.map((subspace, _id) => (
-                                <ListItem key={_id} disablePadding name={subspace.name} _id={subspace._id} onClick={() => handleSubspace(subspace._id, subspace.name)}>
+                            {user.subspacesJoined.map((subspace, index) => (
+                                <ListItem key={index} disablePadding onClick={() => handleSubspace(subspace.name)}>
                                     <ListItemButton sx={{ pl: 4 }}>
                                         <ListItemIcon>
-                                            <TrendingUpRounded sx={classes.icon} />
+                                            <Avatar src={subspace.avatar} alt="Subspace avatar">{subspace.name.charAt(0)}</Avatar>
                                         </ListItemIcon>
                                         <ListItemText primary={subspace.name} />
                                     </ListItemButton>

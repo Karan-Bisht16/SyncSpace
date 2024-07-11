@@ -8,9 +8,7 @@ const styles = () => ({
         padding: "32px 16px",
         textAlign: "center",
         alignItems: "center"
-    },
-    image: { width: "100%", maxWidth: "300px", marginTop: "50px", paddingRight: "10px" },
-    link: { color: "text.primary", fontSize: "22px", paddingTop: "10px", textDecoration: "none" }
+    }    
 });
 
 export default styles;

@@ -1,4 +1,4 @@
-import { FETCH_USER_SESSION, AUTH, LOGOUT, JOIN_SUBSPACE } from "../constants/actionTypes";
+import { FETCH_USER_SESSION, AUTH, LOGOUT, UPDATE_PROFILE, JOIN_SUBSPACE } from "../constants/actionTypes";
 
 export default (user = null, action) => {
     switch (action.type) {
@@ -10,11 +10,10 @@ export default (user = null, action) => {
         case LOGOUT:
             localStorage.removeItem("token");
             return null;
+        case UPDATE_PROFILE:
+            return action.payload;
         case JOIN_SUBSPACE:
-            const { _id, name, membersCount } = action.payload;
-            let tempUser = JSON.parse(JSON.stringify(user));
-            tempUser.subspacesJoined.push({ _id: _id, name: name, membersCount: membersCount });
-            return tempUser;
+            return action.payload;
         default:
             return user;
     }

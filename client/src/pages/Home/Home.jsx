@@ -9,17 +9,18 @@ import { getPosts } from "../../actions/post"
 import styles from "./styles";
 
 function Home(props) {
-    const { user } = props;
+    // const { user } = props;
     const classes = styles();
     const dispatch = useDispatch();
+
     useEffect(() => {
         // Setting webpage title
         document.title = "SyncSpace";
-        // update this to only call once when loaded
+    });
+    const posts = useSelector((state) => state.posts);
+    useEffect(() => {
         dispatch(getPosts());
     }, [dispatch]);
-
-    const posts = useSelector((state) => state.posts);
 
     return (
         <Grid container sx={{ display: "flex" }}>

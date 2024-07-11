@@ -1,6 +1,8 @@
 export const FETCH_USER_SESSION = "FETCH_USER_SESSION";
 export const AUTH = "AUTH";
 export const LOGOUT = "LOGOUT";
+export const UPDATE_PROFILE = "UPDATE_PROFILE";
+export const CHANGE_PASSWORD = "CHANGE_PASSWORD";
 
 export const FETCH_ALL_POST = "FETCH_ALL_POST";
 export const CREATE_POST = "CREATE_POST";

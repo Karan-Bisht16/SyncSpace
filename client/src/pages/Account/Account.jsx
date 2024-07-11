@@ -1,31 +1,31 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Typography, Box, Grid, Avatar, LinearProgress } from "@mui/material";
+import { Avatar, Box, Button, Divider, Grid, LinearProgress, Typography } from "@mui/material";
 import { CloseRounded, ModeEdit } from "@mui/icons-material";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 // Importing my components
-import Posts from "../../Components/Posts/Posts";
-import SnackBar from "../../Components/SnackBar/SnackBar";
-import ProfileBar from "../../Components/ProfileBar/ProfileBar";
+import RealTimeProfileViwer from "./RealTimeProfileViewer/RealTimeProfileViewer";
 import InputField from "../../Components/InputField/InputField";
+import ProfileBar from "../../Components/ProfileBar/ProfileBar";
+import SnackBar from "../../Components/SnackBar/SnackBar";
+import Posts from "../../Components/Posts/Posts";
 // Importing actions
-import { fetchUserInfo, fetchUserPosts } from "../../actions/user";
+import { fetchUserInfo, fetchUserPosts, updateProfile } from "../../actions/user";
 // Importing styling
 import styles from "./styles";
-
-// [CRUD] subspaces, Render posts, 
-// delete, update posts, 
-// [Update and delete] user, profile users, followers
-// repost? terminology space related
+import NotFound from "../../Components/NotFound/NotFound";
 
 function Account() {
     const classes = styles();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     useEffect(() => {
         // Setting webpage title
         document.title = "SyncSpace";
-        // dispatch(getUserPosts());
     }, []);
 
+    const token = localStorage.getItem("token");
+    if (!token) { navigate("/authentication"); }
     const nameField = useRef(null);
     const emailField = useRef(null);
     const bioField = useRef(null);
@@ -37,23 +37,6 @@ function Account() {
             return;
         }
         setSnackbarState(false);
-    }
-    const [editProfile, setEditProfile] = useState(false);
-    function handleEditProfile() {
-        setEditProfile(prevEditProfile => {
-            return !prevEditProfile;
-        })
-    }
-    const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        bio: "",
-    });
-    function handleChange(event) {
-        const { name, value } = event.target;
-        setFormData(prevFormData => {
-            return { ...prevFormData, [name]: value }
-        });
     }
     // Fetching user info
     const [user, setUser] = useState(null);
@@ -98,13 +81,56 @@ function Account() {
         if (userPosts.length === 0) {
             return (
                 <Box sx={classes.noContentContainer}>
-                    <Typography sx={classes.titleFont}>You haven't posted anything</Typography>
+                    <NotFound mainText="You haven't posted anything" />
                 </Box>
             );
         }
         return (
             <Posts posts={userPosts} />
         );
+    }
+    const [editProfile, setEditProfile] = useState(false);
+    function handleEditProfile() {
+        setEditProfile(prevEditProfile => {
+            return !prevEditProfile;
+        })
+    }
+    const [formData, setFormData] = useState({
+        name: "",
+        bio: "",
+        email: "",
+    });
+    function handleChange(event) {
+        const { name, value } = event.target;
+        setFormData(prevFormData => {
+            return { ...prevFormData, [name]: value }
+        });
+    }
+    // Clear Form
+    function handleClear() {
+        setFormData(prevFormData => {
+            return { ...prevFormData, "name": "", "bio": "" }
+        });
+    }
+    // Submit Form
+    async function handleSubmit(event) {
+        event.preventDefault();
+        if (formData.name.trim() === "") {
+            nameField.current.focus();
+            return false;
+        }
+        try {
+            const { status, result } = await dispatch(updateProfile(formData));
+            if (status === 200) {
+                navigate(-1);
+            } else {
+                setSnackbarValue({ message: result.message, status: "error" });
+                setSnackbarState(true);
+            }
+        } catch (error) {
+            setSnackbarValue({ message: error.message, status: "error" });
+            setSnackbarState(true);
+        }
     }
 
     return (
@@ -117,13 +143,13 @@ function Account() {
                         <LinearProgress sx={classes.progressBar} />
                     </Box>
                     :
-                    <div>
+                    <>
                         <Box sx={classes.heading}>
                             <Box sx={classes.userContainer}>
                                 <Avatar sx={classes.userAvatar} alt={user.name} src={user.avatar}>{user.name.charAt(0)}</Avatar>
                                 <Box>
                                     <Typography sx={classes.userName}>{user.name}</Typography>
-                                    <p style={{ fontSize: "14px", margin: "0" }}>s/{user.userName}</p>
+                                    <p style={{ fontSize: "14px", margin: "0" }}>e/{user.userName}</p>
                                 </Box>
                             </Box>
                             <Box sx={classes.editProfile} onClick={handleEditProfile}>
@@ -141,7 +167,7 @@ function Account() {
                             </Box>
                         </Box>
                         {!editProfile ?
-                            <div>
+                            <>
                                 <Grid container sx={classes.subContainer}>
                                     <Grid item md={8.75} sx={Object.assign({ display: { xs: "none", lg: "block" } }, classes.postContainer)}>
                                         {userPostsBlock(userPosts)}
@@ -152,23 +178,43 @@ function Account() {
                                 <Box sx={Object.assign({ display: { xs: "block", lg: "none" } }, classes.postContainer)}>
                                     {userPostsBlock(userPosts)}
                                 </Box>
-                            </div>
+                            </>
                             :
-                            <Box>
-                                <form noValidate>
-                                    <InputField
-                                        name="name" label="Name" value={formData.name} type="text" handleChange={handleChange} reference={nameField}
-                                    />
-                                    <InputField
-                                        name="email" label="Email" value={formData.email} type="text" handleChange={handleChange} reference={emailField}
-                                    />
-                                    <InputField
-                                        name="bio" label="Bio" value={formData.bio} type="text" handleChange={handleChange} reference={bioField}
-                                    />
-                                </form>
-                            </Box>
+                            <>
+                                <Grid container sx={classes.subContainer}>
+                                    <Grid item xs={12} lg={8.75} sx={classes.postContainer}>
+                                        <Box>
+                                            <Typography variant="h5" sx={classes.titleField}>Update Profile</Typography>
+                                            <Divider />
+                                            <form noValidate onSubmit={handleSubmit}>
+                                                <InputField
+                                                    name="name" label="Name" value={formData.name} type="text"
+                                                    handleChange={handleChange} reference={nameField} autoFocus={true}
+                                                />
+                                                <InputField
+                                                    name="bio" label="Bio" value={formData.bio} type="text"
+                                                    handleChange={handleChange} reference={bioField} multiline={true} rows={2}
+                                                />
+                                                <Box sx={{ margin: "16px 0" }}>
+                                                    <Button variant="outlined" onClick={handleClear} sx={classes.clearBtn}>Clear</Button>
+                                                    <Button type="submit" variant="contained" onClick={handleSubmit} sx={classes.updateBtn}>Update</Button>
+                                                </Box>
+                                            </form>
+                                            <Divider />
+                                            <InputField
+                                                name="email" label="Email" value={formData.email} type="text"
+                                                handleChange={handleChange} reference={emailField} disabled={true}
+                                                helperText="e-mail updation will be implmented in future versions"
+                                            />
+                                        </Box>
+                                    </Grid>
+                                    <Grid item md={0.25}></Grid>
+                                    <RealTimeProfileViwer user={user} formData={formData} userPosts={userPosts} />
+                                </Grid>
+                                <Box sx={Object.assign({ display: "none" }, classes.postContainer)} />
+                            </>
                         }
-                    </div>
+                    </>
                 }
             </Box>
             <SnackBar openSnackbar={snackbarState} handleClose={handleSnackbarState} timeOut={5000} message={snackbarValue.message} type={snackbarValue.status} />

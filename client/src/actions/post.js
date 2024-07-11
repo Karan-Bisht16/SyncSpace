@@ -13,9 +13,8 @@ export const getPosts = () => async (dispatch) => {
     try {
         const { data } = await api.fetchPosts();
         dispatch({ type: FETCH_ALL_POST, payload: data });
-    } catch (error) {
-        handleError(error);
-    }
+        return {status: 200, result: data}
+    } catch (error) { return handleError(error) }
 };
 
 export const createPost = (postData) => async (dispatch) => {
@@ -23,7 +22,5 @@ export const createPost = (postData) => async (dispatch) => {
         const { data } = await api.createPost(postData);
         dispatch({ type: CREATE_POST, payload: data });
         return { status: 200, result: data };
-    } catch (error) {
-        handleError(error);
-    }
+    } catch (error) { return handleError(error) }
 };

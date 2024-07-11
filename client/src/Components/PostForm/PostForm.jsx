@@ -1,22 +1,20 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import { Autocomplete, TextField, Button, Box, Tabs, Tab, CircularProgress, LinearProgress } from "@mui/material";
-import { Upload } from "@mui/icons-material";
+import { Autocomplete, Box, Button, LinearProgress, Tab, Tabs, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-// For adding file
-import FileBase from "react-file-base64";
 // Importing my components
-import SnackBar from "../SnackBar/SnackBar";
-import CustomJoditEditor from "../CustomJoditEditor/CustomJoditEditor";
 import ConfirmationDialog from "../ConfirmationDialog/ConfirmationDialog";
+import CustomJoditEditor from "../CustomJoditEditor/CustomJoditEditor";
+import FileUpload from "../FileUpload/FileUpload";
 import { ColorModeContext } from "../../store";
+import SnackBar from "../SnackBar/SnackBar";
 // Importing actions
 import { createPost } from "../../actions/post";
 // Importing styling
 import styles from "./styles"
 
 function PostForm(props) {
-    const { user } = props;
+    const { user, previousSubspace } = props;
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -26,12 +24,13 @@ function PostForm(props) {
     const bodyField = useRef(null);
     const { mode } = useContext(ColorModeContext);
     const [postData, setPostData] = useState({
+        subspaceId: "",
+        subspaceName: "",
+        author: user._id,
+        authorName: user.userName,
         title: "",
         body: "",
         selectedFile: [],
-        author: user._id,
-        subspace: "",
-        subspaceId: "",
     });
     // JS for SnackBar
     const [snackbarState, setSnackbarState] = useState(false);
@@ -42,18 +41,41 @@ function PostForm(props) {
         }
         setSnackbarState(false);
     }
+    // JS for Dialog
+    const [dialog, setDialog] = useState(false);
+    const [dialogValue, setDialogValue] = useState({
+        title: "",
+        message: "",
+        cancelBtnText: "",
+        submitBtnText: "",
+    });
+    async function openDialog(values) {
+        await setDialogValue(values);
+        await setDialog(true);
+        document.querySelector("#focusPostBtn").focus();
+    };
+    function closeDialog() {
+        setDialog(false);
+    };
+    // AutoComplete - is working?
     const [subspaces, setSubspaces] = useState(null);
+    const [predefinedSubspace, setPredefinedSubspace] = useState(false);
     const [loadingSubspace, setLoadingSubspace] = useState(true);
     useEffect(() => {
+        console.log("test");
         if (subspaces === null) {
-            const newSubspaces = user.subspacesJoined.map((subspace) => {
-                return { label: subspace.name, _id: subspace._id }
-            });
-            setSubspaces(newSubspaces);
+            if (previousSubspace) {
+                const subspace = user.subspacesJoined.filter(subspace => subspace.name.replace(/ /g, "-") === previousSubspace)[0];
+                setPredefinedSubspace({ ...subspace, subspaceName: subspace.name.replace(/ /g, "-") });
+            } else {
+                const subspacesArray = user.subspacesJoined.map((subspace) => {
+                    return { label: subspace.name, _id: subspace._id }
+                });
+                setSubspaces(subspacesArray);
+            }
             setLoadingSubspace(false);
         }
-    }, []);
-    // AutoComplete - is working?
+    }, [previousSubspace, subspaces, user.subspacesJoined]);
     function handleAutoCompleteTextFieldChange(event) {
         const value = event.target.value;
         console.log(event.target)
@@ -88,29 +110,25 @@ function PostForm(props) {
             return { ...prevPostData, "body": content };
         });
     }
-    // FileBase64
+    // File Upload
     function handleFileUpload(event) {
         let filesArray = [];
         let flag = false;
         event.forEach(file => {
             let fileSize = Number(file.size.slice(0, file.size.length - 2));
-            if (fileSize <= 25000) {
+            if (fileSize <= process.env.REACT_APP_POST_FILE_SIZE) {
                 filesArray.push(file.base64);
             } else {
                 flag = true;
             }
         });
-        setSnackbarValue({ message: "File size must be less than 25MB!", status: "error" });
+        setSnackbarValue({ message: `File size must be less than ${process.env.REACT_APP_POST_FILE_SIZE / 1000}MB!`, status: "error" });
         setSnackbarState(flag);
         setPostData(prevPostData => {
             return { ...prevPostData, "selectedFile": filesArray };
         });
         let string = filesArray.length + (filesArray.length === 1 ? " file selected" : " files selected");
         document.querySelector("#fileChosen").textContent = string;
-    }
-    function selectFilesFunction(event) {
-        const file = document.querySelector("input[type=file]");
-        file.click();
     }
     function resetSelectedFiles() {
         const file = document.querySelector("input[type=file]");
@@ -132,32 +150,25 @@ function PostForm(props) {
             });
         }
     }
-    // JS for Dialog
-    const [dialog, setDialog] = useState(false);
-    const [dialogValue, setDialogValue] = useState({
-        title: "",
-        message: "",
-        cancelBtnText: "",
-        submitBtnText: "",
-    });
-    async function openDialog(values) {
-        await setDialogValue(values);
-        await setDialog(true);
-        document.querySelector("#focusPostBtn").focus();
-    };
-    function closeDialog() {
-        setDialog(false);
-    };
     // Clear Form 
     function handleClear() {
-        setPostData({
-            title: "",
-            body: "",
-            selectedFile: [],
-            author: user._id,
-            subspace: "",
-            subspaceId: ""
-        });
+        if (predefinedSubspace) {
+            setPostData({
+                author: user._id,
+                title: "",
+                body: "",
+                selectedFile: [],
+            });
+        } else {
+            setPostData({
+                subspaceId: "",
+                subspaceName: "",
+                author: user._id,
+                title: "",
+                body: "",
+                selectedFile: [],
+            });
+        }
         resetSelectedFiles();
     }
     // Submit Form
@@ -167,19 +178,23 @@ function PostForm(props) {
             titleTextField.current.focus();
             return false;
         }
-        console.log(postData.subspace);
-        if (postData.subspace.trim() === "") {
-            subspaceAutoCompleteTextField.current.focus();
-            return false;
-        } else {
+        if (postData.subspaceName.trim() === "") {
+            if (predefinedSubspace) {
+                setPostData(prevPostData => {
+                    return { ...prevPostData, "subspaceName": predefinedSubspace.subspaceName, "subspaceId": predefinedSubspace.subspaceId };
+                });
+            } else {
+                subspaceAutoCompleteTextField.current.focus();
+                return false;
+            }
+        } else if (!predefinedSubspace) {
             const isValidSubspace = subspaces.find(subspaceObject => {
-                return subspaceObject.label === postData.subspace
+                return subspaceObject.label === postData.subspaceName
             });
-            console.log(isValidSubspace);
             if (isValidSubspace) {
                 postData.subspaceId = isValidSubspace._id;
             } else {
-                postData.subspace = "";
+                postData.subspaceName = "";
                 postData.subspaceId = "";
             }
         }
@@ -199,8 +214,15 @@ function PostForm(props) {
     async function handleDialog() {
         setLinearProgressBar(true);
         try {
-            postData.subspace = postData.subspaceId;
-            const { subspaceId, ...updatedData } = postData;
+            // postData.subspaceName = postData.subspaceId;
+            let updatedData;
+            if (tabIndex === "1") {
+                const { selectedFile, ...rest } = postData;
+                updatedData = rest;
+            } else if (tabIndex === "2") {
+                const { body, ...rest } = postData;
+                updatedData = rest;
+            }
             const { status, result } = await dispatch(createPost(updatedData));
             closeDialog();
             if (status === 200) {
@@ -220,27 +242,33 @@ function PostForm(props) {
     return (
         <div>
             <form noValidate onSubmit={handleSubmit}>
-                <div style={{ width: 300, py: 2 }}>
+                <div style={{ width: 300, padding: "16px 0" }}>
                     {loadingSubspace ?
                         <>
                             <TextField disabled id="standard-basic" label="Subspace" variant="standard" />
                             <LinearProgress sx={{ top: "-2.5px", height: "2.5px" }} />
                         </>
                         :
-                        <Autocomplete
-                            options={subspaces} id="clear-on-escape" clearOnEscape
-                            name="subspace" value={postData.subspace}
-                            isOptionEqualToValue={(option, value) => option.value === value.value}
-                            onChange={handleAutoCompleteChange}
+                        <>
+                            {!predefinedSubspace ?
+                                <Autocomplete
+                                    options={subspaces} id="clear-on-escape" clearOnEscape
+                                    name="subspace" value={postData.subspaceName}
+                                    isOptionEqualToValue={(option, value) => option.value === value.value}
+                                    onChange={handleAutoCompleteChange}
 
-                            renderInput={(params) => (
-                                <TextField {...params}
-                                    name="subspace" label="Subspace*" variant="standard"
-                                    value={postData.subspace} inputRef={subspaceAutoCompleteTextField}
-                                    onKeyDown={handleAutoCompleteTextFieldChange}
+                                    renderInput={(params) => (
+                                        <TextField {...params}
+                                            name="subspace" label="Subspace*" variant="standard"
+                                            value={postData.subspaceName} inputRef={subspaceAutoCompleteTextField}
+                                            onKeyDown={handleAutoCompleteTextFieldChange}
+                                        />
+                                    )}
                                 />
-                            )}
-                        />
+                                :
+                                <TextField disabled id="standard-basic" label="Subspace" variant="standard" value={predefinedSubspace.subspaceName || "Error"} />
+                            }
+                        </>
                     }
                 </div>
                 <TextField
@@ -269,17 +297,7 @@ function PostForm(props) {
                     />
                 </Box>
                 <Box sx={{ display: tabIndex === "2" ? "block" : "none" }}>
-                    <Box sx={{ display: "none" }}>
-                        <FileBase type="file" multiple={true} name="selectedFile" onDone={handleFileUpload} />
-                    </Box>
-                    <Box sx={classes.fileUploadButton} onClick={selectFilesFunction}>
-                        <Upload sx={{ fontSize: "50px", padding: "8px 0" }}></Upload>
-                        Select a file to upload
-                        <span id="fileChosen" style={{ fontSize: "14px", fontWeight: "lighter" }}>
-                            No file selected
-                        </span>
-                    </Box>
-                    <Button variant="outlined" size="large" onClick={resetSelectedFiles} sx={classes.resetSelectedFilesBtn}>Reset file</Button>
+                    <FileUpload isMultiple={true} handleFileUpload={handleFileUpload} resetSelectedFiles={resetSelectedFiles} />
                 </Box>
                 <br></br>
                 <Box sx={{ float: "right" }}>
