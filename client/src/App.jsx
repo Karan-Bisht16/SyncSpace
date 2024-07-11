@@ -8,8 +8,8 @@ import {
 import { GoogleOAuthProvider } from "@react-oauth/google";
 // Importing my components
 import SnackBar from "./Components/SnackBar/SnackBar";
-import ProtectedRoute from "./utils/protectedRoute";
-import GuestRoute from "./utils/guestRoute";
+import ProtectedRoute from "./utils/ProtectedRoute";
+import GuestRoute from "./utils/GuestRoute";
 import useFetchUser from "./utils/useFetchUser";
 import Header from "./Components/Header/Header";
 // Importing all webpages
