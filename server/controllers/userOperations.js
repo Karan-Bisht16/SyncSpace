@@ -6,13 +6,14 @@ const saltRounds = 10;
 
 const fetchUserSession = async (req, res) => {
     try {
+        console.log(req.session.user);
         res.status(200).json(req.session.user);
     } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }
 
 const fetchUserInfo = async (req, res) => {
     try {
-        const { email } = jwt.decode(req.headers.authorization);
+        const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
         const user = await User.findOne({ email: email });
         if (user) {
             const { password, ...updatedUser } = user._doc;
@@ -25,7 +26,7 @@ const fetchUserInfo = async (req, res) => {
 
 const fetchUserPosts = async (req, res) => {
     try {
-        const { email } = jwt.decode(req.headers.authorization);
+        const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
         const user = await User.findOne({ email: email });
         const posts = await Post.find({ author: user._id });
         if (posts) {
@@ -160,34 +161,34 @@ const logout = async (req, res) => {
 
 const updateProfile = async (req, res) => {
     try {
-        const { email } = jwt.decode(req.headers.authorization);
+        const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
         const { name, bio } = req.body;
         const isUserNameUnique = await User.findOne({ name: name });
         if (!isUserNameUnique) {
             await User.findOneAndUpdate({ email: email }, { name: name, userName: name.replace(/ /g, "-"), bio: bio });
             req.session.user.name = name;
             req.session.user.userName = name.replace(/ /g, "-");
-            res.status(200).json({ user: req.session.user });
+            res.status(200).json(req.session.user);
         } else if (isUserNameUnique.email === email) {
             await User.findByIdAndUpdate(isUserNameUnique._id, { bio: bio });
-            res.status(200).json({ user: req.session.user });
+            res.status(200).json(req.session.user);
         } else {
             res.status(400).json({ message: "Username not available" });
         }
-    // } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
+        // } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
     } catch (error) { res.status(503).json({ message: error.message }) }
 }
 
 const changePassword = async (req, res) => {
     try {
-        const { email, sub } = jwt.decode(req.headers.authorization);
+        const { email, sub } = jwt.decode(req.headers.authorization.split(" ")[1]);
         if (!sub) {
             const { currentPassword, newPassword } = req.body;
             const existingUser = await User.findOne({ email: email });
             if (await bcrypt.compare(currentPassword, existingUser.password)) {
                 const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
                 await User.findByIdAndUpdate(existingUser._id, { password: hashedPassword });
-                res.sendStatus(200);
+                res.status(200);
             } else {
                 res.status(409).json({ message: "Provided password is incorrect" });
             }
@@ -200,7 +201,7 @@ const changePassword = async (req, res) => {
 
 const deleteProfile = async (req, res) => {
     try {
-        const { email } = jwt.decode(req.headers.authorization);
+        const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
         await User.findOneAndDelete({ email: email });
         res.sendStatus(200);
     } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }

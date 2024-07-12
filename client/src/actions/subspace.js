@@ -20,7 +20,7 @@ export const createSubspace = (subspaceData) => async (dispatch) => {
 export const joinSubspace = (actionData) => async (dispatch) => {
     try {
         const { data } = await api.joinSubspace(actionData);
-        dispatch({ type: JOIN_SUBSPACE, payload: data.user });
+        dispatch({ type: JOIN_SUBSPACE, payload: data });
         return { status: 200, result: data };
     } catch (error) { return handleError(error); }
 };

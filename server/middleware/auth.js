@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 const auth = (req, res, next) => {
     try {
-        let token = req.headers.authorization;
+        let token = req.headers.authorization.split(" ")[1];
         if (!token) {
             token = req.query.token;
         }
@@ -14,6 +14,10 @@ const auth = (req, res, next) => {
             } else if (token && !isCustomToken) {
                 decodedData = jwt.decode(token);
             }
+            console.log(req.session.user._id);
+            console.log(req.session.user.userName);
+            console.log(req.session.user.subspacesJoined.length);
+            console.log("valid token");
             next();
         } catch (error) {
             console.log(error.message);

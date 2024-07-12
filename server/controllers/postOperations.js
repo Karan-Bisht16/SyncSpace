@@ -13,7 +13,7 @@ const getPosts = async (req, res) => {
 }
 const createPost = async (req, res) => {
     console.log(req.body);
-    const { email } = jwt.decode(req.headers.authorization);
+    const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
     const post = req.body;
     const newPost = new Post(post);
     try {

@@ -12,7 +12,7 @@ const createSubspace = async (req, res) => {
             res.status(409).json({ message: "Subspace already exists." })
         } else {
             const newSubspace = new Subspace(subspace);
-            const { email } = jwt.decode(req.headers.authorization);
+            const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
             await newSubspace.save();
             let updatedSubspacesJoined = req.session.user.subspacesJoined;
             updatedSubspacesJoined = [...updatedSubspacesJoined, {
@@ -35,8 +35,9 @@ const createSubspace = async (req, res) => {
 const joinSubspace = async (req, res) => {
     try {
         const { action, subspaceName } = req.query;
-        const { email } = jwt.decode(req.headers.authorization);
+        const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
         const subspace = await Subspace.findOne({ subspaceName: subspaceName });
+        console.log(req.session.user.userName);
         if (action === "true") {
             let updatedSubspacesJoined = req.session.user.subspacesJoined;
             updatedSubspacesJoined = [...updatedSubspacesJoined, {
@@ -57,7 +58,7 @@ const joinSubspace = async (req, res) => {
                 }
             );
             req.session.user.subspacesJoined = updatedSubspacesJoined;
-            res.status(200).json({ user: req.session.user });
+            res.status(200).json(req.session.user);
         } else if (action === "false") {
             let updatedSubspacesJoined = req.session.user.subspacesJoined;
             updatedSubspacesJoined = updatedSubspacesJoined.filter(subspace => subspace.name.replace(/ /g, "-") !== subspaceName);
@@ -73,10 +74,10 @@ const joinSubspace = async (req, res) => {
                     $inc: { membersCount: -1 }
                 }
             );
-            res.status(200).json({ user: req.session.user });
+            res.status(200).json(req.session.user);
         }
     // } catch (error) { res.status(404).json({ message: "Network error. Try again." }) }
-    } catch (error) { res.status(404).json({ message: error.message }) }
+    } catch (error) { res.status(404).json({ message: req.session.user.userName }) }
 }
 
 const fetchAllSubspaceInfo = async (req, res) => {

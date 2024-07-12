@@ -42,7 +42,7 @@ function Post(props) {
             </Box>
             {body ?
                 <Box>
-                    <Typography paragraph>{parse(body)}</Typography>
+                    <Typography component={"div"}>{parse(body)}</Typography>
                 </Box>
                 :
                 <></>

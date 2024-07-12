@@ -74,7 +74,7 @@ export const logoutUser = () => async (dispatch) => {
 export const updateProfile = (formData) => async (dispatch) => {
     try {
         const { data } = await api.updateProfile(formData);
-        dispatch({ type: UPDATE_PROFILE, payload: data.user });
+        dispatch({ type: UPDATE_PROFILE, payload: data });
         return { status: 200, result: data };
     } catch (error) { return handleError(error) }
 }

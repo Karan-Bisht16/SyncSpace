@@ -17,7 +17,7 @@ router.get("/createGoogleUser", auth, createGoogleUser);
 router.post("/signUp", signUp);
 router.post("/signIn", signIn);
 router.delete("/logout", auth, logout);
-// error h
+// error h: update kar raha h but error bhi de raha h ki status undefined ka read nahi kar sakta
 router.patch("/updateProfile", auth, updateProfile);
 // working
 router.patch("/changePassword", auth, changePassword);
