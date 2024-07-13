@@ -12,7 +12,8 @@ const styles = () => ({
         position: "relative"
     },
     bioContainer: {
-        height: "155px",
+        height: "auto",
+        maxHeight: "155px",
         width: { xs: "100%", md: "550px", lg: "175px" },
         paddingTop: "8px",
         wordBreak: "break-all",

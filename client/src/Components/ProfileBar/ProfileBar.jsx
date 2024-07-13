@@ -1,25 +1,15 @@
 import React, { useState } from "react";
-import { Typography, Grid, Box, Tooltip, IconButton } from "@mui/material";
-import { Link, DoneAll } from '@mui/icons-material';
+import { Box, Divider, Grid, IconButton, Tooltip, Typography } from "@mui/material";
+import { Link, DoneAll } from "@mui/icons-material";
 // Importing my components
 import { formatDate } from "../../utils/functions";
-import SnackBar from "../SnackBar/SnackBar";
 // Importing styling
 import styles from "./styles";
 
 function ProfileBar(props) {
-    const { user, userPosts } = props;
+    const { user, userPosts, setSnackbarValue, setSnackbarState } = props;
     const classes = styles();
 
-    // JS for SnackBar
-    const [snackbarState, setSnackbarState] = useState(false);
-    const [snackbarValue, setSnackbarValue] = useState({ message: "", status: "" });
-    function handleSnackbarState(event, reason) {
-        if (reason === "clickaway") {
-            return;
-        }
-        setSnackbarState(false);
-    }
     const [linkCopied, setLinkCopied] = useState(false);
     function handleLinkCopied() {
         navigator.clipboard.writeText(process.env.REACT_APP_DOMAIN + "/profile/" + user.userName)
@@ -66,11 +56,12 @@ function ProfileBar(props) {
                 {gridItemContainer(2, "", "")}
                 {gridItemContainer(5, user.subspacesJoinedCount, "Subspace joined", "Subspaces joined")}
             </Grid>
+            <br />
+            <Divider />
             <Box sx={classes.bioContainer}>
                 {user.bio}
             </Box>
-            <Typography sx={classes.gridItemTitle}>Bio</Typography>
-            <SnackBar openSnackbar={snackbarState} handleClose={handleSnackbarState} timeOut={5000} message={snackbarValue.message} type={snackbarValue.status} />
+            <Typography sx={{ fontSize: "12px", paddingTop: "4px" }}>Bio</Typography>
         </Grid >
     )
 }

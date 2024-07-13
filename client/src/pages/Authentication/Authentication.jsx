@@ -6,15 +6,14 @@ import { GoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 // Importing my components
-import SnackBar from "../../Components/SnackBar/SnackBar";
-// import InputField from "./InputField";
 import InputField from "../../Components/InputField/InputField";
 // Importing actions
 import { getGoogleUser, createGoogleUser, signUp, signIn } from "../../actions/user";
 // Importing styling
 import styles from "./styles";
 
-function Authentication() {
+function Authentication(props) {
+    const { setSnackbarValue, setSnackbarState } = props;
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -28,18 +27,6 @@ function Authentication() {
     const passwordField = useRef(null);
     const confirmPasswordField = useRef(null);
     const regexEmail = /^([a-zA-Z0-9_\.\-]+)@([a-zA-Z0-9_\.\-]+)\.([a-zA-Z]+)/;
-    // JS for Snackbar
-    const [snackbarState, setSnackbarState] = useState(false);
-    const [snackbarValue, setSnackbarValue] = useState({
-        message: "",
-        status: "",
-    });
-    function handleSnackbarState(event, reason) {
-        if (reason === "clickaway") {
-            return;
-        }
-        setSnackbarState(false);
-    }
     // JS for Dialog
     const [openDialog, setOpenDialog] = React.useState(false);
     const handleClickOpenDialog = () => {
@@ -189,6 +176,12 @@ function Authentication() {
                                         <InputField
                                             name={"userName"} label={"Username"} type={"text"} value={authData.userName}
                                             handleChange={handleChange} reference={nameField} autoFocus={true}
+                                            sx={{ display: { xs: "none", sm: "block" } }}
+                                        />
+                                        <InputField
+                                            name={"userName"} label={"Username"} type={"text"} value={authData.userName}
+                                            handleChange={handleChange} reference={nameField} autoFocus={false}
+                                            sx={{ display: { xs: "block", sm: "none" } }}
                                         />
                                     </Grid>
                                 )}
@@ -247,7 +240,6 @@ function Authentication() {
                     </Paper>
                 </Container>
             </Box>
-            <SnackBar openSnackbar={snackbarState} handleClose={handleSnackbarState} timeOut={5000} message={snackbarValue.message} type={snackbarValue.status} />
             <Dialog
                 open={openDialog}
                 onClose={handleCloseDialog}
@@ -255,10 +247,6 @@ function Authentication() {
                     component: "form",
                     onSubmit: (event) => {
                         event.preventDefault();
-                        const formData = new FormData(event.currentTarget);
-                        const formJson = Object.fromEntries(formData.entries());
-                        const userName = formJson.userName;
-                        console.log(userName);
                         handleCloseDialog();
                     },
                 }}

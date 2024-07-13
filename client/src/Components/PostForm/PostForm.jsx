@@ -7,14 +7,13 @@ import ConfirmationDialog from "../ConfirmationDialog/ConfirmationDialog";
 import CustomJoditEditor from "../CustomJoditEditor/CustomJoditEditor";
 import FileUpload from "../FileUpload/FileUpload";
 import { ColorModeContext } from "../../store";
-import SnackBar from "../SnackBar/SnackBar";
 // Importing actions
 import { createPost } from "../../actions/post";
 // Importing styling
-import styles from "./styles"
+import styles from "./styles";
 
 function PostForm(props) {
-    const { user, previousSubspace } = props;
+    const { user, previousSubspace, setSnackbarValue, setSnackbarState } = props;
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -26,21 +25,12 @@ function PostForm(props) {
     const [postData, setPostData] = useState({
         subspaceId: "",
         subspaceName: "",
-        author: user._id,
+        authorId: user._id,
         authorName: user.userName,
         title: "",
         body: "",
         selectedFile: [],
     });
-    // JS for SnackBar
-    const [snackbarState, setSnackbarState] = useState(false);
-    const [snackbarValue, setSnackbarValue] = useState({ message: "", status: "" });
-    function handleSnackbarState(event, reason) {
-        if (reason === "clickaway") {
-            return;
-        }
-        setSnackbarState(false);
-    }
     // JS for Dialog
     const [dialog, setDialog] = useState(false);
     const [dialogValue, setDialogValue] = useState({
@@ -117,7 +107,7 @@ function PostForm(props) {
         event.forEach(file => {
             let fileSize = Number(file.size.slice(0, file.size.length - 2));
             if (fileSize <= process.env.REACT_APP_POST_FILE_SIZE) {
-                filesArray.push(file.base64);
+                filesArray.push({ file: file.base64, type: file.type });
             } else {
                 flag = true;
             }
@@ -153,20 +143,12 @@ function PostForm(props) {
     // Clear Form 
     function handleClear() {
         if (predefinedSubspace) {
-            setPostData({
-                author: user._id,
-                title: "",
-                body: "",
-                selectedFile: [],
+            setPostData(prevPostData => {
+                return { ...prevPostData, "title": "", "body": "" };
             });
         } else {
-            setPostData({
-                subspaceId: "",
-                subspaceName: "",
-                author: user._id,
-                title: "",
-                body: "",
-                selectedFile: [],
+            setPostData(prevPostData => {
+                return { ...prevPostData, "subspaceId": "", "subspaceName": "", "title": "", "body": ""};
             });
         }
         resetSelectedFiles();
@@ -266,17 +248,21 @@ function PostForm(props) {
                                     )}
                                 />
                                 :
-                                <TextField disabled id="standard-basic" label="Subspace" variant="standard" value={predefinedSubspace.subspaceName || "Error"} />
+                                <TextField readOnly disabled id="standard-basic" label={predefinedSubspace.subspaceName} variant="standard" />
                             }
                         </>
                     }
                 </div>
-                <TextField
-                    name="title" id="outlined-required" label="Title"
-                    sx={{ my: 2 }} autoFocus inputRef={titleTextField}
-                    value={postData.title} onChange={handleTitleChange}
-                    autoComplete="off" required fullWidth
-                />
+                <>
+                    <TextField
+                        name="title" id="outlined-required" label="Title" value={postData.title} onChange={handleTitleChange} inputRef={titleTextField}
+                        autoComplete="off" required fullWidth autoFocus sx={{ my: 2, display: { xs: "none", sm: "block" } }}
+                    />
+                    <TextField
+                        name="title" id="outlined-required" label="Title" value={postData.title} onChange={handleTitleChange} inputRef={titleTextField}
+                        autoComplete="off" required fullWidth sx={{ my: 2, display: { xs: "block", sm: "none" } }}
+                    />
+                </>
                 <Box sx={{ width: "100%" }}>
                     <Tabs
                         value={tabIndex}
@@ -299,13 +285,12 @@ function PostForm(props) {
                 <Box sx={{ display: tabIndex === "2" ? "block" : "none" }}>
                     <FileUpload isMultiple={true} handleFileUpload={handleFileUpload} resetSelectedFiles={resetSelectedFiles} />
                 </Box>
-                <br></br>
+                <br />
                 <Box sx={{ float: "right" }}>
                     <Button variant="outlined" size="large" onClick={handleClear} sx={classes.clearBtn}>Clear</Button>
                     <Button variant="contained" color="primary" size="large" type="submit" sx={classes.postBtn}>Post</Button>
                 </Box>
             </form>
-            <SnackBar openSnackbar={snackbarState} handleClose={handleSnackbarState} timeOut={5000} message={snackbarValue.message} type={snackbarValue.status} />
             <ConfirmationDialog dialog={dialog} closeDialog={closeDialog} handleDialog={handleDialog} linearProgressBar={linearProgressBar} dialogValue={dialogValue} />
         </div>
     );

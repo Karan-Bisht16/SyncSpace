@@ -7,8 +7,8 @@ import Post from "./Post/Post";
 import styles from "./styles";
 
 function Posts(props) {
+    const { posts, setSnackbarValue, setSnackbarState } = props;
     const classes = styles();
-    const { posts } = props;
 
     lineSpinner.register("l-loader");
 
@@ -21,7 +21,7 @@ function Posts(props) {
                 :
                 <>
                     {posts.map((post, index) => (
-                        <Post key={index} post={post}></Post>
+                        <Post key={index} post={post} setSnackbarValue={setSnackbarValue} setSnackbarState={setSnackbarState} />
                     ))}
                 </>
             }

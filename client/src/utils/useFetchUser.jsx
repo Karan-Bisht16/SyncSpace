@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserSession } from "../actions/user";
 
-const useFetchUser = (setSnackbarFunction) => {
+const useFetchUser = (setSnackbarValue, setSnackbarState) => {
     const dispatch = useDispatch();
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -22,7 +22,8 @@ const useFetchUser = (setSnackbarFunction) => {
                     const { status, result } = await dispatch(fetchUserSession());
                     if (status === 503) {
                         setUser(false);
-                        setSnackbarFunction(true);
+                        setSnackbarValue({ message: "Server is down. Try again later.", status: "error" });
+                        setSnackbarState(true);
                     } else if (status === 404) {
                         setUser(false);
                     } else if (status === 409) {
@@ -38,7 +39,7 @@ const useFetchUser = (setSnackbarFunction) => {
             }
         }
         fetchUser();
-    }, [dispatch, user, setSnackbarFunction]);
+    }, [dispatch, user, setSnackbarValue, setSnackbarState]);
 
     return { user, loading };
 };

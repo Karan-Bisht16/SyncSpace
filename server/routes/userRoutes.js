@@ -5,21 +5,15 @@ import { fetchUserSession, fetchUserInfo, fetchUserPosts, updateProfile, changeP
 
 const router = express.Router();
 
-// I think working but not sure
 router.get("/session", auth, fetchUserSession);
 router.get("/", auth, fetchUserInfo);
-// working
 router.get("/posts", auth, fetchUserPosts);
-// cannot try
-router.get("/getGoogleUser", auth, getGoogleUser);
-router.get("/createGoogleUser", auth, createGoogleUser);
-// working
+router.get("/getGoogleUser", getGoogleUser);
+router.get("/createGoogleUser", createGoogleUser);
 router.post("/signUp", signUp);
 router.post("/signIn", signIn);
 router.delete("/logout", auth, logout);
-// error h: update kar raha h but error bhi de raha h ki status undefined ka read nahi kar sakta
 router.patch("/updateProfile", auth, updateProfile);
-// working
 router.patch("/changePassword", auth, changePassword);
 router.delete("/deleteProfile", auth, deleteProfile);
 

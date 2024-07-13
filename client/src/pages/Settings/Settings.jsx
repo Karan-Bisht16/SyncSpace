@@ -5,17 +5,17 @@ import { useDispatch } from "react-redux";
 // Importing my components
 import ConfirmationDialog from "../../Components/ConfirmationDialog/ConfirmationDialog";
 import InputField from "../../Components/InputField/InputField";
-import SnackBar from "../../Components/SnackBar/SnackBar";
 // Importing actions
 import { changePassword, deleteProfile } from "../../actions/user";
 // Importing styling
 import styles from "./styles";
 
 function Settings(props) {
-    // const { user } = props;
+    const { setSnackbarValue, setSnackbarState } = props;
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
     useEffect(() => {
         // Setting webpage title
         document.title = "SyncSpace: Settings";
@@ -32,15 +32,6 @@ function Settings(props) {
         newPassword: "",
         confirmPassword: "",
     });
-    // JS for SnackBar
-    const [snackbarState, setSnackbarState] = useState(false);
-    const [snackbarValue, setSnackbarValue] = useState({ message: "", status: "" });
-    function handleSnackbarState(event, reason) {
-        if (reason === "clickaway") {
-            return;
-        }
-        setSnackbarState(false);
-    }
     function handleChange(event) {
         const { name, value } = event.target;
         setFormData(prevFormData => {
@@ -99,9 +90,6 @@ function Settings(props) {
 
         openDialog({ title: "Change Password", message: "Be sure to remember your new password", cancelBtnText: "Cancel", submitBtnText: "Change" });
     }
-    function handleDelete() {
-        openDialog({ title: "Delete Profile", message: "This is action is irreversible. Please be certain", cancelBtnText: "Cancel", submitBtnText: "Delete", type: "error" });
-    }
     const [linearProgressBar, setLinearProgressBar] = useState(false);
     function handleResult(status, result, type, snackbarMessage) {
         closeDialog();
@@ -134,20 +122,23 @@ function Settings(props) {
             setLinearProgressBar(false);
         }
     }
+    function handleDelete() {
+        openDialog({ title: "Delete Profile", message: "This is action is irreversible. Please be certain", cancelBtnText: "Cancel", submitBtnText: "Delete", type: "error" });
+    }
 
     return (
         <Grid container sx={{ display: "flex" }}>
             <Grid item xs={0} md={2} sx={classes.leftContainer}></Grid>
             <Box sx={classes.mainContainer}>
                 <Typography variant="h4">Settings</Typography>
-                {(token && token.length < 500) ?
+                {(token && token.length < 500) &&
                     <>
                         <Typography variant="h5" sx={classes.titleField}>Change Password</Typography>
                         <Divider />
                         <form noValidate onSubmit={handleChangePassword}>
                             <InputField
                                 name="currentPassword" label="Current Password" value={formData.currentPassword} type="text"
-                                handleChange={handleChange} reference={currentPasswordField} autoFocus={true}
+                                handleChange={handleChange} reference={currentPasswordField}
                             />
                             <InputField
                                 name="newPassword" label="New Password" value={formData.newPassword} type="text"
@@ -163,15 +154,14 @@ function Settings(props) {
                             </Box>
                         </form>
                     </>
-                    :
-                    <></>
                 }
                 <Typography variant="h5" sx={classes.titleField}>Account Settings</Typography>
                 <Divider />
-                <Typography paragraph sx={{ margin: "8px 0" }}>Once you delete your account, there is no going back. Please be certain.</Typography>
+                <Typography paragraph sx={{ margin: "8px 0" }}>
+                    Once you delete your account, there is no going back. Please be certain.
+                </Typography>
                 <Button variant="contained" color="error" onClick={handleDelete}>Delete Account</Button>
             </Box>
-            <SnackBar openSnackbar={snackbarState} handleClose={handleSnackbarState} timeOut={5000} message={snackbarValue.message} type={snackbarValue.status} />
             <ConfirmationDialog dialog={dialog} closeDialog={closeDialog} handleDialog={handleDialog} linearProgressBar={linearProgressBar} dialogValue={dialogValue} />
         </Grid>
     );

@@ -8,12 +8,13 @@ const post_Schema = new mongoose.Schema({
     title: { type: String, required: true, trim: true },
     body: { type: String },
     selectedFile: { type: Array },
-    author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    authorId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     authorName: { type: String, trim: true, required: true },
     subspaceId: { type: mongoose.Schema.Types.ObjectId, ref: "SubSpace", required: true },
     subspaceName: { type: String, trim: true, required: true },
     dateCreated: { type: Date, default: Date.now },
     likes: { type: Number, default: 0 },
+    edited: { type: Boolean, default: false },
     comments: {
         type: [condenseCommentSchema],
         default: []

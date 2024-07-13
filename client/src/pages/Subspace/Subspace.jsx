@@ -6,7 +6,6 @@ import { lineSpinner } from "ldrs"
 // Importing my components
 import ConfirmationDialog from "../../Components/ConfirmationDialog/ConfirmationDialog";
 import NotFound from "../../Components/NotFound/NotFound";
-import SnackBar from "../../Components/SnackBar/SnackBar";
 import { formatMembersCount } from "../../utils/functions";
 import Posts from "../../Components/Posts/Posts";
 // Importing actions
@@ -15,7 +14,7 @@ import { fetchAllSubspaceInfo, joinSubspace } from "../../actions/subspace";
 import styles from "./styles";
 
 function Subspace(props) {
-    const { user } = props;
+    const { user, setSnackbarValue, setSnackbarState } = props;
     const { name } = useParams();
     const subspaceName = name.replace(/ /g, "-");
     const classes = styles();
@@ -29,15 +28,6 @@ function Subspace(props) {
         setSecondaryLoading(true);
         setNoSubspaceFound(false);
     }, [subspaceName]);
-    // JS for SnackBar
-    const [snackbarState, setSnackbarState] = useState(false);
-    const [snackbarValue, setSnackbarValue] = useState({ message: "", status: "" });
-    function handleSnackbarState(event, reason) {
-        if (reason === "clickaway") {
-            return;
-        }
-        setSnackbarState(false);
-    }
     // JS for Dialog
     const [dialog, setDialog] = useState(false);
     const [dialogValue, setDialogValue] = useState({
@@ -98,7 +88,7 @@ function Subspace(props) {
             }
         }
         getSubspaceInfo();
-    }, [subspaceName, user, dispatch]);
+    }, [subspaceName, user, dispatch, setSnackbarValue, setSnackbarState]);
 
     function handleCreate() {
         if (!user) {
@@ -194,14 +184,26 @@ function Subspace(props) {
                                     <>
                                         {subspacePosts.length === 0 ?
                                             <Box sx={classes.postContainer}>
-                                                <NotFound
-                                                    mainText="No post in this subspace"
-                                                    link={{ linkText: "Create one", to: "/create-post", state: { subspaceName } }}
-                                                />
+                                                <>
+                                                    {joined ?
+                                                        <NotFound
+                                                            mainText="No post in this subspace"
+                                                            link={{ linkText: "Create one", to: "/create-post", state: { subspaceName } }}
+                                                        />
+                                                        :
+                                                        <Box sx={{ textAlign: "center" }}>
+                                                            <NotFound
+                                                                mainText="No post in this subspace"
+                                                                link={false}
+                                                            />
+                                                            <Typography sx={classes.link} onClick={handleCreate}>Create One</Typography>
+                                                        </Box>
+                                                    }
+                                                </>
                                             </Box>
                                             :
                                             <Box sx={{ width: "auto", minWidth: { xs: "99%", md: "65%", lg: "75%" }, margin: "0 auto", padding: "32px 16px" }}>
-                                                <Posts posts={subspacePosts} />
+                                                <Posts posts={subspacePosts} setSnackbarValue={setSnackbarValue} setSnackbarState={setSnackbarState} />
                                             </Box>
                                         }
                                     </>
@@ -211,7 +213,6 @@ function Subspace(props) {
                     </>
                 }
             </Box>
-            <SnackBar openSnackbar={snackbarState} handleClose={handleSnackbarState} timeOut={5000} message={snackbarValue.message} type={snackbarValue.status} />
             <ConfirmationDialog dialog={dialog} closeDialog={closeDialog} handleDialog={handleDialog} linearProgressBar={linearProgressBar} dialogValue={dialogValue} />
         </Grid>
     );

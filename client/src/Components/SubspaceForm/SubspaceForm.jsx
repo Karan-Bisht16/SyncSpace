@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Button, Box, Chip, Grid, Stepper, Step, StepLabel, Typography } from "@mui/material";
+import { Button, Box, Chip, Divider, Grid, Stepper, Step, StepLabel, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 // Importing my components
@@ -8,14 +8,13 @@ import ConfirmationDialog from "../ConfirmationDialog/ConfirmationDialog";
 import preDefinedTopics from "../../assets/preDefinedTopics";
 import InputField from "../InputField/InputField";
 import FileUpload from "../FileUpload/FileUpload";
-import SnackBar from "../SnackBar/SnackBar";
 // Importing actions
 import { createSubspace } from "../../actions/subspace";
 // Importing styling
 import styles from "./styles"
 
 function SubspaceForm(props) {
-    const { user } = props;
+    const { user, setSnackbarValue, setSnackbarState } = props;
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -36,15 +35,6 @@ function SubspaceForm(props) {
         moderators: [creator],
         topics: [],
     });
-    // JS for SnackBar
-    const [snackbarState, setSnackbarState] = useState(false);
-    const [snackbarValue, setSnackbarValue] = useState({ message: "", status: "" });
-    function handleSnackbarState(event, reason) {
-        if (reason === "clickaway") {
-            return;
-        }
-        setSnackbarState(false);
-    }
     // JS for Dialog
     const [dialog, setDialog] = useState(false);
     const [dialogValue, setDialogValue] = useState({
@@ -63,7 +53,7 @@ function SubspaceForm(props) {
     };
     // JS for Stepper
     const steps = ["Add name", "Add styling", "Add topics"]
-    const [activeStep, setActiveStep] = React.useState(0);
+    const [activeStep, setActiveStep] = useState(0);
     function handleNext() {
         if (activeStep === 0) {
             if (handleFirstSubmit()) {
@@ -97,6 +87,13 @@ function SubspaceForm(props) {
             }
             return [...prevTopicsArray];
         });
+    }
+    function getFormattedChip(data) {
+        if (!data.label) {
+            return (<div key={data.key} style={classes.chipDivider}><Divider /></div>);
+        } else {
+            return (<Chip key={data.key} label={data.label} onClick={() => handleTopicSelection(data)} />);
+        }
     }
     // File Upload
     function handleFileUpload(file) {
@@ -205,12 +202,17 @@ function SubspaceForm(props) {
 
     return (
         <div>
-            <Grid container sx={classes.subContainer}>
-                <Grid item xs={12} lg={8.75} sx={classes.postContainer}>
+            <Grid container>
+                <Grid item xs={12} lg={8.75}>
                     <Box>
-                        <Typography variant="h4" sx={{ marginBottom: { xs: "241px", lg: "24px" } }}>Create Subspace</Typography>
-                        <form noValidate onSubmit={handleSubmit} style={classes.formContainer}>
-                            {activeStep === 0 &&
+                        {(activeStep === 0 || activeStep === 1) &&
+                            <Typography variant="h4" sx={{ marginBottom: { xs: "241px", lg: "24px" } }}>Create Subspace</Typography>
+                        }
+                        {(activeStep === 2) &&
+                            <Typography variant="h4" sx={{ marginBottom: { xs: "24px", sm: "241px", lg: "24px" } }}>Create Subspace</Typography>
+                        }
+                        <form noValidate onSubmit={handleSubmit}>
+                            {(activeStep === 0) &&
                                 <>
                                     <InputField
                                         name="name" label="Name" value={subspaceData.name} type="text"
@@ -222,23 +224,22 @@ function SubspaceForm(props) {
                                     />
                                     <hr />
                                 </>
-                            }
-                            {activeStep === 1 &&
+                            } {(activeStep === 1) &&
                                 <>
                                     <FileUpload handleFileUpload={handleFileUpload} resetSelectedFiles={resetSelectedFiles} />
                                     <hr />
                                 </>
-                            }
-                            {activeStep === 2 &&
+                            } {(activeStep === 2) &&
                                 <Box sx={classes.topicsContainer}>
-                                    <Box sx={{ bgcolor: "background.secondary", borderRadius: "16px", padding: "4px 16px" }}>
+                                    <Box sx={classes.selectedChipContainer}>
                                         <Box>
                                             {!topicsArray.length ?
                                                 <p>Choose atleast 5 topics from below</p> :
                                                 <div style={{ padding: "12px 0", display: "flex", flexWrap: "wrap", gap: "5px" }}>
                                                     {topicsArray.map(data => {
                                                         return (
-                                                            <Chip key={data.key}
+                                                            <Chip
+                                                                key={data.key}
                                                                 label={data.label}
                                                                 color="primary"
                                                                 onDelete={() => handleTopicDeletion(data)}
@@ -251,15 +252,7 @@ function SubspaceForm(props) {
                                     </Box>
                                     <hr />
                                     <Box sx={classes.chipContainer}>
-                                        {preDefinedTopics.map(data => {
-                                            return (
-                                                <Chip key={data.key}
-                                                    label={data.label}
-                                                    onClick={() => handleTopicSelection(data)}
-                                                />
-                                            );
-                                        })}
-
+                                        {preDefinedTopics.map(data => { return (getFormattedChip(data)) })}
                                     </Box>
                                     <hr />
                                     <Box sx={{ marginTop: "15px" }}>
@@ -273,8 +266,7 @@ function SubspaceForm(props) {
 
                                     </Box>
                                 </Box>
-                            }
-                            {(activeStep === 1) &&
+                            } {(activeStep === 1) &&
                                 <Box sx={{ float: "left" }}>
                                     <Button variant="outlined" size="large" sx={classes.resetBtn} onClick={handleBack}>Back</Button>
                                 </Box>
@@ -287,7 +279,7 @@ function SubspaceForm(props) {
                     </Box>
                 </Grid>
                 <Grid item lg={0.25}></Grid>
-                <RealTimeSubspaceViewer subspaceData={subspaceData} />
+                <RealTimeSubspaceViewer subspaceData={subspaceData} activeStep={activeStep} />
             </Grid>
 
             <Box sx={classes.stepperContainer}>
@@ -301,7 +293,6 @@ function SubspaceForm(props) {
                     })}
                 </Stepper>
             </Box>
-            <SnackBar openSnackbar={snackbarState} handleClose={handleSnackbarState} timeOut={5000} message={snackbarValue.message} type={snackbarValue.status} />
             <ConfirmationDialog dialog={dialog} closeDialog={closeDialog} handleDialog={handleDialog} linearProgressBar={linearProgressBar} dialogValue={dialogValue} />
         </div>
     );

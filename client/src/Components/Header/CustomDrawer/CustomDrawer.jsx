@@ -1,21 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import { Avatar, Box, Typography, List, ListItem, ListItemButton, ListItemText, ListItemIcon, Divider, Collapse } from "@mui/material"
 import { TrendingUpRounded, ExpandLess, ExpandMore, ForumTwoTone, GroupAddOutlined, PersonAddAlt1 } from "@mui/icons-material";
 import { NavLink, useNavigate } from "react-router-dom";
+import { hatch } from "ldrs";
 // Importing styling
 import styles from "./styles";
 // Importing images
 import SyncSpaceLogo from "../../../assets/img-syncspace-logo.avif";
-import { hatch } from "ldrs"
 
 function CustomDrawer(props) {
     const { user, handleDrawerClose } = props;
     const classes = styles();
     const navigate = useNavigate();
-    hatch.register("l-all")
 
     const mainSubspaces = [{ name: "Universe" }, { name: "Trending" }];
-    const [open, setOpen] = React.useState(true);
+    const [open, setOpen] = useState(true);
     function handleClick() {
         setOpen(!open);
     };
@@ -31,6 +30,7 @@ function CustomDrawer(props) {
         handleDrawerClose();
         navigate("/ss/" + name.replace(/ /g, "-"));
     }
+    hatch.register("l-all");
 
     return (
         <div>

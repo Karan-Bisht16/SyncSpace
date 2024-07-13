@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import RealTimeProfileViwer from "./RealTimeProfileViewer/RealTimeProfileViewer";
 import InputField from "../../Components/InputField/InputField";
 import ProfileBar from "../../Components/ProfileBar/ProfileBar";
-import SnackBar from "../../Components/SnackBar/SnackBar";
+// import SnackBar from "../../Components/SnackBar/SnackBar";
 import Posts from "../../Components/Posts/Posts";
 // Importing actions
 import { fetchUserInfo, fetchUserPosts, updateProfile } from "../../actions/user";
@@ -15,29 +15,23 @@ import { fetchUserInfo, fetchUserPosts, updateProfile } from "../../actions/user
 import styles from "./styles";
 import NotFound from "../../Components/NotFound/NotFound";
 
-function Account() {
+function Account(props) {
+    const { setSnackbarValue, setSnackbarState } = props;
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    
     useEffect(() => {
         // Setting webpage title
         document.title = "SyncSpace";
-    }, []);
+    });
 
     const token = localStorage.getItem("token");
     if (!token) { navigate("/authentication"); }
+
     const nameField = useRef(null);
     const emailField = useRef(null);
     const bioField = useRef(null);
-    // JS for SnackBar
-    const [snackbarState, setSnackbarState] = useState(false);
-    const [snackbarValue, setSnackbarValue] = useState({ message: "", status: "" });
-    function handleSnackbarState(event, reason) {
-        if (reason === "clickaway") {
-            return;
-        }
-        setSnackbarState(false);
-    }
     // Fetching user info
     const [user, setUser] = useState(null);
     const [userPosts, setUserPosts] = useState([]);
@@ -76,7 +70,7 @@ function Account() {
             }
         }
         getUserInfo();
-    }, [dispatch, user]);
+    }, [dispatch, user, setSnackbarValue, setSnackbarState]);
     function userPostsBlock(userPosts) {
         if (userPosts.length === 0) {
             return (
@@ -86,7 +80,7 @@ function Account() {
             );
         }
         return (
-            <Posts posts={userPosts} />
+            <Posts posts={userPosts} setSnackbarValue={setSnackbarValue} setSnackbarState={setSnackbarState} />
         );
     }
     const [editProfile, setEditProfile] = useState(false);
@@ -122,7 +116,11 @@ function Account() {
         try {
             const { status, result } = await dispatch(updateProfile(formData));
             if (status === 200) {
-                navigate(-1);
+                setEditProfile(false);
+                setUser(prevUser => {
+                    return { ...prevUser, name: formData.name, userName: formData.name.replace(/ /g, "-"), bio: formData.bio }
+                });
+                navigate("/account", { state: { message: "Account updated successfully!", status: "success" } });
             } else {
                 setSnackbarValue({ message: result.message, status: "error" });
                 setSnackbarState(true);
@@ -169,11 +167,11 @@ function Account() {
                         {!editProfile ?
                             <>
                                 <Grid container sx={classes.subContainer}>
-                                    <Grid item md={8.75} sx={Object.assign({ display: { xs: "none", lg: "block" } }, classes.postContainer)}>
+                                    <Grid item xs={12} lg={8.75} sx={Object.assign({ display: { xs: "none", lg: "block" } }, classes.postContainer)}>
                                         {userPostsBlock(userPosts)}
                                     </Grid>
                                     <Grid item md={0.25}></Grid>
-                                    <ProfileBar user={user} userPosts={userPosts} />
+                                    <ProfileBar user={user} userPosts={userPosts} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />
                                 </Grid>
                                 <Box sx={Object.assign({ display: { xs: "block", lg: "none" } }, classes.postContainer)}>
                                     {userPostsBlock(userPosts)}
@@ -185,11 +183,16 @@ function Account() {
                                     <Grid item xs={12} lg={8.75} sx={classes.postContainer}>
                                         <Box>
                                             <Typography variant="h5" sx={classes.titleField}>Update Profile</Typography>
-                                            <Divider />
                                             <form noValidate onSubmit={handleSubmit}>
                                                 <InputField
                                                     name="name" label="Name" value={formData.name} type="text"
                                                     handleChange={handleChange} reference={nameField} autoFocus={true}
+                                                    sx={{ display: { xs: "none", sm: "flex" } }}
+                                                />
+                                                <InputField
+                                                    name="name" label="Name" value={formData.name} type="text"
+                                                    handleChange={handleChange} reference={nameField} autoFocus={false}
+                                                    sx={{ display: { xs: "flex", sm: "none" } }}
                                                 />
                                                 <InputField
                                                     name="bio" label="Bio" value={formData.bio} type="text"
@@ -217,7 +220,6 @@ function Account() {
                     </>
                 }
             </Box>
-            <SnackBar openSnackbar={snackbarState} handleClose={handleSnackbarState} timeOut={5000} message={snackbarValue.message} type={snackbarValue.status} />
         </Grid>
     );
 }

@@ -1,12 +1,11 @@
+import "dotenv/config";
 import cors from "cors";
+import express from "express";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import session from "express-session";
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-import "dotenv/config";
-import express from "express";
 import methodOverride from "method-override";
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -19,18 +18,20 @@ app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 app.use(methodOverride("_method"));
 app.use(express.static(__dirname + "/public"));
 
+import mongoose from "mongoose";
+import connection from "./database.js";
+connection();
+
 // cors() must be present above routes
+// origin: [process.env.FRONT_END_DOMAIN_1, process.env.FRONT_END_DOMAIN_2, process.env.FRONT_END_DOMAIN_3],
+// app.use(cors());
+
 const corsOptions = {
     origin: true,
     credentials: true,
     optionsSuccessStatus: 200,
 }
-app.use(cors(corsOptions))
-// app.use(cors());
-
-import mongoose from "mongoose";
-import connection from "./database.js";
-connection();
+app.use(cors(corsOptions));
 
 import MongoStore from "connect-mongo";
 const mongoStore = MongoStore.create({
@@ -44,10 +45,13 @@ const mongoStore = MongoStore.create({
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     store: mongoStore,
     cookie: {
         maxAge: 365 * 24 * 60 * 60 * 1000,
+        // httpOnly: true,
+        // secure: process.env.NODE_ENV === "production",
+        // sameSite: 'lax',
     }
 }));
 

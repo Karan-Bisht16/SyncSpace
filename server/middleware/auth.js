@@ -14,10 +14,6 @@ const auth = (req, res, next) => {
             } else if (token && !isCustomToken) {
                 decodedData = jwt.decode(token);
             }
-            console.log(req.session.user._id);
-            console.log(req.session.user.userName);
-            console.log(req.session.user.subspacesJoined.length);
-            console.log("valid token");
             next();
         } catch (error) {
             console.log(error.message);

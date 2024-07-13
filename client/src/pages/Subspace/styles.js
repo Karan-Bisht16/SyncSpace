@@ -25,7 +25,6 @@ const styles = () => ({
     subspaceDescription: { fontSize: { xs: "14px", sm: "16px" }, maxHeight: "50px", overflow: "scroll", wordBreak: "break-all", hyphens: "auto" },
     subspaceOperation: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px" },
     subspaceBtn: { float: "right", display: "flex", gap: "8px", alignItems: "center" },
-
     subspaceString: { fontSize: "12px", width: "18px", minWidth: "18px" },
     btn: { width: { xs: "110px", sm: "125px" }, borderRadius: "100px", fontSize: { xs: "12px", sm: "16px" } },
     notJoinedBtn: {
@@ -45,7 +44,8 @@ const styles = () => ({
         alignItems: "center",
         borderRadius: "16px",
         bgcolor: "background.backdrop"
-    }
+    },
+    link: { color: "#0090c1", fontSize: "20px", textDecoration: "none", cursor: "pointer" }
 });
 
 export default styles;

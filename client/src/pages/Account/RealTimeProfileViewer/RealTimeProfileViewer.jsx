@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Divider, Grid, Typography } from "@mui/material";
 // Importing my components
 import { formatDate } from "../../../utils/functions";
 // Importing styling
@@ -37,12 +37,14 @@ function RealTimeProfileViwer(props) {
                 {gridItemContainer(5, user.credits, "Celestial Credit", "Celestial Credits")}
                 {gridItemContainer(5, user.postsCount, "Post", "Posts")}
                 {gridItemContainer(2, "", "")}
-                {gridItemContainer(12, user.subspacesJoinedCount, "Subspace joined", "Subspaces joined")}
+                {gridItemContainer(5, user.subspacesJoinedCount, "Subspace joined", "Subspaces joined")}
             </Grid>
+            <br />
+            <Divider />
             <Box sx={classes.bioContainer}>
                 {formData.bio}
             </Box>
-            <Typography sx={classes.gridItemTitle}>Bio</Typography>
+            <Typography sx={{ fontSize: "12px", paddingTop: "4px" }}>Bio</Typography>
         </Grid >
     );
 }

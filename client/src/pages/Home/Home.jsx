@@ -9,7 +9,7 @@ import { getPosts } from "../../actions/post"
 import styles from "./styles";
 
 function Home(props) {
-    // const { user } = props;
+    const { setSnackbarValue, setSnackbarState } = props;
     const classes = styles();
     const dispatch = useDispatch();
 
@@ -26,7 +26,7 @@ function Home(props) {
         <Grid container sx={{ display: "flex" }}>
             <Grid item xs={0} md={2} sx={classes.leftContainer}></Grid>
             <Box sx={classes.mainContainer}>
-                <Posts posts={posts} />
+                <Posts posts={posts} setSnackbarValue={setSnackbarValue} setSnackbarState={setSnackbarState} />
             </Box>
         </Grid>
     );

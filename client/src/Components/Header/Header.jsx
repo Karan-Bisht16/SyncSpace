@@ -1,12 +1,11 @@
-import React, { useState, useContext, useEffect, useCallback } from "react";
+import React, { useEffect, useContext, useCallback } from "react";
 import { AppBar, Typography, Button, Box, Drawer, Toolbar, IconButton, CssBaseline } from "@mui/material";
 import { Menu, Add } from "@mui/icons-material";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 // Importing my components
-import SnackBar from "../SnackBar/SnackBar";
-import ToolBar from "../ToolBar/ToolBar";
 import CustomDrawer from "./CustomDrawer/CustomDrawer";
+import ToolBar from "../ToolBar/ToolBar";
 import { ColorModeContext } from "../../store";
 // Importing actions
 import { logoutUser } from "../../actions/user";
@@ -16,21 +15,12 @@ import styles from "./styles";
 import SyncSpaceLogo from "../../assets/img-syncspace-logo.avif";
 
 function Header(props) {
-    const { user } = props;
+    const { user, setSnackbarValue, setSnackbarState } = props;
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
 
-    // JS for Snackbar
-    const [snackbarState, setSnackbarState] = useState(false);
-    const [snackbarValue, setSnackbarValue] = useState({ message: "", status: "" });
-    function handleSnackbarState(event, reason) {
-        if (reason === "clickaway") {
-            return;
-        }
-        setSnackbarState(false);
-    }
     // JS for Toggle Theme
     const { mode, toggleMode } = useContext(ColorModeContext);
     function setDarkMode() {
@@ -87,7 +77,7 @@ function Header(props) {
             setSnackbarState(true);
             setSnackbarValue({ message: location.state.message, status: location.state.status });
         }
-    }, [mode, toggleBodyTheme, toggleMode, location.state]);
+    }, [mode, toggleBodyTheme, toggleMode, location.state, setSnackbarValue, setSnackbarState]);
 
     return (
         <>
@@ -104,17 +94,19 @@ function Header(props) {
                             <Menu />
                         </IconButton>
                     </Toolbar>
-                    <Box component={Link} to="/" sx={classes.logoTitle}>
-                        <img style={classes.logo} src={SyncSpaceLogo} alt="Logo of SyncSpace"></img>
-                        <Typography align="center" variant="h5" sx={{ color: "white", display: { xs: "none", sm: "flex" } }}>SyncSpace</Typography>
+                    <Box component={Link} to="/" sx={classes.titleComponent}>
+                        <img style={classes.logo} src={SyncSpaceLogo} alt="Logo of SyncSpace" />
+                        <Typography align="center" variant="h5" sx={classes.title}>SyncSpace</Typography>
                     </Box>
                 </div>
                 {user ?
                     <Box sx={classes.flexContainer}>
-                        <Button component={Link} to="/create-post" variant="contained"
+                        <Button
+                            component={Link} to="/create-post" variant="contained"
                             sx={Object.assign({ display: { xs: "none", sm: "flex" } }, classes.createPostBtn)}
                         >+ Create</Button>
-                        <Button component={Link} to="/create-post" variant="contained"
+                        <Button
+                            component={Link} to="/create-post" variant="contained"
                             sx={Object.assign({ display: { xs: "flex", sm: "none" } }, classes.createPostBtn, classes.createPostBtnXS)}
                         ><Add /></Button>
                         <ToolBar
@@ -131,9 +123,8 @@ function Header(props) {
             <Box sx={classes.flexContainer}>
                 <CssBaseline />
                 <Box
-                    component="nav"
+                    component="nav" aria-label="mailbox folders"
                     sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-                    aria-label="mailbox folders"
                 >
                     <Drawer
                         variant="temporary"
@@ -146,9 +137,8 @@ function Header(props) {
                         <CustomDrawer user={user} handleDrawerClose={handleDrawerClose} />
                     </Drawer>
                     <Drawer
-                        variant="permanent"
+                        variant="permanent" open
                         sx={{ display: { xs: "none", md: "block" }, "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth } }}
-                        open
                     >
                         <CustomDrawer user={user} handleDrawerClose={handleDrawerClose} />
                     </Drawer>
@@ -157,7 +147,6 @@ function Header(props) {
                     <Toolbar />
                 </Box>
             </Box>
-            <SnackBar openSnackbar={snackbarState} handleClose={handleSnackbarState} timeOut={5000} message={snackbarValue.message} type={snackbarValue.status} />
         </>
     );
 }

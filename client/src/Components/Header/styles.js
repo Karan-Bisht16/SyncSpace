@@ -14,7 +14,7 @@ const styles = () => ({
     flexContainer: { display: "flex", alignItems: "center" },
     sideBar: { display: { sm: "flex", md: "none" }, paddingRight: "12px" },
     logo: { width: "45px", height: "45px", borderRadius: "50%" },
-    logoTitle: {
+    titleComponent: {
         display: "flex",
         flexDirection: "row",
         gap: "15px",
@@ -23,8 +23,10 @@ const styles = () => ({
         marginRight: "15px",
         marginLeft: { xs: "0", md: "24px" }
     },
+    title: { color: "white", display: { xs: "none", sm: "flex" } },
     link: { textDecoration: "none" },
     createPostBtn: {
+        height: "37px",
         bgcolor: "button.primary",
         color: "button.secondary",
         "&:hover": {

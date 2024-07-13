@@ -1,13 +1,23 @@
+const saltRounds = 10;
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 import Post from "../models/post.js";
-const saltRounds = 10;
+import { createUserSession } from "../utils/functions.js";
 
 const fetchUserSession = async (req, res) => {
     try {
-        console.log(req.session.user);
-        res.status(200).json(req.session.user);
+        if (req.session.user) {
+            res.status(200).json(req.session.user);
+        } else {
+            const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
+            const user = await User.findOne({ email: email });
+            if (user) {
+                res.status(200).json(createUserSession(user));
+            } else {
+                res.status(409).json({ message: "No user for given token" });
+            }
+        }
     } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }
 
@@ -28,7 +38,7 @@ const fetchUserPosts = async (req, res) => {
     try {
         const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
         const user = await User.findOne({ email: email });
-        const posts = await Post.find({ author: user._id });
+        const posts = await Post.find({ author: user._id }).sort({ _id: -1 });
         if (posts) {
             res.status(200).json(posts);
         } else {
@@ -49,15 +59,7 @@ const getGoogleUser = async (req, res) => {
                 if (checkIfLoginOrSignUp.avatar !== picture) {
                     await User.findByIdAndUpdate(checkIfLoginOrSignUp._id, { avatar: picture });
                 }
-                req.session.user = {
-                    _id: checkIfLoginOrSignUp._id,
-                    name: checkIfLoginOrSignUp.name,
-                    userName: checkIfLoginOrSignUp.userName,
-                    email: checkIfLoginOrSignUp.email,
-                    avatar: picture,
-                    subspacesJoined: checkIfLoginOrSignUp.subspacesJoined,
-                };
-                res.status(200).json({ user: req.session.user, token: req.query.token });
+                res.status(200).json({ user: createUserSession(checkIfLoginOrSignUp), token: req.query.token });
             } else {
                 res.status(409).json({ message: "Unique username required" });
             }
@@ -80,15 +82,7 @@ const createGoogleUser = async (req, res) => {
                 googleId: sub,
                 avatar: picture,
             });
-            req.session.user = {
-                _id: newUser._id,
-                name: newUser.name,
-                userName: newUser.userName,
-                email: newUser.email,
-                avatar: newUser.avatar,
-                subspacesJoined: newUser.subspacesJoined,
-            };
-            res.status(200).json({ user: req.session.user, token: token });
+            res.status(200).json({ user: createUserSession(newUser), token: token });
         }
     } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }
@@ -112,18 +106,10 @@ const signUp = async (req, res) => {
                     password: hashedPassword,
                 });
                 const token = jwt.sign({ _id: newUser._id, email: newUser.email }, process.env.JWT_TOKEN_KEY, { expiresIn: 365 * 24 * 60 * 60 * 1000 });
-                req.session.user = {
-                    _id: newUser._id,
-                    name: newUser.name,
-                    userName: newUser.userName,
-                    email: newUser.email,
-                    avatar: newUser.avatar,
-                    subspacesJoined: newUser.subspacesJoined,
-                };
-                res.status(200).json({ user: req.session.user, token });
+                res.status(200).json({ user: createUserSession(newUser), token });
             }
         }
-    } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
+    } catch (error) { res.status(503).json({ message: "Network error. Try agin" }) }
 }
 
 const signIn = async (req, res) => {
@@ -135,15 +121,7 @@ const signIn = async (req, res) => {
         } else {
             if (await bcrypt.compare(userPassword, existingUser.password)) {
                 const token = jwt.sign({ _id: existingUser._id, email: existingUser.email }, process.env.JWT_TOKEN_KEY, { expiresIn: 365 * 24 * 60 * 60 * 1000 });
-                req.session.user = {
-                    _id: existingUser._id,
-                    name: existingUser.name,
-                    userName: existingUser.userName,
-                    email: existingUser.email,
-                    avatar: existingUser.avatar,
-                    subspacesJoined: existingUser.subspacesJoined,
-                };
-                res.status(200).json({ user: req.session.user, token });
+                res.status(200).json({ user: createUserSession(existingUser), token });
             } else {
                 res.status(400).json({ message: "Invalid credentials" });
             }
@@ -165,13 +143,11 @@ const updateProfile = async (req, res) => {
         const { name, bio } = req.body;
         const isUserNameUnique = await User.findOne({ name: name });
         if (!isUserNameUnique) {
-            await User.findOneAndUpdate({ email: email }, { name: name, userName: name.replace(/ /g, "-"), bio: bio });
-            req.session.user.name = name;
-            req.session.user.userName = name.replace(/ /g, "-");
-            res.status(200).json(req.session.user);
+            const updatedUser = await User.findOneAndUpdate({ email: email }, { name: name, userName: name.replace(/ /g, "-"), bio: bio }, { new: true });
+            res.status(200).json(createUserSession(updatedUser));
         } else if (isUserNameUnique.email === email) {
-            await User.findByIdAndUpdate(isUserNameUnique._id, { bio: bio });
-            res.status(200).json(req.session.user);
+            const updatedUser = await User.findByIdAndUpdate(isUserNameUnique._id, { bio: bio }, { new: true });
+            res.status(200).json(createUserSession(updatedUser));
         } else {
             res.status(400).json({ message: "Username not available" });
         }

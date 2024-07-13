@@ -4,7 +4,6 @@ import { getPosts, createPost } from "../controllers/postOperations.js";
 
 const router = express.Router();
 
-// working
 router.get("/", getPosts);
 router.post("/", auth, createPost);
 

@@ -7,7 +7,7 @@ import PostForm from "../../Components/PostForm/PostForm";
 import styles from "./styles";
 
 function CreatePost(props) {
-    const { user } = props;
+    const { user, setSnackbarValue, setSnackbarState } = props;
     const classes = styles();
     const location = useLocation();
 
@@ -26,7 +26,10 @@ function CreatePost(props) {
             <Grid item xs={0} md={2} sx={classes.leftContainer}></Grid>
             <Box id="postForm" sx={classes.mainContainer}>
                 <Typography variant="h4">Create Post</Typography>
-                <PostForm user={user} previousSubspace={usePreviousSubspace} />
+                <PostForm
+                    user={user} previousSubspace={usePreviousSubspace}
+                    setSnackbarValue={setSnackbarValue} setSnackbarState={setSnackbarState}
+                />
             </Box>
         </Grid>
     );

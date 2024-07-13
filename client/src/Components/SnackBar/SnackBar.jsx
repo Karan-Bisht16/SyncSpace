@@ -2,17 +2,34 @@ import React from "react";
 import { Snackbar, Alert } from "@mui/material";
 
 function SnackBar(props) {
+    const { openSnackbar, timeOut, handleClose, type, message, sx, vertical, horizontal } = props;
+
     return (
-        <Snackbar open={props.openSnackbar} autoHideDuration={props.timeOut} onClose={props.handleClose} >
-            <Alert
-                onClose={props.handleClose}
-                severity={props.type}
-                variant="filled"
-                sx={{ width: '100%' }}
-            >
-                {props.message}
-            </Alert>
-        </Snackbar>
+        <>
+            {(vertical && horizontal) ?
+                <Snackbar open={openSnackbar} autoHideDuration={timeOut} onClose={handleClose} anchorOrigin={{ vertical, horizontal }} sx={sx}>
+                    <Alert
+                        onClose={handleClose}
+                        severity={type}
+                        variant="filled"
+                        sx={{ width: "100%", marginTop: "78px" }}
+                    >
+                        {message}
+                    </Alert>
+                </Snackbar>
+                :
+                <Snackbar open={openSnackbar} autoHideDuration={timeOut} onClose={handleClose} sx={sx}>
+                    <Alert
+                        onClose={handleClose}
+                        severity={type}
+                        variant="filled"
+                        sx={{ width: "100%" }}
+                    >
+                        {message}
+                    </Alert>
+                </Snackbar>
+            }
+        </>
     );
 }
 

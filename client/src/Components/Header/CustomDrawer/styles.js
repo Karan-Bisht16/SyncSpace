@@ -6,7 +6,6 @@ const styles = () => ({
     logo: { width: "45px", height: "45px", borderRadius: "50%" },
     link: { textDecoration: "none" },
     icon: { color: "button.secondary" }
-    // icon: { color: "#0090c1" }
 });
 
 export default styles;

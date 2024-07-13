@@ -1,7 +1,12 @@
 // Styling for Account.jsx 
 const styles = () => ({
     leftContainer: { height: { xs: "0", md: "80vh" }, minWidth: { xs: "0", md: "275px" } },
-    mainContainer: { width: "auto", minWidth: { xs: "99%", md: "65%", lg: "75%" }, margin: "0 auto", padding: "32px 16px" },
+    mainContainer: {
+        width: "auto",
+        minWidth: { xs: "99%", md: "65%", lg: "75%" },
+        maxWidth: { xs: "99%", md: "65%", lg: "75%" },
+        margin: "0 auto", padding: "32px 16px"
+    },
     flexContainer: { display: "flex" },
     heading: { display: "flex", justifyContent: "space-between", alignItems: "center" },
     editProfile: {
@@ -23,6 +28,8 @@ const styles = () => ({
     subContainer: { marginTop: "15px" },
     postContainer: {
         minHeight: "50vh",
+        maxHeight: "70vh",
+        overflow: "scroll",
         padding: "20px 20px",
         borderRadius: "10px",
         bgcolor: "background.tertiary",

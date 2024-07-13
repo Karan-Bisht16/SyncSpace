@@ -1,18 +1,17 @@
 // Styling for ProfileBar.jsx
 const styles = () => ({
     profileContainer: {
-        // height: "auto", try these
         maxHeight: "75vh",
         maxWidth: "100% !important",
         padding: "20px 20px",
         borderRadius: "10px",
         bgcolor: "background.tertiary",
         boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
-        marginBottom: { xs: "20px", lg: "0" }
+        marginBottom: { xs: "20px", lg: "0" },
     },
     bioContainer: {
-        // height: "auto",
-        // height: "155px",
+        height: "auto",
+        maxHeight: "155px",
         width: { xs: "100%", md: "550px", lg: "175px" },
         paddingTop: "8px",
         wordBreak: "break-all",

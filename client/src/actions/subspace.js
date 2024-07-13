@@ -12,7 +12,7 @@ function handleError(error) {
 export const createSubspace = (subspaceData) => async (dispatch) => {
     try {
         const { data } = await api.createSubspace(subspaceData);
-        dispatch({ type: JOIN_SUBSPACE, payload: data.user });
+        dispatch({ type: JOIN_SUBSPACE, payload: data });
         return { status: 200, result: data };
     } catch (error) { return handleError(error) }
 };

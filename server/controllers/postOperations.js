@@ -12,9 +12,9 @@ const getPosts = async (req, res) => {
     } catch (error) { res.status(404).json({ message: "Network error. Try again." }) }
 }
 const createPost = async (req, res) => {
-    console.log(req.body);
     const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
     const post = req.body;
+    console.log(`${post.subspaceName}, ${post.authorName}, ${post.title}, `);
     const newPost = new Post(post);
     try {
         await newPost.save();

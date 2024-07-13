@@ -8,10 +8,10 @@ const styles = () => ({
         borderRadius: "10px",
         bgcolor: "background.tertiary",
         boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
-        marginBottom: { xs: "20px", lg: "0" },
+        marginBottom: "0",
         position: { xs: "absolute", lg: "relative" },
         top: { xs: "165px", lg: "0" },
-        overflow: "scroll"
+        overflow: "scroll",
     },
     bioContainer: {
         height: "155px",

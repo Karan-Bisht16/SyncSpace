@@ -2,11 +2,13 @@ import React from "react";
 import { Box, Switch, Avatar, Menu, MenuItem, ListItemIcon, Divider, IconButton, Tooltip } from "@mui/material";
 import { PersonAdd, Settings, Logout, DarkMode } from "@mui/icons-material";
 import { Link } from "react-router-dom";
+// Importing styling
 import styles from "./styles";
 
 function ToolBar(props) {
-    const classes = styles();
     const { mode, user, handleToggleMode, handleLogout } = props;
+    const classes = styles();
+
     // JS for Dropdown Menu
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
@@ -68,8 +70,8 @@ function ToolBar(props) {
                 transformOrigin={{ horizontal: "right", vertical: "top" }}
                 anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
             >
-                <MenuItem onClick={handleClose} sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                <MenuItem onClick={handleClose} sx={classes.menuItem}>
+                    <Box sx={classes.themeItem}>
                         <ListItemIcon>
                             <DarkMode fontSize="small" />
                         </ListItemIcon>
@@ -78,13 +80,13 @@ function ToolBar(props) {
                     <Switch onChange={handleToggleMode} checked={mode === "dark"}></Switch>
                 </MenuItem>
                 <MenuItem component={Link} to="/account" onClick={handleClose}>
-                    <Box sx={{ display: "flex", alignItems: "center", color: "text.primary" }}>
+                    <Box sx={classes.defaultItem}>
                         <Avatar sx={classes.avatar} alt={user.name} src={user.avatar}>{user.name.charAt(0)}</Avatar> My account
                     </Box>
                 </MenuItem>
                 <Divider />
                 <MenuItem component={Link} to="/add-account" onClick={handleClose}>
-                    <Box sx={{ display: "flex", alignItems: "center", color: "text.primary" }}>
+                    <Box sx={classes.defaultItem}>
                         <ListItemIcon>
                             <PersonAdd fontSize="small" />
                         </ListItemIcon>
@@ -92,7 +94,7 @@ function ToolBar(props) {
                     </Box>
                 </MenuItem>
                 <MenuItem component={Link} to="/settings" onClick={handleClose}>
-                    <Box sx={{ display: "flex", alignItems: "center", color: "text.primary" }}>
+                    <Box sx={classes.defaultItem}>
                         <ListItemIcon>
                             <Settings fontSize="small" />
                         </ListItemIcon>
@@ -100,7 +102,7 @@ function ToolBar(props) {
                     </Box>
                 </MenuItem>
                 <MenuItem onClick={handleLogout}>
-                    <Box sx={{ display: "flex", alignItems: "center", color: "text.primary" }}>
+                    <Box sx={classes.defaultItem}>
                         <ListItemIcon>
                             <Logout fontSize="small" />
                         </ListItemIcon>
