@@ -32,9 +32,16 @@ export const fetchAllSubspaceInfo = (subspaceName) => async () => {
     } catch (error) { return handleError(error) }
 };
 
-export const fetchSubspacePosts = (subspaceName) => async () => {
+export const fetchSubspaceAvatar = (subspaceName) => async () => {
     try {
-        const { data } = await api.fetchSubspacePosts(subspaceName);
+        const { data } = await api.fetchSubspaceAvatar(subspaceName);
         return { status: 200, result: data };
     } catch (error) { return handleError(error) }
 }
+
+// export const fetchSubspacePosts = (subspaceName) => async () => {
+//     try {
+//         const { data } = await api.fetchSubspacePosts(subspaceName);
+//         return { status: 200, result: data };
+//     } catch (error) { return handleError(error) }
+// }

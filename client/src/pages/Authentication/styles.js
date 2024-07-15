@@ -2,8 +2,7 @@
 const styles = () => ({
     leftContainer: { minWidth: { xs: "0", md: "275px" } },
     mainContainer: {
-        width: "auto",
-        minWidth: { xs: "99%", md: "65%", lg: "75%" },
+        width: { xs: "99%", md: "65%", lg: "75%" },
         margin: "0 auto",
         padding: "60px 16px 16px 16px",
         alignItems: "center",

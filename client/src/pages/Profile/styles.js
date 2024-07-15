@@ -1,4 +1,4 @@
-// Styling for Account.jsx 
+// Styling for Profile.jsx 
 const styles = () => ({
     leftContainer: { height: { xs: "0", md: "80vh" }, minWidth: { xs: "0", md: "275px" } },
     mainContainer: { width: { xs: "99%", md: "65%", lg: "75%" }, margin: "0 auto", padding: "32px 16px" },
@@ -30,7 +30,15 @@ const styles = () => ({
         bgcolor: "background.tertiary",
         boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
     },
-    loadingScreenStyling: { height: "80vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" },
+    primaryLoadingScreenStyling: { height: "80vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" },
+    secondaryLoadingScreenStyling: { 
+        height: "100%", 
+        display: "flex", 
+        justifyContent: "center", 
+        alignItems: "center", 
+        borderRadius: "10px",
+        bgcolor: "background.tertiary" 
+    },
     titleFont: { fontSize: { xs: "24px", md: "36px" } },
     progressBar: { width: { xs: "80%", md: "500px" }, color: "#0090c1", marginTop: "7.5px" },
     noContentContainer: { display: "flex", justifyContent: "center", alignItems: "center", height: "100%" },

@@ -6,6 +6,7 @@ import {
     Route,
 } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { square } from "ldrs";
 // Importing my components
 import SnackBar from "./Components/SnackBar/SnackBar";
@@ -15,10 +16,11 @@ import useFetchUser from "./utils/useFetchUser";
 import Header from "./Components/Header/Header";
 // Importing all webpages
 import Home from "./pages/Home/Home";
+import PostContainer from "./pages/PostContainer/PostContainer";
 import CreatePost from "./pages/CreatePost/CreatePost";
 import CreateSubspace from "./pages/CreateSubspace/CreateSubspace";
 import Subspace from "./pages/Subspace/Subspace";
-import Account from "./pages/Account/Account";
+import Profile from "./pages/Profile/Profile";
 import Settings from "./pages/Settings/Settings";
 import Authentication from "./pages/Authentication/Authentication";
 import PageNotFound from "./pages/PageNotFound/PageNotFound";
@@ -27,6 +29,7 @@ import "./styles.css";
 
 function App() {
     square.register("l-main-loading");
+    const queryClient = new QueryClient();
     // JS for SnackBar
     const [snackbarState, setSnackbarState] = useState(false);
     const [snackbarValue, setSnackbarValue] = useState({ message: "", status: "" });
@@ -41,7 +44,6 @@ function App() {
         width: "100hw", height: "100vh", bgcolor: "background.default",
         display: "flex", justifyContent: "center", alignItems: "center",
     }
-
     if (loading) {
         return (
             <Box sx={loadingScreenStyling}>
@@ -49,57 +51,67 @@ function App() {
             </Box>
         );
     }
+
     return (
         <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_OAUTH_API_TOKEN}>
-            <Router>
-                <Header user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />
-                <Routes>
-                    <Route
-                        exact
-                        path="/"
-                        element={<Home user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
-                    />
-                    <Route
-                        path="/create-post"
-                        element={<ProtectedRoute Component={CreatePost} user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
-                    />
-                    <Route
-                        path="/create-subspace"
-                        element={<ProtectedRoute Component={CreateSubspace} user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
-                    />
-                    <Route
-                        path="/ss/:name"
-                        element={<Subspace user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
-                    />
-                    <Route
-                        path="/authentication"
-                        element={<GuestRoute Component={Authentication} user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
-                    />
-                    <Route
-                        path="/account"
-                        element={<ProtectedRoute Component={Account} user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
-                    />
-                    <Route
-                        path="/settings"
-                        element={<ProtectedRoute Component={Settings} user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
-                    />
-                    <Route
-                        path="*"
-                        element={<PageNotFound />}
-                    />
-                </Routes>
-            </Router>
-            <SnackBar
-                openSnackbar={snackbarState} handleClose={handleSnackbarState} timeOut={5000}
-                message={snackbarValue.message} type={snackbarValue.status}
-                sx={{ display: { xs: "none", sm: "flex" } }}
-            />
-            <SnackBar
-                openSnackbar={snackbarState} handleClose={handleSnackbarState} timeOut={5000}
-                message={snackbarValue.message} type={snackbarValue.status}
-                vertical="top" horizontal="left"
-                sx={{ display: { xs: "flex", sm: "none" } }}
-            />
+            <QueryClientProvider client={queryClient}>
+
+                <Router>
+                    <Header user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />
+                    <Routes>
+                        <Route
+                            exact
+                            path="/"
+                            element={<Home user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
+                        />
+                        <Route
+                            exact
+                            path="/post/:id"
+                            element={<PostContainer user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
+                        />
+                        <Route
+                            path="/create-post"
+                            element={<ProtectedRoute Component={CreatePost} user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
+                        />
+                        <Route
+                            path="/create-subspace"
+                            element={<ProtectedRoute Component={CreateSubspace} user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
+                        />
+                        <Route
+                            path="/ss/:subspaceName"
+                            element={<Subspace user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
+                        />
+                        <Route
+                            path="/authentication"
+                            element={<GuestRoute Component={Authentication} user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
+                        />
+                        <Route
+                            exact
+                            path="/e/:userName"
+                            element={<Profile user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
+                        />
+                        <Route
+                            path="/settings"
+                            element={<ProtectedRoute Component={Settings} user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
+                        />
+                        <Route
+                            path="*"
+                            element={<PageNotFound />}
+                        />
+                    </Routes>
+                </Router>
+                <SnackBar
+                    openSnackbar={snackbarState} handleClose={handleSnackbarState} timeOut={5000}
+                    message={snackbarValue.message} type={snackbarValue.status}
+                    sx={{ display: { xs: "none", sm: "flex" } }}
+                />
+                <SnackBar
+                    openSnackbar={snackbarState} handleClose={handleSnackbarState} timeOut={2500}
+                    message={snackbarValue.message} type={snackbarValue.status}
+                    vertical="top" horizontal="left"
+                    sx={{ display: { xs: "flex", sm: "none" } }}
+                />
+            </QueryClientProvider>
         </GoogleOAuthProvider>
     );
 }

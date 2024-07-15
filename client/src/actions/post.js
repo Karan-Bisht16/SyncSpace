@@ -1,5 +1,5 @@
 import * as api from "../api";
-import { FETCH_ALL_POST, CREATE_POST } from "../constants/actionTypes";
+import { CREATE_POST } from "../constants/actionTypes";
 
 function handleError(error) {
     if (error.code === "ERR_NETWORK") {
@@ -9,11 +9,26 @@ function handleError(error) {
     }
 }
 
-export const getPosts = () => async (dispatch) => {
+// export const getPosts = () => async (dispatch) => {
+//     try {
+//         const { data } = await api.getPosts();
+//         dispatch({ type: FETCH_ALL_POST, payload: data });
+//         return { status: 200, result: data }
+//     } catch (error) { return handleError(error) }
+// };
+
+export const fetchPostInfo = (postId) => async () => {
     try {
-        const { data } = await api.fetchPosts();
-        dispatch({ type: FETCH_ALL_POST, payload: data });
-        return {status: 200, result: data}
+        const { data } = await api.fetchPostInfo(postId);
+        return { status: 200, result: data };
+    } catch (error) { return handleError(error) }
+}
+
+export const fetchPosts = (searchParams) => async () => {
+    try {
+        const { data } = await api.fetchPosts(searchParams);
+        // dispatch({ type: FETCH_LIMITED_POSTS, payload: data.results });
+        return data;
     } catch (error) { return handleError(error) }
 };
 

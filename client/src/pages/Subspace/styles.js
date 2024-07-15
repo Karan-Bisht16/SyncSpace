@@ -1,9 +1,8 @@
 // Styling for Subspace.jsx
 const styles = () => ({
     leftContainer: { height: { xs: "0", md: "80vh" }, minWidth: { xs: "0", md: "275px" } },
-    mainContainer: { width: "100%", maxWidth: { xs: "99%", md: "65%", lg: "75%" }, margin: "0 auto", padding: "32px 16px" },
+    mainContainer: { width: { xs: "99%", md: "65%", lg: "75%" }, margin: "0 auto", padding: "32px 16px" },
     flexContainer: { display: "flex" },
-    noSubspaceFoundContainer: { display: "flex", flexDirection: "column", alignItems: "center" },
     primaryLoadingScreenStyling: { height: "80vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" },
     primaryProgressBar: { width: { xs: "80%", md: "500px" }, color: "#0090c1", marginTop: "7.5px" },
     titleFont: { fontSize: { xs: "24px", md: "36px" } },
@@ -45,7 +44,8 @@ const styles = () => ({
         borderRadius: "16px",
         bgcolor: "background.backdrop"
     },
-    link: { color: "#0090c1", fontSize: "20px", textDecoration: "none", cursor: "pointer" }
+    link: { color: "#0090c1", fontSize: "20px", textDecoration: "none", cursor: "pointer" },
+    subspacePostContainer: { width: "auto", minWidth: { xs: "99%", md: "65%", lg: "75%" }, margin: "0 auto", padding: "32px 16px" },
 });
 
 export default styles;

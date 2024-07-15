@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
-import Post from "../models/post.js";
 import Subspace from "../models/subspace.js";
 import { createUserSession } from "../utils/functions.js";
 
@@ -31,8 +30,7 @@ const createSubspace = async (req, res) => {
                 res.status(200).json(createUserSession(user));
             }
         }
-        // } catch (error) { res.status(409).json({ message: "Network error. Try again." }) }
-    } catch (error) { res.status(409).json({ message: error.message }) }
+    } catch (error) { res.status(404).json({ message: "Network error. Try again." }) }
 }
 
 const joinSubspace = async (req, res) => {
@@ -83,27 +81,24 @@ const joinSubspace = async (req, res) => {
                 res.status(200).json(createUserSession(user));
             }
         }
-        // } catch (error) { res.status(404).json({ message: "Network error. Try again." }) }
-    } catch (error) { res.status(404).json({ message: req.session.user.userName }) }
+    } catch (error) { res.status(404).json({ message: "Network error. Try again." }) }
 }
 
 const fetchAllSubspaceInfo = async (req, res) => {
     try {
         const { subspaceName } = req.query;
         const subspace = await Subspace.findOne({ subspaceName: subspaceName });
-        const posts = await Post.find({ subspaceId: subspace._id });
-        res.status(200).json({ subspaceData: subspace, subspacePosts: posts });
-
+        res.status(200).json({ subspaceData: subspace, subspacePostsCount: subspace.postsCount });
     } catch (error) { res.status(404).json({ message: "Network error. Try again." }) }
 }
 
-const fetchSubspacePosts = async (req, res) => {
+const fetchSubspaceAvatar = async (req, res) => {
     try {
         const { subspaceName } = req.query;
         const subspace = await Subspace.findOne({ subspaceName: subspaceName });
-        const posts = await Post.find({ subspaceId: subspace._id }).sort({ _id: -1 });
-        res.status(200).json(posts);
+        res.status(200).json({ subspaceAvatar: subspace.avatar });
+
     } catch (error) { res.status(404).json({ message: "Network error. Try again." }) }
 }
 
-export { createSubspace, joinSubspace, fetchAllSubspaceInfo, fetchSubspacePosts };
+export { createSubspace, joinSubspace, fetchAllSubspaceInfo, fetchSubspaceAvatar };

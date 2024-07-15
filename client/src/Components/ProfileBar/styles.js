@@ -1,7 +1,7 @@
 // Styling for ProfileBar.jsx
 const styles = () => ({
     profileContainer: {
-        maxHeight: "75vh",
+        height: "460px",
         maxWidth: "100% !important",
         padding: "20px 20px",
         borderRadius: "10px",

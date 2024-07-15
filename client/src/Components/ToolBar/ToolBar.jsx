@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Switch, Avatar, Menu, MenuItem, ListItemIcon, Divider, IconButton, Tooltip } from "@mui/material";
-import { PersonAdd, Settings, Logout, DarkMode } from "@mui/icons-material";
+import { Settings, Logout, DarkMode } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 // Importing styling
 import styles from "./styles";
@@ -79,20 +79,12 @@ function ToolBar(props) {
                     </Box>
                     <Switch onChange={handleToggleMode} checked={mode === "dark"}></Switch>
                 </MenuItem>
-                <MenuItem component={Link} to="/account" onClick={handleClose}>
+                <MenuItem component={Link} to={`/e/${user.name.replace(/ /g, "-")}`} onClick={handleClose}>
                     <Box sx={classes.defaultItem}>
                         <Avatar sx={classes.avatar} alt={user.name} src={user.avatar}>{user.name.charAt(0)}</Avatar> My account
                     </Box>
                 </MenuItem>
                 <Divider />
-                <MenuItem component={Link} to="/add-account" onClick={handleClose}>
-                    <Box sx={classes.defaultItem}>
-                        <ListItemIcon>
-                            <PersonAdd fontSize="small" />
-                        </ListItemIcon>
-                        Add another account
-                    </Box>
-                </MenuItem>
                 <MenuItem component={Link} to="/settings" onClick={handleClose}>
                     <Box sx={classes.defaultItem}>
                         <ListItemIcon>

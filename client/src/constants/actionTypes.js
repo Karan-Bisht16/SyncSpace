@@ -5,6 +5,7 @@ export const UPDATE_PROFILE = "UPDATE_PROFILE";
 export const CHANGE_PASSWORD = "CHANGE_PASSWORD";
 
 export const FETCH_ALL_POST = "FETCH_ALL_POST";
+export const FETCH_LIMITED_POSTS = "FETCH_LIMITED_POSTS";
 export const CREATE_POST = "CREATE_POST";
 export const UPDATE_POST = "UPDATE_POST";
 export const DELETE_POST = "DELETE_POST";

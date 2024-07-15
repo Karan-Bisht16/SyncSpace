@@ -1,7 +1,11 @@
 // Styling for CreateSubspace.jsx
 const styles = () => ({
     leftContainer: { height: { xs: "0", md: "80vh" }, minWidth: { xs: "0", md: "275px" } },
-    mainContainer: { height: { xs: "125vh", md: "auto" }, width: "auto", minWidth: { xs: "99%", md: "65%", lg: "75%" }, margin: "0 auto", padding: "32px 16px" },
+    mainContainer: {
+        height: { xs: "125vh", md: "auto" },
+        width: { xs: "99%", md: "65%", lg: "75%" },
+        margin: "0 auto", padding: "32px 16px"
+    },
     postContainer: {
         minHeight: "50vh",
         padding: "20px 20px",

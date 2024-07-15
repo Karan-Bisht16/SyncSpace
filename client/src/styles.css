@@ -24,14 +24,3 @@ body {
 ::-webkit-scrollbar {
     display: none;
 }
-
-@media (min-width: 900px) and (max-width: 1250px) {
-    #postForm {
-        width: 100% !important;
-        height: 100vh !important;
-        z-index: 1500;
-        position: absolute;
-        top: 85px;
-        right: 0;
-    }
-}

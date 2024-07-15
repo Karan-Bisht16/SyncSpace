@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Avatar, Box, Button, Grid, LinearProgress, Typography } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { lineSpinner } from "ldrs"
+import { lineSpinner } from "ldrs";
 // Importing my components
 import ConfirmationDialog from "../../Components/ConfirmationDialog/ConfirmationDialog";
 import NotFound from "../../Components/NotFound/NotFound";
@@ -15,18 +15,26 @@ import styles from "./styles";
 
 function Subspace(props) {
     const { user, setSnackbarValue, setSnackbarState } = props;
-    const { name } = useParams();
-    const subspaceName = name.replace(/ /g, "-");
+    const { subspaceName } = useParams();
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     useEffect(() => {
         // Setting webpage title
-        document.title = "SyncSpace: " + subspaceName;
+        document.title = "SyncSpace: ss/" + subspaceName;
+    });
+
+    const [rerender, setRerender] = useState(false);
+    const [primaryLoading, setPrimaryLoading] = useState(true);
+    const [secondaryLoading, setSecondaryLoading] = useState(true);
+    const [noSubspaceFound, setNoSubspaceFound] = useState(false);
+    useEffect(() => {
         setPrimaryLoading(true);
         setSecondaryLoading(true);
         setNoSubspaceFound(false);
+        setRerender(subspaceName);
+        setSubspacePostsCount(0);
     }, [subspaceName]);
     // JS for Dialog
     const [dialog, setDialog] = useState(false);
@@ -44,9 +52,6 @@ function Subspace(props) {
     function closeDialog() {
         setDialog(false);
     };
-    const [primaryLoading, setPrimaryLoading] = useState(true);
-    const [secondaryLoading, setSecondaryLoading] = useState(true);
-    const [noSubspaceFound, setNoSubspaceFound] = useState(false);
     const [subspaceData, setSubspaceData] = useState({
         subspaceId: "Loading...",
         name: "Loading...",
@@ -54,14 +59,14 @@ function Subspace(props) {
         description: "Loading...",
         avatar: "",
     });
-    const [subspacePosts, setSubspacePosts] = useState([]);
+    const [subspacePostsCount, setSubspacePostsCount] = useState(0);
     useEffect(() => {
         async function fetchSubspaceInfo() {
             const { status, result } = await dispatch(fetchAllSubspaceInfo({ subspaceName: subspaceName }));
             if (status === 200) {
                 setSubspaceData(result.subspaceData);
                 setPrimaryLoading(false);
-                setSubspacePosts(result.subspacePosts);
+                setSubspacePostsCount(result.subspaceData.postsCount);
                 setSecondaryLoading(false);
             } else if (status === 404) {
                 setPrimaryLoading(false);
@@ -182,7 +187,7 @@ function Subspace(props) {
                                     </Box>
                                     :
                                     <>
-                                        {subspacePosts.length === 0 ?
+                                        {subspacePostsCount === 0 ?
                                             <Box sx={classes.postContainer}>
                                                 <>
                                                     {joined ?
@@ -202,8 +207,11 @@ function Subspace(props) {
                                                 </>
                                             </Box>
                                             :
-                                            <Box sx={{ width: "auto", minWidth: { xs: "99%", md: "65%", lg: "75%" }, margin: "0 auto", padding: "32px 16px" }}>
-                                                <Posts posts={subspacePosts} setSnackbarValue={setSnackbarValue} setSnackbarState={setSnackbarState} />
+                                            <Box sx={classes.subspacePostContainer}>
+                                                <Posts 
+                                                    key={rerender} searchQuery={{ subspaceName: rerender }} 
+                                                    setSnackbarValue={setSnackbarValue} setSnackbarState={setSnackbarState} 
+                                                />
                                             </Box>
                                         }
                                     </>

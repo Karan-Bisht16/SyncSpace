@@ -7,20 +7,19 @@ import { useNavigate } from "react-router-dom";
 import RealTimeProfileViwer from "./RealTimeProfileViewer/RealTimeProfileViewer";
 import InputField from "../../Components/InputField/InputField";
 import ProfileBar from "../../Components/ProfileBar/ProfileBar";
-// import SnackBar from "../../Components/SnackBar/SnackBar";
 import Posts from "../../Components/Posts/Posts";
 // Importing actions
-import { fetchUserInfo, fetchUserPosts, updateProfile } from "../../actions/user";
+import { fetchUserInfo, updateProfile } from "../../actions/user";
 // Importing styling
 import styles from "./styles";
 import NotFound from "../../Components/NotFound/NotFound";
 
 function Account(props) {
-    const { setSnackbarValue, setSnackbarState } = props;
+    const { user, setSnackbarValue, setSnackbarState } = props;
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    
+
     useEffect(() => {
         // Setting webpage title
         document.title = "SyncSpace";
@@ -33,46 +32,36 @@ function Account(props) {
     const emailField = useRef(null);
     const bioField = useRef(null);
     // Fetching user info
-    const [user, setUser] = useState(null);
-    const [userPosts, setUserPosts] = useState([]);
+    const [updatedUser, setUpdatedUser] = useState(user);
+    const [userPostsCount, setUserPostsCount] = useState([]);
     const [loading, setLoading] = useState(true);
     useEffect(() => {
         async function getUserInfo() {
-            if (!user) {
-                try {
-                    const { status, result } = await dispatch(fetchUserInfo());
-                    const resultUser = result;
-                    if (status === 200) {
-                        setUser(resultUser);
-                        document.title = "SyncSpace: s/" + resultUser.name;
-                        setFormData({
-                            name: resultUser.name,
-                            email: resultUser.email,
-                            bio: resultUser.bio,
-                        });
-                        const { status, result } = await dispatch(fetchUserPosts());
-                        const resultPosts = result;
-                        if (status === 200) {
-                            setUserPosts(resultPosts);
-                        } else {
-                            setSnackbarValue({ message: resultPosts.message, status: "error" });
-                            setSnackbarState(true);
-                        }
-                    } else {
-                        setUser(false);
-                        setSnackbarValue({ message: resultUser.message, status: "error" });
-                        setSnackbarState(true);
-                    }
-                    setLoading(false);
-                } catch (error) {
-                    console.log(error);
+            try {
+                const { status, result } = await dispatch(fetchUserInfo({ userName: user.name.replace(/ /g, "-") }));
+                if (status === 200) {
+                    setUpdatedUser(result);
+                    document.title = "SyncSpace: e/" + result.userName;
+                    setFormData({
+                        name: result.name,
+                        email: result.email,
+                        bio: result.bio,
+                    });
+                    setUserPostsCount(result.postsCount);
+                } else {
+                    setUpdatedUser(false);
+                    setSnackbarValue({ message: result.message, status: "error" });
+                    setSnackbarState(true);
                 }
+                setLoading(false);
+            } catch (error) {
+                console.log(error);
             }
         }
         getUserInfo();
-    }, [dispatch, user, setSnackbarValue, setSnackbarState]);
-    function userPostsBlock(userPosts) {
-        if (userPosts.length === 0) {
+    }, [user, dispatch, setSnackbarValue, setSnackbarState]);
+    function userPostsBlock() {
+        if (userPostsCount === 0) {
             return (
                 <Box sx={classes.noContentContainer}>
                     <NotFound mainText="You haven't posted anything" />
@@ -80,7 +69,7 @@ function Account(props) {
             );
         }
         return (
-            <Posts posts={userPosts} setSnackbarValue={setSnackbarValue} setSnackbarState={setSnackbarState} />
+            <Posts searchQuery={{ authorId: updatedUser._id }} setSnackbarValue={setSnackbarValue} setSnackbarState={setSnackbarState} />
         );
     }
     const [editProfile, setEditProfile] = useState(false);
@@ -117,7 +106,7 @@ function Account(props) {
             const { status, result } = await dispatch(updateProfile(formData));
             if (status === 200) {
                 setEditProfile(false);
-                setUser(prevUser => {
+                setUpdatedUser(prevUser => {
                     return { ...prevUser, name: formData.name, userName: formData.name.replace(/ /g, "-"), bio: formData.bio }
                 });
                 navigate("/account", { state: { message: "Account updated successfully!", status: "success" } });
@@ -144,10 +133,10 @@ function Account(props) {
                     <>
                         <Box sx={classes.heading}>
                             <Box sx={classes.userContainer}>
-                                <Avatar sx={classes.userAvatar} alt={user.name} src={user.avatar}>{user.name.charAt(0)}</Avatar>
+                                <Avatar sx={classes.userAvatar} alt={updatedUser.name} src={updatedUser.avatar}>{updatedUser.name.charAt(0)}</Avatar>
                                 <Box>
-                                    <Typography sx={classes.userName}>{user.name}</Typography>
-                                    <p style={{ fontSize: "14px", margin: "0" }}>e/{user.userName}</p>
+                                    <Typography sx={classes.userName}>{updatedUser.name}</Typography>
+                                    <p style={{ fontSize: "14px", margin: "0" }}>e/{updatedUser.userName}</p>
                                 </Box>
                             </Box>
                             <Box sx={classes.editProfile} onClick={handleEditProfile}>
@@ -167,14 +156,14 @@ function Account(props) {
                         {!editProfile ?
                             <>
                                 <Grid container sx={classes.subContainer}>
-                                    <Grid item xs={12} lg={8.75} sx={Object.assign({ display: { xs: "none", lg: "block" } }, classes.postContainer)}>
-                                        {userPostsBlock(userPosts)}
+                                    <Grid item xs={12} lg={8.75} sx={{ display: { xs: "none", lg: "block" } }}>
+                                        {userPostsBlock()}
                                     </Grid>
                                     <Grid item md={0.25}></Grid>
-                                    <ProfileBar user={user} userPosts={userPosts} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />
+                                    <ProfileBar user={updatedUser} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />
                                 </Grid>
-                                <Box sx={Object.assign({ display: { xs: "block", lg: "none" } }, classes.postContainer)}>
-                                    {userPostsBlock(userPosts)}
+                                <Box sx={{ display: { xs: "block", lg: "none" } }}>
+                                    {userPostsBlock()}
                                 </Box>
                             </>
                             :
@@ -212,7 +201,7 @@ function Account(props) {
                                         </Box>
                                     </Grid>
                                     <Grid item md={0.25}></Grid>
-                                    <RealTimeProfileViwer user={user} formData={formData} userPosts={userPosts} />
+                                    <RealTimeProfileViwer user={updatedUser} formData={formData} />
                                 </Grid>
                                 <Box sx={Object.assign({ display: "none" }, classes.postContainer)} />
                             </>

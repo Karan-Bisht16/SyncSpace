@@ -1,13 +1,12 @@
 import express from "express";
 import auth from "../middleware/auth.js";
 import { getGoogleUser, createGoogleUser, signUp, signIn, logout } from "../controllers/userOperations.js";
-import { fetchUserSession, fetchUserInfo, fetchUserPosts, updateProfile, changePassword, deleteProfile } from "../controllers/userOperations.js";
+import { fetchUserSession, fetchUserInfo, updateProfile, changePassword, deleteProfile } from "../controllers/userOperations.js";
 
 const router = express.Router();
 
 router.get("/session", auth, fetchUserSession);
-router.get("/", auth, fetchUserInfo);
-router.get("/posts", auth, fetchUserPosts);
+router.get("/", fetchUserInfo);
 router.get("/getGoogleUser", getGoogleUser);
 router.get("/createGoogleUser", createGoogleUser);
 router.post("/signUp", signUp);

@@ -2,7 +2,6 @@ const saltRounds = 10;
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
-import Post from "../models/post.js";
 import { createUserSession } from "../utils/functions.js";
 
 const fetchUserSession = async (req, res) => {
@@ -23,26 +22,13 @@ const fetchUserSession = async (req, res) => {
 
 const fetchUserInfo = async (req, res) => {
     try {
-        const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
-        const user = await User.findOne({ email: email });
+        const { userName } = req.query;
+        const user = await User.findOne({ userName: userName });
         if (user) {
             const { password, ...updatedUser } = user._doc;
             res.status(200).json(updatedUser);
         } else {
             res.status(404).json({ message: "User not found" });
-        }
-    } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
-}
-
-const fetchUserPosts = async (req, res) => {
-    try {
-        const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
-        const user = await User.findOne({ email: email });
-        const posts = await Post.find({ author: user._id }).sort({ _id: -1 });
-        if (posts) {
-            res.status(200).json(posts);
-        } else {
-            res.status(404).json({ message: "No posts found" });
         }
     } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }
@@ -151,8 +137,7 @@ const updateProfile = async (req, res) => {
         } else {
             res.status(400).json({ message: "Username not available" });
         }
-        // } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
-    } catch (error) { res.status(503).json({ message: error.message }) }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }
 
 const changePassword = async (req, res) => {
@@ -183,4 +168,4 @@ const deleteProfile = async (req, res) => {
     } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }
 
-export { fetchUserSession, fetchUserInfo, fetchUserPosts, getGoogleUser, createGoogleUser, signUp, signIn, logout, updateProfile, changePassword, deleteProfile };
+export { fetchUserSession, fetchUserInfo, getGoogleUser, createGoogleUser, signUp, signIn, logout, updateProfile, changePassword, deleteProfile };

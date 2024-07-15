@@ -9,10 +9,8 @@ function SnackBar(props) {
             {(vertical && horizontal) ?
                 <Snackbar open={openSnackbar} autoHideDuration={timeOut} onClose={handleClose} anchorOrigin={{ vertical, horizontal }} sx={sx}>
                     <Alert
-                        onClose={handleClose}
-                        severity={type}
-                        variant="filled"
-                        sx={{ width: "100%", marginTop: "78px" }}
+                        onClose={handleClose} severity={type} variant="filled"
+                        sx={{ width: "100%", position: "absolute", top: "78px" }}
                     >
                         {message}
                     </Alert>
@@ -20,9 +18,7 @@ function SnackBar(props) {
                 :
                 <Snackbar open={openSnackbar} autoHideDuration={timeOut} onClose={handleClose} sx={sx}>
                     <Alert
-                        onClose={handleClose}
-                        severity={type}
-                        variant="filled"
+                        onClose={handleClose} severity={type} variant="filled"
                         sx={{ width: "100%" }}
                     >
                         {message}
