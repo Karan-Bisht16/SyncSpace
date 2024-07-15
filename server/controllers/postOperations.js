@@ -3,7 +3,7 @@ import Post from "../models/post.js";
 import User from "../models/user.js";
 import Subspace from "../models/subspace.js";
 
-let globalCount = 1;
+let globalCount = 0;
 const LIMIT = process.env.POSTS_LIMIT;
 
 const fetchPostInfo = async (req, res) => {
