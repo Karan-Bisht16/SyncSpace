@@ -23,7 +23,8 @@ const styles = () => ({
         hyphens: "auto"
     },
     flexContainer: { display: "flex", alignItems: "end" },
-    mainContainer: { display: "flex", gap: "15px", alignItems: "center" },
+    mainContainer: { display: "flex", gap: "8px", alignItems: "center" },
+    avatarContainer: { bgcolor: "background.primary", padding: "2px", borderRadius: "50%" },
     subspaceString: { fontSize: "12px", width: "18px", minWidth: "18px", paddingBottom: "3px" },
     customSubspaceName: { fontSize: { lg: "14px" }, paddingBottom: "3px" },
     gridItemBox: { padding: "8px 0", wordBreak: "break-all", hyphens: "auto" },

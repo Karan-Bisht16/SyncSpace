@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { Upload } from "@mui/icons-material";
 // For adding file
 import FileBase from "react-file-base64";

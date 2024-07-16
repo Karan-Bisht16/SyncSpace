@@ -4,7 +4,7 @@ import User from "../models/user.js";
 import Subspace from "../models/subspace.js";
 
 let globalCount = 0;
-const LIMIT = process.env.POSTS_LIMIT;
+const LIMIT = process.env.POSTS_LIMIT || 2;
 
 const fetchPostInfo = async (req, res) => {
     try {
@@ -56,7 +56,18 @@ const createPost = async (req, res) => {
         await User.findOneAndUpdate({ email: email }, { $inc: { postsCount: 1 } });
         await Subspace.findOneAndUpdate({ subspaceName: post.subspaceName }, { $inc: { postsCount: 1 } });
         res.status(200).json(newPost);
-    } catch (error) { res.status(409).json({ message: "Network error. Try again." }) }
+    } catch (error) { console.log(error); res.status(409).json({ message: "Network error. Try again." }) }
 }
 
-export { fetchPosts, fetchPostInfo, createPost };
+const deletePost = async (req, res) => {
+    const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
+    const { id } = req.query;
+    try {
+        const post = await Post.findByIdAndDelete(id);
+        await User.findOneAndUpdate({ email: email }, { $inc: { postsCount: -1 } });
+        await Subspace.findOneAndUpdate({ subspaceName: post.subspaceName }, { $inc: { postsCount: -1 } });
+        res.sendStatus(200);
+    } catch (error) { console.log(error); res.status(409).json({ message: "Network error. Try again." }) }
+}
+
+export { fetchPosts, fetchPostInfo, createPost, deletePost };

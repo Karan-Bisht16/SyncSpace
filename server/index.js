@@ -13,18 +13,13 @@ const PORT = process.env.PORT || 8080;
 // Middleware setup
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true, limit: "25mb" }));
-// app.use(express.json());
-// app.use(express.urlencoded({  }));
+
 app.use(methodOverride("_method"));
 app.use(express.static(__dirname + "/public"));
 
 import mongoose from "mongoose";
 import connection from "./database.js";
 connection();
-
-// cors() must be present above routes
-// origin: [process.env.FRONT_END_DOMAIN_1, process.env.FRONT_END_DOMAIN_2, process.env.FRONT_END_DOMAIN_3],
-// app.use(cors());
 
 const corsOptions = {
     origin: true,
@@ -49,9 +44,6 @@ app.use(session({
     store: mongoStore,
     cookie: {
         maxAge: 365 * 24 * 60 * 60 * 1000,
-        // httpOnly: true,
-        // secure: process.env.NODE_ENV === "production",
-        // sameSite: 'lax',
     }
 }));
 

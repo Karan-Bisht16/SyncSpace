@@ -87,7 +87,6 @@ function Settings(props) {
             setSnackbarState(true);
             return false;
         }
-
         openDialog({ title: "Change Password", message: "Be sure to remember your new password", cancelBtnText: "Cancel", submitBtnText: "Change" });
     }
     const [linearProgressBar, setLinearProgressBar] = useState(false);

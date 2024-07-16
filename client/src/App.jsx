@@ -16,8 +16,8 @@ import useFetchUser from "./utils/useFetchUser";
 import Header from "./Components/Header/Header";
 // Importing all webpages
 import Home from "./pages/Home/Home";
-import PostContainer from "./pages/PostContainer/PostContainer";
 import CreatePost from "./pages/CreatePost/CreatePost";
+import PostContainer from "./pages/PostContainer/PostContainer";
 import CreateSubspace from "./pages/CreateSubspace/CreateSubspace";
 import Subspace from "./pages/Subspace/Subspace";
 import Profile from "./pages/Profile/Profile";
@@ -65,13 +65,13 @@ function App() {
                             element={<Home user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
                         />
                         <Route
+                            path="/create-post"
+                            element={<ProtectedRoute Component={CreatePost} user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
+                        />
+                        <Route
                             exact
                             path="/post/:id"
                             element={<PostContainer user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
-                        />
-                        <Route
-                            path="/create-post"
-                            element={<ProtectedRoute Component={CreatePost} user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
                         />
                         <Route
                             path="/create-subspace"

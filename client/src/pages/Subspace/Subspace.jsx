@@ -53,7 +53,6 @@ function Subspace(props) {
         setDialog(false);
     };
     const [subspaceData, setSubspaceData] = useState({
-        subspaceId: "Loading...",
         name: "Loading...",
         subspaceName: "Loading...",
         description: "Loading...",
@@ -99,7 +98,7 @@ function Subspace(props) {
         if (!user) {
             navigate("/authentication");
         } else if (joined) {
-            navigate("/create-post", { state: { subspaceName } });
+            navigate("/create-post", { state: { subspaceName, subspaceId: subspaceData?._id } });
         } else {
             openDialog({ title: "Join Subspace", message: `Join ss/${subspaceName} to create posts.`, cancelBtnText: "Cancel", submitBtnText: "Join" });
         }
@@ -110,7 +109,7 @@ function Subspace(props) {
         await handleJoin();
         setLinearProgressBar(false);
         closeDialog();
-        navigate("/create-post", { state: { subspaceName } });
+        navigate("/create-post", { state: { subspaceName, subspaceId: subspaceData?._id } });
     }
     const [joined, setJoined] = useState(false);
     async function handleJoin() {
@@ -178,7 +177,6 @@ function Subspace(props) {
                                             variant="contained" onClick={handleCreate}
                                             sx={Object.assign({ display: { xs: "block", sm: "none" }, borderRadius: "100px", fontSize: "12px" }, classes.notJoinedBtn)}
                                         >+</Button>
-
                                     </Box>
                                 </Box>
                                 {secondaryLoading ?
@@ -193,7 +191,7 @@ function Subspace(props) {
                                                     {joined ?
                                                         <NotFound
                                                             mainText="No post in this subspace"
-                                                            link={{ linkText: "Create one", to: "/create-post", state: { subspaceName } }}
+                                                            link={{ linkText: "Create one", to: "/create-post", state: { subspaceName, subspaceId: subspaceData?._id } }}
                                                         />
                                                         :
                                                         <Box sx={{ textAlign: "center" }}>
@@ -208,9 +206,9 @@ function Subspace(props) {
                                             </Box>
                                             :
                                             <Box sx={classes.subspacePostContainer}>
-                                                <Posts 
-                                                    key={rerender} searchQuery={{ subspaceName: rerender }} 
-                                                    setSnackbarValue={setSnackbarValue} setSnackbarState={setSnackbarState} 
+                                                <Posts
+                                                    key={rerender} searchQuery={{ subspaceName: rerender }}
+                                                    setSnackbarValue={setSnackbarValue} setSnackbarState={setSnackbarState}
                                                 />
                                             </Box>
                                         }

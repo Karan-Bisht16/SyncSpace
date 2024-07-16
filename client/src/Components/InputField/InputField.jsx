@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, TextField } from "@mui/material";
+import { TextField } from "@mui/material";
 
 function InputField(props) {
     const { name, label, value, type, reference, handleChange, autoFocus, error, helperText, disabled, multiline, rows, id } = props;

@@ -81,7 +81,9 @@ function CustomDrawer(props) {
                                 <ListItem key={index} disablePadding onClick={() => handleSubspace(subspace.name)}>
                                     <ListItemButton sx={{ pl: 4 }}>
                                         <ListItemIcon>
-                                            <Avatar src={subspace.avatar} alt="Subspace avatar">{subspace.name.charAt(0)}</Avatar>
+                                            <Box sx={{ bgcolor: "background.primary", padding: "2px", borderRadius: "50%" }}>
+                                                <Avatar sx={{ height: "35px", width: "35px" }} src={subspace.avatar} alt="Subspace avatar">{subspace.name.charAt(0)}</Avatar>
+                                            </Box>
                                         </ListItemIcon>
                                         <ListItemText primary={subspace.name} />
                                     </ListItemButton>

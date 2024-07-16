@@ -173,7 +173,7 @@ function Profile(props) {
                                         </Box>
                                     </Box>
                                     {((user) && (user.userName === userName)) &&
-                                        <Box sx={classes.editProfile} onClick={handleEditProfile}>
+                                        <Box sx={classes.editProfileBtn} onClick={handleEditProfile}>
                                             {!editProfile ?
                                                 <>
                                                     <ModeEdit sx={{ display: { xs: "flex", sm: "none" } }} />

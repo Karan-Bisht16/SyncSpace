@@ -1,9 +1,5 @@
 import mongoose from "mongoose";
 
-const condenseCommentSchema = mongoose.Schema({
-    commentId: { type: mongoose.Schema.Types.ObjectId, ref: "Comment" }
-});
-
 const post_Schema = new mongoose.Schema({
     title: { type: String, required: true, trim: true },
     body: { type: String },
@@ -13,13 +9,9 @@ const post_Schema = new mongoose.Schema({
     subspaceId: { type: mongoose.Schema.Types.ObjectId, ref: "SubSpace", required: true },
     subspaceName: { type: String, trim: true, required: true },
     dateCreated: { type: Date, default: Date.now },
-    likes: { type: Number, default: 0 },
-    edited: { type: Boolean, default: false },
-    comments: {
-        type: [condenseCommentSchema],
-        default: []
-    },
-    commentsCount: { type: Number, default: 0 }
+    likesCount: { type: Number, default: 0 },
+    commentsCount: { type: Number, default: 0 },
+    edited: { type: Boolean, default: false }
 });
 
 const Post = mongoose.model("Post", post_Schema);

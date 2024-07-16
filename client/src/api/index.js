@@ -32,3 +32,4 @@ export const fetchSubspaceAvatar = (subspaceName) => API.get("/subspace/avatar",
 export const fetchPostInfo = (postId) => API.get(`/posts?id=${postId}`);
 export const fetchPosts = (searchParams) => API.post("/posts/", searchParams);
 export const createPost = (newPost) => API.post("/posts/createPost", newPost);
+export const deletePost = (postId) => API.get(`/posts/deletePost?id=${postId}`);

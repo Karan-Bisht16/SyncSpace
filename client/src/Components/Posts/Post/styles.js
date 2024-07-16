@@ -16,7 +16,7 @@ const styles = () => ({
     bodyContainer: {
         bgcolor: "background.tertiary",
         borderRadius: "16px",
-        padding: "8px 16px",
+        padding: "12px 16px",
         margin: "4px 0 8px 0",
         boxShadow: "rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px"
     },
@@ -33,7 +33,8 @@ const styles = () => ({
         overflow: "hidden"
     },
     imageBox: { height: "100%", width: "100%", verticalAlign: "middle" },
-    postActionsContainer: {
+    allPostActionsContainer: { display: "flex", justifyContent: "space-between", alignItems: "center" },
+    majorPostActionsContainer: {
         color: "text.heading",
         width: { xs: "auto", md: "250px" },
         bgcolor: "background.default",

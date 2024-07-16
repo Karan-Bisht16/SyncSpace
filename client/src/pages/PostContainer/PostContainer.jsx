@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Box, Button, Grid, LinearProgress, Typography } from "@mui/material";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -42,7 +42,7 @@ function PostContainer(props) {
                 if (result) {
                     setPostData(result);
                     setPrimaryLoading(false);
-                    setCommentsFound(result.comments);
+                    // setCommentsFound(result.comments);
                     setSecondaryLoading(false);
                     document.title = "SyncSpace: " + result.title;
                 } else {
@@ -79,7 +79,7 @@ function PostContainer(props) {
         <Grid container sx={{ display: "flex" }}>
             <Grid item xs={0} md={2} sx={classes.leftContainer}></Grid>
             <Box sx={classes.mainContainer}>
-                <div className="container mx-auto my-10">
+                <div className="mx-auto my-10">
                     {noPostFound ?
                         <NotFound
                             img={true}

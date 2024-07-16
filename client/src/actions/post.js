@@ -1,5 +1,4 @@
 import * as api from "../api";
-import { CREATE_POST } from "../constants/actionTypes";
 
 function handleError(error) {
     if (error.code === "ERR_NETWORK") {
@@ -8,14 +7,6 @@ function handleError(error) {
         return { status: error.response.status, result: error.response.data };
     }
 }
-
-// export const getPosts = () => async (dispatch) => {
-//     try {
-//         const { data } = await api.getPosts();
-//         dispatch({ type: FETCH_ALL_POST, payload: data });
-//         return { status: 200, result: data }
-//     } catch (error) { return handleError(error) }
-// };
 
 export const fetchPostInfo = (postId) => async () => {
     try {
@@ -27,15 +18,20 @@ export const fetchPostInfo = (postId) => async () => {
 export const fetchPosts = (searchParams) => async () => {
     try {
         const { data } = await api.fetchPosts(searchParams);
-        // dispatch({ type: FETCH_LIMITED_POSTS, payload: data.results });
         return data;
     } catch (error) { return handleError(error) }
 };
 
-export const createPost = (postData) => async (dispatch) => {
+export const createPost = (postData) => async () => {
     try {
         const { data } = await api.createPost(postData);
-        dispatch({ type: CREATE_POST, payload: data });
+        return { status: 200, result: data };
+    } catch (error) { return handleError(error) }
+};
+
+export const deletePost = (postId) => async () => {
+    try {
+        const { data } = await api.deletePost(postId);
         return { status: 200, result: data };
     } catch (error) { return handleError(error) }
 };

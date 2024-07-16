@@ -58,7 +58,7 @@ function Posts(props) {
     }
 
     return (
-        <div className="container mx-auto my-10">
+        <div className="mx-auto my-10">
             {data &&
                 data.results.map((item, index) => (
                     <Post key={index} post={item} setSnackbarValue={setSnackbarValue} setSnackbarState={setSnackbarState} />

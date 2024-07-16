@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { Button, Box, Chip, Divider, Grid, Stepper, Step, StepLabel, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import imageCompression from "browser-image-compression";
 // Importing my components
 import RealTimeSubspaceViewer from "./RealTimeSubspaceViewer/RealTimeSubspaceViewer";
 import ConfirmationDialog from "../ConfirmationDialog/ConfirmationDialog";
@@ -96,6 +97,22 @@ function SubspaceForm(props) {
         }
     }
     // File Upload
+    const fileUploadOptions = {
+        maxSizeMB: 0.05,
+        maxWidthOrHeight: 360,
+        useWebWorker: true,
+    }
+    function setFile(fileBase64String) {
+        document.querySelector("#fileChosen").textContent = "1 file selected";
+        setSubspaceData(prevSubspaceData => {
+            return { ...prevSubspaceData, "avatar": fileBase64String };
+        });
+    }
+    async function compressImage(imageFile) {
+        const compressedBlob = await imageCompression(imageFile, fileUploadOptions);
+        const compressedBase64String = await imageCompression.getDataUrlFromFile(compressedBlob);
+        setFile(compressedBase64String);
+    }
     function handleFileUpload(file) {
         let fileSize = Number(file.size.slice(0, file.size.length - 2));
         let fileType = file.type.includes("image");
@@ -107,11 +124,10 @@ function SubspaceForm(props) {
             setSnackbarValue({ message: "Select a valid image", status: "error" });
             setSnackbarState(true);
             resetSelectedFiles();
+        } else if (fileSize > 50) {
+            compressImage(file.file);
         } else {
-            document.querySelector("#fileChosen").textContent = "1 file selected";
-            setSubspaceData(prevSubspaceData => {
-                return { ...prevSubspaceData, "avatar": file.base64 };
-            });
+            setFile(file.base64);
         }
     }
     function resetSelectedFiles() {
