@@ -3,6 +3,7 @@ import { Avatar, Box, Button, Divider, Grid, LinearProgress, Tab, Tabs, Typograp
 import { CloseRounded, ModeEdit } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { Player } from '@lordicon/react';
 // Importing my components
 import RealTimeProfileViwer from "./RealTimeProfileViewer/RealTimeProfileViewer";
 import InputField from "../../Components/InputField/InputField";
@@ -132,6 +133,8 @@ function Profile(props) {
             setSnackbarState(true);
         }
     }
+    const ICON = require('../../assets/animation-deleted.json');
+    const playerRef = useRef(null);
 
     return (
         <Grid container sx={classes.flexContainer}>
@@ -146,7 +149,15 @@ function Profile(props) {
                     :
                     <>
                         {userProfileDeleted ?
-                            <Box sx={{ marginTop: "30vh" }}>
+                            <Box sx={{ marginTop: "15vh" }}>
+                                <Box sx={{display: "flex", justifyContent: "center"}}>
+                                    <Player
+                                        ref={playerRef}
+                                        icon={ICON}
+                                        size={250}
+                                    />
+                                    {playerRef.current?.playFromBeginning()}
+                                </Box>
                                 <NotFound
                                     img={false}
                                     mainText="This profile has been deleted"
