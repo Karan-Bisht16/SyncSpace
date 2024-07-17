@@ -6,7 +6,7 @@ import Posts from "../../Components/Posts/Posts";
 import styles from "./styles";
 
 function Home(props) {
-    const { setSnackbarValue, setSnackbarState } = props;
+    const { snackbar, confirmationDialog } = props;
     const classes = styles();
 
     useEffect(() => {
@@ -18,7 +18,7 @@ function Home(props) {
         <Grid container sx={{ display: "flex" }}>
             <Grid item xs={0} md={2} sx={classes.leftContainer}></Grid>
             <Box sx={classes.mainContainer}>
-                <Posts searchQuery={null} setSnackbarValue={setSnackbarValue} setSnackbarState={setSnackbarState} />
+                <Posts searchQuery={null} customParams="HOME_PAGE" snackbar={snackbar} confirmationDialog={confirmationDialog} />
             </Box>
         </Grid>
     );

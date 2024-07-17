@@ -15,7 +15,9 @@ import { createSubspace } from "../../actions/subspace";
 import styles from "./styles"
 
 function SubspaceForm(props) {
-    const { user, setSnackbarValue, setSnackbarState } = props;
+    const { user, snackbar, confirmationDialog } = props;
+    const [setSnackbarValue, setSnackbarState] = snackbar;
+    const [dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar] = confirmationDialog;
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -36,22 +38,6 @@ function SubspaceForm(props) {
         moderators: [creator],
         topics: [],
     });
-    // JS for Dialog
-    const [dialog, setDialog] = useState(false);
-    const [dialogValue, setDialogValue] = useState({
-        title: "",
-        message: "",
-        cancelBtnText: "",
-        submitBtnText: "",
-    });
-    async function openDialog(values) {
-        await setDialogValue(values);
-        await setDialog(true);
-        document.querySelector("#focusPostBtn").focus();
-    };
-    function closeDialog() {
-        setDialog(false);
-    };
     // JS for Stepper
     const steps = ["Add name", "Add styling", "Add topics"]
     const [activeStep, setActiveStep] = useState(0);
@@ -196,7 +182,6 @@ function SubspaceForm(props) {
         console.log(subspaceData);
         openDialog({ title: "Create Subspace", message: "Create a new subspace?", cancelBtnText: "Cancel", submitBtnText: "Create" });
     }
-    const [linearProgressBar, setLinearProgressBar] = useState(false);
     async function handleDialog() {
         setLinearProgressBar(true);
         try {
@@ -207,12 +192,11 @@ function SubspaceForm(props) {
             } else {
                 setSnackbarValue({ message: result.message, status: "error" });
                 setSnackbarState(true);
-                setLinearProgressBar(false);
             }
         } catch (error) {
+            closeDialog();
             setSnackbarValue({ message: error.message, status: "error" });
             setSnackbarState(true);
-            setLinearProgressBar(false);
         }
     }
 

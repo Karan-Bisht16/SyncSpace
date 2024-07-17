@@ -32,4 +32,6 @@ export const fetchSubspaceAvatar = (subspaceName) => API.get("/subspace/avatar",
 export const fetchPostInfo = (postId) => API.get(`/posts?id=${postId}`);
 export const fetchPosts = (searchParams) => API.post("/posts/", searchParams);
 export const createPost = (newPost) => API.post("/posts/createPost", newPost);
-export const deletePost = (postId) => API.get(`/posts/deletePost?id=${postId}`);
+export const deletePost = (postId) => API.delete("/posts/deletePost", { params: postId });
+export const isPostLiked = (postAndUserId) => API.get("/posts/isPostLiked", { params: postAndUserId });
+export const likePost = (actionData) => API.patch("/posts/likePost", actionData);

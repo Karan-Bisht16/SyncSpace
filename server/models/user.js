@@ -22,9 +22,8 @@ const userSchema = new mongoose.Schema({
         default: []
     },
     subspacesJoinedCount: { type: Number, default: 0 },
-    postsCount: { type: Number, default: 0 }
-    // subspacesCreated: 
-    // subspacesCreatedCount: 
+    postsCount: { type: Number, default: 0 },
+    isDeleted: { type: Boolean, default: false }
 });
 
 const User = mongoose.model("User", userSchema);

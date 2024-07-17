@@ -7,7 +7,7 @@ import PostForm from "../../Components/PostForm/PostForm";
 import styles from "./styles";
 
 function CreatePost(props) {
-    const { user, setSnackbarValue, setSnackbarState } = props;
+    const { user, snackbar, confirmationDialog } = props;
     const classes = styles();
     const location = useLocation();
 
@@ -90,7 +90,7 @@ function CreatePost(props) {
                     user={user}
                     postData={postData} setPostData={setPostData}
                     hasPredefinedSubspace={hasPredefinedSubspace}
-                    setSnackbarValue={setSnackbarValue} setSnackbarState={setSnackbarState}
+                    snackbar={snackbar} confirmationDialog={confirmationDialog}
                 />
             </Box>
         </Grid>

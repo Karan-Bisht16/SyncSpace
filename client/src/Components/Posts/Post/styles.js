@@ -36,13 +36,12 @@ const styles = () => ({
     allPostActionsContainer: { display: "flex", justifyContent: "space-between", alignItems: "center" },
     majorPostActionsContainer: {
         color: "text.heading",
-        width: { xs: "auto", md: "250px" },
+        width: "250px",
         bgcolor: "background.default",
         display: "flex",
         justifyContent: "space-around",
         alignItems: "center",
-        borderRadius: "32px",
-        marginTop: "8px"
+        borderRadius: "32px"
     },
     iconColor: { color: "text.heading" },
     iconText: { fontSize: "16px" },

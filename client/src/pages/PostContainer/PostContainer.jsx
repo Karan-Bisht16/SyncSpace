@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Box, Button, Grid, LinearProgress, Typography } from "@mui/material";
-import { Link, useLocation, useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Box, Button, Grid, LinearProgress, TextField, Typography } from "@mui/material";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { lineSpinner } from "ldrs"
 // Importing my components
@@ -12,9 +12,11 @@ import { fetchPostInfo } from "../../actions/post";
 import styles from "./styles";
 
 function PostContainer(props) {
-    const { user, setSnackbarValue, setSnackbarState } = props;
+    const { user, snackbar, confirmationDialog } = props;
+    const [setSnackbarValue, setSnackbarState] = snackbar;
     const { id } = useParams();
     const classes = styles();
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const location = useLocation();
 
@@ -22,7 +24,7 @@ function PostContainer(props) {
     const [primaryLoading, setPrimaryLoading] = useState(true);
     const [secondaryLoading, setSecondaryLoading] = useState(true);
     const [noPostFound, setNoPostFound] = useState(false);
-    const [commentsFound, setCommentsFound] = useState(false);
+    const [commentsFound, setCommentsFound] = useState([]);
     const [postData, setPostData] = useState({
         authorName: "Loading...",
         subspaceName: "",
@@ -42,7 +44,8 @@ function PostContainer(props) {
                 if (result) {
                     setPostData(result);
                     setPrimaryLoading(false);
-                    // setCommentsFound(result.comments);
+                    // change this
+                    setCommentsFound([]);
                     setSecondaryLoading(false);
                     document.title = "SyncSpace: " + result.title;
                 } else {
@@ -73,6 +76,22 @@ function PostContainer(props) {
         }
         getPostInfo();
     }, [id, location, dispatch, setSnackbarValue, setSnackbarState]);
+
+    const [addComment, setAddComment] = useState(false);
+    function handleAddComment() {
+        console.log("hey");
+    }
+    function handleOpenComment() {
+        if (user) {
+            setAddComment(true);
+        } else {
+            navigate("/authentication");
+        }
+    }
+    function handleCancelComment() {
+        setAddComment(false);
+    }
+
     lineSpinner.register("l-loader");
 
     return (
@@ -95,14 +114,34 @@ function PostContainer(props) {
                                 </Box>
                                 :
                                 <>
-                                    <Post post={postData} individual={true} redirect={redirect} setSnackbarValue={setSnackbarValue} setSnackbarState={setSnackbarState} />
+                                    <Post post={postData} individual={true} redirect={redirect} snackbar={snackbar} confirmationDialog={confirmationDialog} />
                                     {secondaryLoading ?
                                         <Box sx={classes.noCommentsContainer}>
                                             <l-loader size="75" speed="1.75" color="#0090c1" />
                                         </Box>
                                         :
                                         <>
-                                            <Button sx={classes.addCommentBtn}>+ Add a comment</Button>
+                                            {addComment ?
+                                                <>
+                                                    <Box sx={classes.addCommentContainer}>
+                                                        {/* use InputField here after you make it a controlled input */}
+                                                        <TextField
+                                                            label="Your comment"
+                                                            sx={{ bgcolor: "background.secondary", width: "95%" }}
+                                                            autofocus multiline rows={3}
+                                                            resize={true}
+                                                        />
+                                                    </Box>
+                                                    <Box sx={{ display: "flex", gap: "8px", justifyContent: "end", width: "95%", margin: "8px auto" }}>
+                                                        <Button variant="outlined" sx={classes.commentBtn} onClick={handleCancelComment}>Cancel</Button>
+                                                        <Button variant="contained" sx={classes.commentBtn} onClick={handleAddComment}>Add</Button>
+                                                    </Box>
+                                                </>
+                                                :
+                                                <Box sx={classes.addCommentBtnContainer}>
+                                                    <Button sx={classes.addCommentBtn} onClick={handleOpenComment}>+ Add a comment</Button>
+                                                </Box>
+                                            }
                                             {commentsFound.length === 0 ?
                                                 <Box sx={classes.noCommentsContainer}>
                                                     <NotFound
@@ -117,7 +156,7 @@ function PostContainer(props) {
                                                 </Box>
                                                 :
                                                 <Box sx={classes.commentsContainer}>
-                                                    huh
+                                                    hey
                                                 </Box>
                                             }
                                         </>

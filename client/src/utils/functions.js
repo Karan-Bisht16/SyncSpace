@@ -1,5 +1,8 @@
 function formatDate(date) {
-    return new Date(date).toUTCString().slice(5, 17);
+    if (date){
+        return new Date(date).toUTCString().slice(5, 17);
+    } 
+    return "Loading...";
 }
 
 function formatTime(date) {

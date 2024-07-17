@@ -17,7 +17,8 @@ const subspaceSchema = new mongoose.Schema({
     membersCount: { type: Number, default: 1 },
     moderators: [{ type: condenseUserSchema }],
     topics: { type: mongoose.Schema.Types.Array, required: true },
-    postsCount: { type: Number, default: 0 }
+    postsCount: { type: Number, default: 0 },
+    isDeleted: { type: Boolean, default: false }
 });
 
 const Subspace = mongoose.model("Subspace", subspaceSchema);

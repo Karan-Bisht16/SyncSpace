@@ -2,6 +2,7 @@ const saltRounds = 10;
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
+import Like from "../models/like.js";
 import { createUserSession } from "../utils/functions.js";
 
 const fetchUserSession = async (req, res) => {
@@ -163,7 +164,13 @@ const changePassword = async (req, res) => {
 const deleteProfile = async (req, res) => {
     try {
         const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
-        await User.findOneAndDelete({ email: email });
+        await User.updateOne(
+            { email: email },
+            {
+                $unset: { email: "", password: "", googleId: "", avatar: "", dateJoined: "", credits: "", bio: "", subspacesJoined: "", subspacesJoinedCount: "", postsCount: "" },
+                isDeleted: true,
+            }
+        );
         res.sendStatus(200);
     } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }

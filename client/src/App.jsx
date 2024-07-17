@@ -12,8 +12,8 @@ import { square } from "ldrs";
 import SnackBar from "./Components/SnackBar/SnackBar";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import GuestRoute from "./utils/GuestRoute";
-import useFetchUser from "./utils/useFetchUser";
 import Header from "./Components/Header/Header";
+import useFetchUser from "./utils/useFetchUser";
 // Importing all webpages
 import Home from "./pages/Home/Home";
 import CreatePost from "./pages/CreatePost/CreatePost";
@@ -39,6 +39,25 @@ function App() {
         }
         setSnackbarState(false);
     }
+    // JS for Confirmation Dialog
+    const [dialog, setDialog] = useState(false);
+    const [dialogValue, setDialogValue] = useState({
+        title: "",
+        message: "",
+        cancelBtnText: "",
+        submitBtnText: "",
+    });
+    const [linearProgressBar, setLinearProgressBar] = useState(false);
+    async function openDialog(values) {
+        await setDialogValue(values);
+        await setDialog(true);
+        document.querySelector("#focusPostBtn").focus();
+    };
+    function closeDialog() {
+        setDialog(false);
+        setLinearProgressBar(false)
+    };
+    // Fetching user
     const { user, loading } = useFetchUser(setSnackbarValue, setSnackbarState);
     const loadingScreenStyling = {
         width: "100hw", height: "100vh", bgcolor: "background.default",
@@ -51,48 +70,92 @@ function App() {
             </Box>
         );
     }
-
     return (
         <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_OAUTH_API_TOKEN}>
             <QueryClientProvider client={queryClient}>
-
                 <Router>
-                    <Header user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />
+                    <Header user={user} snackbar={[setSnackbarValue, setSnackbarState]} />
                     <Routes>
                         <Route
                             exact
                             path="/"
-                            element={<Home user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
+                            element={
+                                <Home
+                                    user={user}
+                                    snackbar={[setSnackbarValue, setSnackbarState]}
+                                    confirmationDialog={[dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar]}
+                                />
+                            }
                         />
                         <Route
                             path="/create-post"
-                            element={<ProtectedRoute Component={CreatePost} user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
+                            element={
+                                <ProtectedRoute
+                                    Component={CreatePost} user={user}
+                                    snackbar={[setSnackbarValue, setSnackbarState]}
+                                    confirmationDialog={[dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar]}
+                                />
+                            }
                         />
                         <Route
                             exact
                             path="/post/:id"
-                            element={<PostContainer user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
+                            element={
+                                <PostContainer
+                                    user={user}
+                                    snackbar={[setSnackbarValue, setSnackbarState]}
+                                    confirmationDialog={[dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar]}
+                                />
+                            }
                         />
                         <Route
                             path="/create-subspace"
-                            element={<ProtectedRoute Component={CreateSubspace} user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
+                            element={
+                                <ProtectedRoute
+                                    Component={CreateSubspace} user={user}
+                                    snackbar={[setSnackbarValue, setSnackbarState]}
+                                    confirmationDialog={[dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar]}
+                                />
+                            }
                         />
                         <Route
                             path="/ss/:subspaceName"
-                            element={<Subspace user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
+                            element={
+                                <Subspace
+                                    user={user}
+                                    snackbar={[setSnackbarValue, setSnackbarState]}
+                                    confirmationDialog={[dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar]}
+                                />
+                            }
                         />
                         <Route
                             path="/authentication"
-                            element={<GuestRoute Component={Authentication} user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
+                            element={
+                                <GuestRoute
+                                    Component={Authentication} user={user}
+                                    snackbar={[setSnackbarValue, setSnackbarState]}
+                                />
+                            }
                         />
                         <Route
-                            exact
                             path="/e/:userName"
-                            element={<Profile user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
+                            element={
+                                <Profile
+                                    user={user}
+                                    snackbar={[setSnackbarValue, setSnackbarState]}
+                                    confirmationDialog={[dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar]}
+                                />
+                            }
                         />
                         <Route
                             path="/settings"
-                            element={<ProtectedRoute Component={Settings} user={user} setSnackbarState={setSnackbarState} setSnackbarValue={setSnackbarValue} />}
+                            element={
+                                <ProtectedRoute
+                                    Component={Settings} user={user}
+                                    snackbar={[setSnackbarValue, setSnackbarState]}
+                                    confirmationDialog={[dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar]}
+                                />
+                            }
                         />
                         <Route
                             path="*"

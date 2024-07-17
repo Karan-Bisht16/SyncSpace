@@ -15,7 +15,8 @@ import styles from "./styles";
 import SyncSpaceLogo from "../../assets/img-syncspace-logo.avif";
 
 function Header(props) {
-    const { user, setSnackbarValue, setSnackbarState } = props;
+    const { user, snackbar } = props;
+    const [setSnackbarValue, setSnackbarState] = snackbar;
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -74,8 +75,8 @@ function Header(props) {
             toggleMode();
         }
         if (location.state && location.state.status) {
-            setSnackbarState(true);
             setSnackbarValue({ message: location.state.message, status: location.state.status });
+            setSnackbarState(true);
         }
     }, [mode, toggleBodyTheme, toggleMode, location.state, setSnackbarValue, setSnackbarState]);
 

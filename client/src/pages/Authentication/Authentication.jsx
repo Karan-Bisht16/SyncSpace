@@ -13,7 +13,8 @@ import { getGoogleUser, createGoogleUser, signUp, signIn } from "../../actions/u
 import styles from "./styles";
 
 function Authentication(props) {
-    const { setSnackbarValue, setSnackbarState } = props;
+    const { snackbar } = props;
+    const [setSnackbarValue, setSnackbarState] = snackbar;
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -28,12 +29,12 @@ function Authentication(props) {
     const confirmPasswordField = useRef(null);
     const regexEmail = /^([a-zA-Z0-9_\.\-]+)@([a-zA-Z0-9_\.\-]+)\.([a-zA-Z]+)/;
     // JS for Dialog
-    const [openDialog, setOpenDialog] = React.useState(false);
-    const handleClickOpenDialog = () => {
+    const [openDialog, setOpenDialog] = useState(false);
+    function handleClickOpenDialog() {
         setOpenDialog(true);
         setUniqueUserNameError(false);
     };
-    const handleCloseDialog = () => {
+    function handleCloseDialog() {
         setOpenDialog(false);
     };
     const [authData, setAuthData] = useState({

@@ -14,7 +14,9 @@ import { fetchAllSubspaceInfo, joinSubspace } from "../../actions/subspace";
 import styles from "./styles";
 
 function Subspace(props) {
-    const { user, setSnackbarValue, setSnackbarState } = props;
+    const { user, snackbar, confirmationDialog } = props;
+    const [setSnackbarValue, setSnackbarState] = snackbar;
+    const [dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar] = confirmationDialog;
     const { subspaceName } = useParams();
     const classes = styles();
     const dispatch = useDispatch();
@@ -36,22 +38,6 @@ function Subspace(props) {
         setRerender(subspaceName);
         setSubspacePostsCount(0);
     }, [subspaceName]);
-    // JS for Dialog
-    const [dialog, setDialog] = useState(false);
-    const [dialogValue, setDialogValue] = useState({
-        title: "",
-        message: "",
-        cancelBtnText: "",
-        submitBtnText: "",
-    });
-    async function openDialog(values) {
-        await setDialogValue(values);
-        await setDialog(true);
-        document.querySelector("#focusPostBtn").focus();
-    };
-    function closeDialog() {
-        setDialog(false);
-    };
     const [subspaceData, setSubspaceData] = useState({
         name: "Loading...",
         subspaceName: "Loading...",
@@ -103,7 +89,6 @@ function Subspace(props) {
             openDialog({ title: "Join Subspace", message: `Join ss/${subspaceName} to create posts.`, cancelBtnText: "Cancel", submitBtnText: "Join" });
         }
     }
-    const [linearProgressBar, setLinearProgressBar] = useState(false);
     async function handleDialog() {
         setLinearProgressBar(true);
         await handleJoin();
@@ -180,13 +165,13 @@ function Subspace(props) {
                                     </Box>
                                 </Box>
                                 {secondaryLoading ?
-                                    <Box sx={classes.postContainer}>
+                                    <Box sx={{ display: "flex", justifyContent: "center", marginTop: "24px" }}>
                                         <l-loader size="75" speed="1.75" color="#0090c1" />
                                     </Box>
                                     :
                                     <>
                                         {subspacePostsCount === 0 ?
-                                            <Box sx={classes.postContainer}>
+                                            <Box sx={classes.noContentContainer}>
                                                 <>
                                                     {joined ?
                                                         <NotFound
@@ -206,10 +191,7 @@ function Subspace(props) {
                                             </Box>
                                             :
                                             <Box sx={classes.subspacePostContainer}>
-                                                <Posts
-                                                    key={rerender} searchQuery={{ subspaceName: rerender }}
-                                                    setSnackbarValue={setSnackbarValue} setSnackbarState={setSnackbarState}
-                                                />
+                                                <Posts key={rerender} searchQuery={{ subspaceName: rerender }} snackbar={snackbar} confirmationDialog={confirmationDialog} />
                                             </Box>
                                         }
                                     </>

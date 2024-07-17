@@ -36,7 +36,7 @@ const styles = () => ({
         }
     },
     joinedBtn: { padding: "3px 24px", border: "1px solid #0090c1" },
-    postContainer: {
+    noContentContainer: {
         display: "flex",
         justifyContent: "center",
         minHeight: "50vh",
@@ -45,7 +45,7 @@ const styles = () => ({
         bgcolor: "background.backdrop"
     },
     link: { color: "#0090c1", fontSize: "20px", textDecoration: "none", cursor: "pointer" },
-    subspacePostContainer: { width: "auto", minWidth: { xs: "100%", md: "65%", lg: "75%" }, margin: "0 auto", padding: "32px 0px" },
+    subspacePostContainer: { width: "auto", minWidth: { xs: "100%", md: "65%", lg: "75%" }, margin: "0 auto", padding: "0" },
 });
 
 export default styles;

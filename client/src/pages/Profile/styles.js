@@ -21,7 +21,6 @@ const styles = () => ({
             transition: "0.2s"
         }
     },
-    subContainer: { marginTop: "15px" },
     postContainer: {
         minHeight: "50vh",
         maxHeight: "70vh",
@@ -32,17 +31,8 @@ const styles = () => ({
         boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
     },
     primaryLoadingScreenStyling: { height: "80vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" },
-    secondaryLoadingScreenStyling: {
-        height: "100%",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: "10px",
-        bgcolor: "background.tertiary"
-    },
     titleFont: { fontSize: { xs: "24px", md: "36px" } },
     progressBar: { width: { xs: "80%", md: "500px" }, color: "#0090c1", marginTop: "7.5px" },
-    noContentContainer: { display: "flex", justifyContent: "center", alignItems: "center", height: "100%" },
     titleField: { marginBottom: "4px" },
     clearBtn: { color: "#0090c1", marginBottom: "16px" },
     updateBtn: { bgcolor: "#0090c1", color: "#ffffff", marginLeft: "8px", marginBottom: "16px" }

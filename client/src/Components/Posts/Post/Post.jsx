@@ -1,43 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { Avatar, Box, Checkbox, Grid, IconButton, ListItemIcon, Menu, MenuItem, Paper, Tooltip, Typography } from "@mui/material";
-import { FiberManualRecordTwoTone, CloseRounded, CommentOutlined, DeleteTwoTone, DoneAll, EditNoteRounded, Favorite, FavoriteBorderOutlined, Link, MoreVert } from "@mui/icons-material";
+import { FiberManualRecordTwoTone, CloseRounded, CommentOutlined, DeleteTwoTone, DoneAll, EditNoteRounded, Favorite, FavoriteBorderOutlined, Link, MoreHoriz } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Carousel from "react-bootstrap/Carousel";
 import parse from "html-react-parser";
 // Importing my components
 import ConfirmationDialog from "../../ConfirmationDialog/ConfirmationDialog";
-import { formatTime } from "../../../utils/functions";
+import { formatDate, formatTime } from "../../../utils/functions";
 // Importing actions
 import { fetchSubspaceAvatar } from "../../../actions/subspace";
-import { deletePost } from "../../../actions/post";
+import { deletePost, isPostLiked, likePost } from "../../../actions/post";
 // Importing styling
 import styles from "./styles";
 
 function Post(props) {
-    const { post, individual, redirect, setSnackbarValue, setSnackbarState } = props;
+    const { post, individual, redirect, snackbar, confirmationDialog } = props;
     const { subspaceName, authorName, dateCreated, title, body, selectedFile, likesCount, commentsCount } = post;
+    const [setSnackbarValue, setSnackbarState] = snackbar;
+    const [dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar] = confirmationDialog;
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    // JS for Dialog
-    const [dialog, setDialog] = useState(false);
-    const [dialogValue, setDialogValue] = useState({
-        title: "",
-        message: "",
-        cancelBtnText: "",
-        submitBtnText: "",
-    });
-    async function openDialog(values) {
-        await setDialogValue(values);
-        await setDialog(true);
-        document.querySelector("#focusPostBtn").focus();
-    };
-    function closeDialog() {
-        setDialog(false);
-    };
     const user = useSelector(state => state.user);
+    const [postLiked, setPostLiked] = useState(false);
     const [subspaceAvatar, setSubspaceAvatar] = useState(null);
     useEffect(() => {
         async function getSubspaceAvatar() {
@@ -46,7 +33,14 @@ function Post(props) {
                 setSubspaceAvatar(result.subspaceAvatar);
             }
         }
+        async function checkIfPostIsLiked() {
+            const { status, result } = await dispatch(isPostLiked({ postId: post._id, userId: user._id }));
+            if (status === 200) {
+                setPostLiked(result);
+            }
+        }
         if (user) {
+            checkIfPostIsLiked();
             const desiredSubspace = user.subspacesJoined.filter(subspace => subspace.name.replace(/ /g, "-") === subspaceName)[0];
             if (desiredSubspace) {
                 setSubspaceAvatar(desiredSubspace.avatar);
@@ -57,7 +51,8 @@ function Post(props) {
             getSubspaceAvatar();
         }
         // check if post is liked: in 'like' collection check for a recod where you have both postId and userId
-    }, [user, subspaceName, dispatch]);
+        // change styling spread out post actions on mobile
+    }, [post._id, user, subspaceName, dispatch]);
     function handleSubspaceClick() {
         navigate("/ss/" + subspaceName);
     }
@@ -108,18 +103,34 @@ function Post(props) {
     function handleCloseMenu() {
         setAnchorEl(null);
     };
-    function handleLike(event) {
-        console.log(event.target);
+    const [postLikesCount, setPostLikesCount] = useState(likesCount);
+    async function handleLike() {
+        if (user) {
+            const { status, result } = await dispatch(likePost({ postId: post._id, userId: user._id, action: !postLiked }));
+            if (status === 200) {
+                if (postLiked) {
+                    setPostLikesCount(postLikesCount - 1);
+                } else {
+                    setPostLikesCount(postLikesCount + 1);
+                }
+                setPostLiked(!postLiked);
+            } else {
+                setSnackbarValue({ message: result.message, status: "error" });
+                setSnackbarState(true);
+            }
+        } else {
+            navigate("/authentication");
+        }
     }
     async function handleDelete() {
         handleCloseMenu();
-        openDialog({ title: "Delete post", message: "This action is irreversible", cancelBtnText: "Cancel", submitBtnText: "Delete" });
+        openDialog({ title: "Delete post", message: "This action is irreversible", cancelBtnText: "Cancel", submitBtnText: "Delete", type: "error" });
     }
-    const [linearProgressBar, setLinearProgressBar] = useState(false);
     async function handleDialog() {
         setLinearProgressBar(true);
         try {
-            const { status, result } = await dispatch(deletePost(post._id));
+            const { status, result } = await dispatch(deletePost({ postId: post._id }));
+            closeDialog();
             if (status === 200) {
                 navigate("/", { state: { message: "Post deleted.", status: "success" } });
             } else {
@@ -127,9 +138,9 @@ function Post(props) {
                 setSnackbarState(true);
             }
         } catch (error) {
+            closeDialog();
             setSnackbarValue({ message: error.message, status: "error" });
             setSnackbarState(true);
-            setLinearProgressBar(false);
         }
     }
 
@@ -148,7 +159,9 @@ function Post(props) {
                                 <span style={classes.headerText}>ss/</span>{subspaceName}
                             </Typography>
                             <FiberManualRecordTwoTone sx={{ fontSize: "8px" }} />
-                            <Typography sx={classes.headerText}>{formatTime(dateCreated)} ago</Typography>
+                            <Tooltip title={formatDate(dateCreated)}>
+                                <Typography sx={classes.headerText}>{formatTime(dateCreated)} ago</Typography>
+                            </Tooltip>
                         </Box>
                     </Box>
                     {individual &&
@@ -189,8 +202,8 @@ function Post(props) {
             <Box elevation={2} sx={classes.allPostActionsContainer}>
                 <Paper sx={classes.majorPostActionsContainer}>
                     <Box>
-                        <Checkbox onClick={handleLike} icon={<FavoriteBorderOutlined sx={classes.iconColor} />} checkedIcon={<Favorite sx={{ color: "#0090c1" }} />} />
-                        <span style={classes.iconText}>{likesCount}</span>
+                        <Checkbox onClick={handleLike} checked={postLiked} icon={<FavoriteBorderOutlined sx={classes.iconColor} />} checkedIcon={<Favorite sx={{ color: "#0090c1" }} />} />
+                        <span style={classes.iconText}>{postLikesCount}</span>
                     </Box>
                     {individual ?
                         <Box>
@@ -221,40 +234,40 @@ function Post(props) {
                 </Paper>
                 {individual && user && (user.userName === authorName) &&
                     <Box>
-                        <IconButton>
-                            <MoreVert onClick={handleClickMenu} />
-                            <Menu
-                                id="basic-menu"
-                                anchorEl={anchorEl}
-                                open={open}
-                                anchorOrigin={{
-                                    vertical: 'bottom',
-                                    horizontal: 'right',
-                                }}
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                onClose={handleCloseMenu}
-                                MenuListProps={{
-                                    'aria-labelledby': 'basic-button',
-                                }}
-                                sx={{ marginTop: "8px" }}
-                            >
-                                <MenuItem variant="error" onClick={handleDelete}>
-                                    <ListItemIcon>
-                                        <DeleteTwoTone fontSize="small" />
-                                    </ListItemIcon>
-                                    Delete post
-                                </MenuItem>
-                                <MenuItem disabled>
-                                    <ListItemIcon>
-                                        <EditNoteRounded fontSize="small" />
-                                    </ListItemIcon>
-                                    Edit post
-                                </MenuItem>
-                            </Menu>
+                        <IconButton onClick={handleClickMenu}>
+                            <MoreHoriz />
                         </IconButton>
+                        <Menu
+                            id="basic-menu"
+                            anchorEl={anchorEl}
+                            open={open}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            onClose={handleCloseMenu}
+                            MenuListProps={{
+                                'aria-labelledby': 'basic-button',
+                            }}
+                            sx={{ marginTop: "8px" }}
+                        >
+                            <MenuItem variant="error" onClick={handleDelete}>
+                                <ListItemIcon>
+                                    <DeleteTwoTone fontSize="small" />
+                                </ListItemIcon>
+                                Delete post
+                            </MenuItem>
+                            <MenuItem disabled>
+                                <ListItemIcon>
+                                    <EditNoteRounded fontSize="small" />
+                                </ListItemIcon>
+                                Edit post
+                            </MenuItem>
+                        </Menu>
                     </Box>
                 }
             </Box>

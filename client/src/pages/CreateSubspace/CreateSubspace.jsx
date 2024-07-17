@@ -6,7 +6,7 @@ import SubspaceForm from "../../Components/SubspaceForm/SubspaceForm";
 import styles from "./styles";
 
 function CreateSubspace(props) {
-    const { user, setSnackbarValue, setSnackbarState } = props;
+    const { user, snackbar, confirmationDialog } = props;
     const classes = styles();
     useEffect(() => {
         // Setting webpage title
@@ -17,7 +17,7 @@ function CreateSubspace(props) {
         <Grid container sx={{ display: "flex" }}>
             <Grid item xs={0} md={2} sx={classes.leftContainer}></Grid>
             <Box sx={classes.mainContainer}>
-                <SubspaceForm user={user} setSnackbarValue={setSnackbarValue} setSnackbarState={setSnackbarState} />
+                <SubspaceForm user={user} snackbar={snackbar} confirmationDialog={confirmationDialog} />
                 <Box sx={Object.assign({ display: "none" }, classes.postContainer)} />
             </Box>
         </Grid>

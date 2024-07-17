@@ -11,7 +11,9 @@ import { changePassword, deleteProfile } from "../../actions/user";
 import styles from "./styles";
 
 function Settings(props) {
-    const { setSnackbarValue, setSnackbarState } = props;
+    const { snackbar, confirmationDialog } = props;
+    const [setSnackbarValue, setSnackbarState] = snackbar;
+    const [dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar] = confirmationDialog;
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -38,22 +40,6 @@ function Settings(props) {
             return { ...prevFormData, [name]: value }
         });
     }
-    // JS for Dialog
-    const [dialog, setDialog] = useState(false);
-    const [dialogValue, setDialogValue] = useState({
-        title: "",
-        message: "",
-        cancelBtnText: "",
-        submitBtnText: "",
-    });
-    async function openDialog(values) {
-        await setDialogValue(values);
-        await setDialog(true);
-        document.querySelector("#focusPostBtn").focus();
-    };
-    function closeDialog() {
-        setDialog(false);
-    };
     // Clear form
     function handleClear() {
         setFormData({
@@ -89,7 +75,6 @@ function Settings(props) {
         }
         openDialog({ title: "Change Password", message: "Be sure to remember your new password", cancelBtnText: "Cancel", submitBtnText: "Change" });
     }
-    const [linearProgressBar, setLinearProgressBar] = useState(false);
     function handleResult(status, result, type, snackbarMessage) {
         closeDialog();
         if (status === 200) {
@@ -102,7 +87,6 @@ function Settings(props) {
         } else {
             setSnackbarValue({ message: result.message, status: "error" });
             setSnackbarState(true);
-            setLinearProgressBar(false);
         }
     }
     async function handleDialog() {
@@ -116,9 +100,9 @@ function Settings(props) {
                 handleResult(status, result, "DELETE");
             }
         } catch (error) {
+            closeDialog();
             setSnackbarValue({ message: error.message, status: "error" });
             setSnackbarState(true);
-            setLinearProgressBar(false);
         }
     }
     function handleDelete() {

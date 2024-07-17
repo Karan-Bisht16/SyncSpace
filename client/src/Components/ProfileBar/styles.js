@@ -7,7 +7,8 @@ const styles = () => ({
         borderRadius: "10px",
         bgcolor: "background.tertiary",
         boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
-        marginBottom: { xs: "20px", lg: "0" },
+        marginTop: { xs: "0", lg: "48px" },
+        marginBottom: { xs: "20px", lg: "0" }
     },
     bioContainer: {
         height: "auto",

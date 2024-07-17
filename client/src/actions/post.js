@@ -35,3 +35,17 @@ export const deletePost = (postId) => async () => {
         return { status: 200, result: data };
     } catch (error) { return handleError(error) }
 };
+
+export const isPostLiked = (postAndUserId) => async () => {
+    try {
+        const { data } = await api.isPostLiked(postAndUserId);
+        return { status: 200, result: data };
+    } catch (error) { return handleError(error) }
+}
+
+export const likePost = (actionData) => async () => {
+    try {
+        const { data } = await api.likePost(actionData);
+        return { status: 200, result: data };
+    } catch (error) { return handleError(error) }
+}

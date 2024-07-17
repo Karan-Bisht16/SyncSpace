@@ -12,14 +12,13 @@ import { fetchPosts } from "../../actions/post";
 import styles from "./styles";
 
 function Posts(props) {
-    const { setSnackbarValue, setSnackbarState } = props;
-    const { searchQuery } = props;
+    const { searchQuery, customParams, snackbar, confirmationDialog } = props;
     const classes = styles();
     const dispatch = useDispatch();
     lineSpinner.register("l-loader");
 
     async function fetchLimitedPosts(pageParams) {
-        const response = await dispatch(fetchPosts({ pageParams, searchQuery }));
+        const response = await dispatch(fetchPosts({ pageParams, searchQuery, customParams }));
         return response;
     };
     const data = null;
@@ -61,7 +60,7 @@ function Posts(props) {
         <div className="mx-auto my-10">
             {data &&
                 data.results.map((item, index) => (
-                    <Post key={index} post={item} setSnackbarValue={setSnackbarValue} setSnackbarState={setSnackbarState} />
+                    <Post key={index} post={item} snackbar={snackbar} confirmationDialog={confirmationDialog} />
                 ))}
 
             <InfiniteScroll
@@ -73,7 +72,7 @@ function Posts(props) {
                 {queryData.pages.map((page, index) => (
                     <div key={index}>
                         {page.results.map((item, index) => (
-                            <Post key={index} post={item} setSnackbarValue={setSnackbarValue} setSnackbarState={setSnackbarState} />
+                            <Post key={index} post={item} snackbar={snackbar} confirmationDialog={confirmationDialog} />
                         ))}
                     </div>
                 ))}

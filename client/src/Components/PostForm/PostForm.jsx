@@ -13,7 +13,9 @@ import { createPost } from "../../actions/post";
 import styles from "./styles";
 
 function PostForm(props) {
-    const { postData, hasPredefinedSubspace, setPostData, setSnackbarValue, setSnackbarState } = props;
+    const { postData, hasPredefinedSubspace, setPostData, snackbar, confirmationDialog } = props;
+    const [setSnackbarValue, setSnackbarState] = snackbar;
+    const [dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar] = confirmationDialog
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -22,22 +24,6 @@ function PostForm(props) {
     const bodyField = useRef(null);
     const { mode } = useContext(ColorModeContext);
 
-    // JS for Dialog
-    const [dialog, setDialog] = useState(false);
-    const [dialogValue, setDialogValue] = useState({
-        title: "",
-        message: "",
-        cancelBtnText: "",
-        submitBtnText: "",
-    });
-    async function openDialog(values) {
-        await setDialogValue(values);
-        await setDialog(true);
-        document.querySelector("#focusPostBtn").focus();
-    };
-    function closeDialog() {
-        setDialog(false);
-    };
     // Title Field
     function handleTitleChange(event) {
         const { value } = event.target;
@@ -87,7 +73,7 @@ function PostForm(props) {
             return { ...prevPostData, "selectedFile": [] };
         });
     }
-    // TabChange
+    // Tab Change
     const [tabIndex, setTabIndex] = useState("1");
     function handleTabChange(event, newTabIndex) {
         setTabIndex(newTabIndex);
@@ -128,7 +114,6 @@ function PostForm(props) {
         }
         openDialog({ title: "Confirm Post", message: "Are you sure you want to post?", cancelBtnText: "Cancel", submitBtnText: "Post" });
     }
-    const [linearProgressBar, setLinearProgressBar] = useState(false);
     async function handleDialog() {
         setLinearProgressBar(true);
         try {
@@ -143,16 +128,15 @@ function PostForm(props) {
             const { status, result } = await dispatch(createPost(updatedData));
             closeDialog();
             if (status === 200) {
-                navigate(`/`, { state: { status: "success", message: "Post added!" } });
+                navigate("/", { state: { status: "success", message: "Post added!" } });
             } else {
                 setSnackbarValue({ message: result.message, status: "error" });
                 setSnackbarState(true);
-                setLinearProgressBar(false);
             }
         } catch (error) {
+            closeDialog();
             setSnackbarValue({ message: error.message, status: "error" });
             setSnackbarState(true);
-            setLinearProgressBar(false);
         }
     }
 

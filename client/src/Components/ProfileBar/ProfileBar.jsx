@@ -7,7 +7,8 @@ import { formatDate } from "../../utils/functions";
 import styles from "./styles";
 
 function ProfileBar(props) {
-    const { updatedUser, setSnackbarValue, setSnackbarState } = props;
+    const { updatedUser, snackbar } = props;
+    const [setSnackbarValue, setSnackbarState] = snackbar;
     const classes = styles();
 
     const [linkCopied, setLinkCopied] = useState(false);
@@ -21,7 +22,11 @@ function ProfileBar(props) {
         return (
             <Grid item xs={size}>
                 <Box sx={classes.gridItemBox}>
-                    <Typography>{value}</Typography>
+                    {value === 0 ?
+                        <Typography>{value}</Typography>
+                        :
+                        <Typography>{value || "Loading..."}</Typography>
+                    }
                     <Typography sx={classes.gridItemTitle}>{value === 1 ? singularTitle : pluralTitle}</Typography>
                 </Box>
             </Grid>
@@ -50,7 +55,7 @@ function ProfileBar(props) {
             </Box>
             <Grid container>
                 {gridItemContainer(5, updatedUser.postsCount, "Record", "Records")}
-                {gridItemContainer(2, "", "")}
+                {gridItemContainer(2, " ", "")}
                 {gridItemContainer(5, updatedUser.credits, "Celestial Credit", "Celestial Credits")}
                 {gridItemContainer(12, updatedUser.subspacesJoinedCount, "Subspace joined", "Subspaces joined")}
             </Grid>

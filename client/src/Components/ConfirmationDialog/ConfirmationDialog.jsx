@@ -12,23 +12,14 @@ function ConfirmationDialog(props) {
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
         >
-            <DialogTitle id="alert-dialog-title" sx={{ padding: "12px 24px" }}>{title}</DialogTitle>
+            <DialogTitle id="alert-dialog-title" sx={{ padding: "8px 24px" }}>{title}</DialogTitle>
             <LinearProgress sx={{ opacity: linearProgressBar ? "1" : "0" }} />
-            <DialogContent sx={{ padding: "12px 24px" }}>
+            <DialogContent sx={{ padding: "8px 24px" }}>
                 <DialogContentText id="alert-dialog-description">{message}</DialogContentText>
             </DialogContent>
             <DialogActions>
-                {type === "error" ?
-                    <>
-                        <Button onClick={closeDialog} color="error">{cancelBtnText}</Button>
-                        <Button id="focusPostBtn" variant="contained" color="error" onClick={handleDialog}>{submitBtnText}</Button>
-                    </>
-                    :
-                    <>
-                        <Button onClick={closeDialog}>{cancelBtnText}</Button>
-                        <Button id="focusPostBtn" variant="contained" onClick={handleDialog}>{submitBtnText}</Button>
-                    </>
-                }
+                <Button onClick={closeDialog}>{cancelBtnText}</Button>
+                <Button id="focusPostBtn" variant="contained" color={type} onClick={handleDialog}>{submitBtnText}</Button>
             </DialogActions>
         </Dialog>
     );
