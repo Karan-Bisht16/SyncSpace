@@ -106,15 +106,21 @@ function Post(props) {
     const [postLikesCount, setPostLikesCount] = useState(likesCount);
     async function handleLike() {
         if (user) {
-            const { status, result } = await dispatch(likePost({ postId: post._id, userId: user._id, action: !postLiked }));
-            if (status === 200) {
-                if (postLiked) {
-                    setPostLikesCount(postLikesCount - 1);
-                } else {
-                    setPostLikesCount(postLikesCount + 1);
-                }
-                setPostLiked(!postLiked);
+            const tempPostLiked = postLiked;
+            setPostLiked(!postLiked);
+            if (tempPostLiked) {
+                setPostLikesCount(postLikesCount - 1);
             } else {
+                setPostLikesCount(postLikesCount + 1);
+            }
+            const { status, result } = await dispatch(likePost({ postId: post._id, userId: user._id, action: !tempPostLiked }));
+            if (status !== 200) {
+                setPostLiked(tempPostLiked);
+                if (tempPostLiked) {
+                    setPostLikesCount(postLikesCount + 1);
+                } else {
+                    setPostLikesCount(postLikesCount - 1);
+                }
                 setSnackbarValue({ message: result.message, status: "error" });
                 setSnackbarState(true);
             }
@@ -173,7 +179,11 @@ function Post(props) {
             {body ?
                 <Box sx={classes.bodyContainer}>
                     <Typography sx={classes.bodyText} component={"div"}>{bodyText()}</Typography>
-                    <Typography sx={classes.author} onClick={handleUserProfileClick}>e/{authorName}</Typography>
+                    <Box sx={{ width: "100%", display: "flex", justifyContent: "end" }}>
+                        <span style={classes.author} onClick={handleUserProfileClick}>
+                            <span style={{ fontSize: "13px" }}>e/</span>{authorName}
+                        </span>
+                    </Box>
                 </Box>
                 :
                 <>
@@ -196,7 +206,9 @@ function Post(props) {
                             </Box>
                         }
                     </Box>
-                    <Typography sx={classes.author} onClick={handleUserProfileClick}>e/{authorName}</Typography>
+                    <Box sx={{ width: "100%", display: "flex", justifyContent: "end", paddingRight: "16px" }}>
+                        <span style={classes.author} onClick={handleUserProfileClick}>e/{authorName}</span>
+                    </Box>
                 </>
             }
             <Box elevation={2} sx={classes.allPostActionsContainer}>
@@ -241,6 +253,7 @@ function Post(props) {
                             id="basic-menu"
                             anchorEl={anchorEl}
                             open={open}
+                            onClose={handleCloseMenu}
                             anchorOrigin={{
                                 vertical: 'bottom',
                                 horizontal: 'right',
@@ -249,13 +262,9 @@ function Post(props) {
                                 vertical: 'top',
                                 horizontal: 'right',
                             }}
-                            onClose={handleCloseMenu}
-                            MenuListProps={{
-                                'aria-labelledby': 'basic-button',
-                            }}
                             sx={{ marginTop: "8px" }}
                         >
-                            <MenuItem variant="error" onClick={handleDelete}>
+                            <MenuItem onClick={handleDelete}>
                                 <ListItemIcon>
                                     <DeleteTwoTone fontSize="small" />
                                 </ListItemIcon>

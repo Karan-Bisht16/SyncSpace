@@ -30,6 +30,7 @@ const styles = () => ({
         bgcolor: "background.tertiary",
         boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
     },
+    profileDeletedContainer: { display: "flex", justifyContent: "center", marginTop: "15vh" },
     primaryLoadingScreenStyling: { height: "80vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" },
     titleFont: { fontSize: { xs: "24px", md: "36px" } },
     progressBar: { width: { xs: "80%", md: "500px" }, color: "#0090c1", marginTop: "7.5px" },

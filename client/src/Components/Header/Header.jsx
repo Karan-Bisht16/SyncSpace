@@ -75,8 +75,12 @@ function Header(props) {
             toggleMode();
         }
         if (location.state && location.state.status) {
-            setSnackbarValue({ message: location.state.message, status: location.state.status });
-            setSnackbarState(true);
+            const arrivalTime = location.state.time;
+            const now = new Date().getTime();
+            if (now - arrivalTime < 5000) {
+                setSnackbarValue({ message: location.state.message, status: location.state.status });
+                setSnackbarState(true);
+            }
         }
     }, [mode, toggleBodyTheme, toggleMode, location.state, setSnackbarValue, setSnackbarState]);
 

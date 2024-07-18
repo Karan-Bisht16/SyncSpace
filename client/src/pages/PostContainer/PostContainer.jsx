@@ -91,7 +91,6 @@ function PostContainer(props) {
     function handleCancelComment() {
         setAddComment(false);
     }
-
     lineSpinner.register("l-loader");
 
     return (

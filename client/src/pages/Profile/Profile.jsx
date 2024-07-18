@@ -3,7 +3,7 @@ import { Avatar, Box, Button, Divider, Grid, LinearProgress, Tab, Tabs, Typograp
 import { CloseRounded, ModeEdit } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { Player } from '@lordicon/react';
+import { Player } from "@lordicon/react";
 // Importing my components
 import RealTimeProfileViwer from "./RealTimeProfileViewer/RealTimeProfileViewer";
 import InputField from "../../Components/InputField/InputField";
@@ -27,7 +27,10 @@ function Profile(props) {
         // Setting webpage title
         document.title = "SyncSpace: e/" + userName;
     });
-
+    useEffect(() => {
+        setNoUserFound(false);
+        setUserProfileDeleted(false);
+    }, [userName]);
     const nameField = useRef(null);
     const emailField = useRef(null);
     const bioField = useRef(null);
@@ -93,7 +96,7 @@ function Profile(props) {
         })
     }
     const [formData, setFormData] = useState({
-        name: "",
+        name: user.name,
         bio: "",
         email: "",
     });
@@ -123,7 +126,9 @@ function Profile(props) {
                 setUpdatedUser(prevUser => {
                     return { ...prevUser, name: formData.name, userName: formData.name.replace(/ /g, "-"), bio: formData.bio }
                 });
-                navigate(`/e/${userName}`, { state: { message: "Account updated successfully!", status: "success" } });
+                navigate(`/e/${formData.name.replace(/ /g, "-")}`, {
+                    state: { message: "Account updated successfully!", status: "success", time: new Date().getTime() }
+                });
             } else {
                 setSnackbarValue({ message: result.message, status: "error" });
                 setSnackbarState(true);
@@ -133,7 +138,7 @@ function Profile(props) {
             setSnackbarState(true);
         }
     }
-    const ICON = require('../../assets/animation-deleted.json');
+    const ICON = require("../../assets/animation-deleted.json");
     const playerRef = useRef(null);
 
     return (
@@ -149,8 +154,8 @@ function Profile(props) {
                     :
                     <>
                         {userProfileDeleted ?
-                            <Box sx={{ marginTop: "15vh" }}>
-                                <Box sx={{display: "flex", justifyContent: "center"}}>
+                            <Box>
+                                <Box sx={classes.profileDeletedContainer}>
                                     <Player
                                         ref={playerRef}
                                         icon={ICON}

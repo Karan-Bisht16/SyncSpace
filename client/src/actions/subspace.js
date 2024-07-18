@@ -1,5 +1,5 @@
 import * as api from "../api";
-import { JOIN_SUBSPACE } from "../constants/actionTypes";
+import { CREATE_SUBSPACE, JOIN_SUBSPACE, DELETE_SUBSPACE } from "../constants/actionTypes";
 
 function handleError(error) {
     if (error.code === "ERR_NETWORK") {
@@ -12,7 +12,7 @@ function handleError(error) {
 export const createSubspace = (subspaceData) => async (dispatch) => {
     try {
         const { data } = await api.createSubspace(subspaceData);
-        dispatch({ type: JOIN_SUBSPACE, payload: data });
+        dispatch({ type: CREATE_SUBSPACE, payload: data });
         return { status: 200, result: data };
     } catch (error) { return handleError(error) }
 };
@@ -39,9 +39,10 @@ export const fetchSubspaceAvatar = (subspaceName) => async () => {
     } catch (error) { return handleError(error) }
 }
 
-// export const fetchSubspacePosts = (subspaceName) => async () => {
-//     try {
-//         const { data } = await api.fetchSubspacePosts(subspaceName);
-//         return { status: 200, result: data };
-//     } catch (error) { return handleError(error) }
-// }
+export const deleteSubspace = (subspaceName) => async (dispatch) => {
+    try {
+        const { data } = await api.deleteSubspace(subspaceName);
+        dispatch({ type: DELETE_SUBSPACE, payload: data });
+        return { status: 200, result: data };
+    } catch (error) { return handleError(error) }
+}

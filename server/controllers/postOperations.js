@@ -106,7 +106,6 @@ const isPostLiked = async (req, res) => {
 
 const likePost = async (req, res) => {
     const { postId, userId, action } = req.body;
-    console.log(postId, userId, action);
     try {
         if (action) {
             const post = await Post.findByIdAndUpdate(postId, { $inc: { likesCount: 1 } }, { new: true });

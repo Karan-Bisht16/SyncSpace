@@ -97,8 +97,35 @@ const fetchSubspaceAvatar = async (req, res) => {
         const { subspaceName } = req.query;
         const subspace = await Subspace.findOne({ subspaceName: subspaceName });
         res.status(200).json({ subspaceAvatar: subspace.avatar });
-
     } catch (error) { res.status(404).json({ message: "Network error. Try again." }) }
 }
 
-export { createSubspace, joinSubspace, fetchAllSubspaceInfo, fetchSubspaceAvatar };
+const deleteSubspace = async (req, res) => {
+    try {
+        const { subspaceName } = req.query;
+        const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
+        const subspace = await Subspace.findOneAndUpdate({ subspaceName: subspaceName }, {
+            $unset: { description: "", avatar: "", creator: "", dateCreated: "", members: "", membersCount: "", moderators: "", topics: "", postsCount: "" },
+            isDeleted: true,
+        }, { returnOriginal: true });
+        const subspaceObj = {
+            subspaceId: subspace._id,
+            name: subspace.name,
+            description: subspace.description,
+            avatar: subspace.avatar,
+        };
+        const user = await User.findOneAndUpdate({ email: email }, {
+            $pull: { subspacesJoined: subspaceObj },
+            $inc: { subspacesJoinedCount: -1 }
+        }, { new: true });
+        if (req.session.user) {
+            req.session.user.subspacesJoined = req.session.user.subspacesJoined.filter(subspace => subspace.name.replace(/ /g, "-") !== subspaceName);
+            res.status(200).json(req.session.user);
+        } else {
+            res.status(200).json(createUserSession(user));
+        }
+    } catch (error) { console.log(error); res.status(404).json({ message: "Network error. Try again." }) }
+
+}
+
+export { createSubspace, joinSubspace, fetchAllSubspaceInfo, fetchSubspaceAvatar, deleteSubspace };

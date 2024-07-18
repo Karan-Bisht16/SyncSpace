@@ -8,11 +8,20 @@ const styles = () => ({
     titleFont: { fontSize: { xs: "24px", md: "36px" } },
     mainDialog: {
         display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        maxHeight: "160px",
+        padding: { xs: "8px", sm: "24px" },
+        bgcolor: "background.backdrop",
+        borderRadius: "16px",
+        overflow: "hidden"
+    },
+    mainText: {
+        display: "flex",
         justify: "start",
         gap: { xs: "10px", sm: "25px" },
         alignItems: { xs: "start", sm: "center" },
         maxHeight: "160px",
-        padding: { xs: "8px", sm: "24px" },
         bgcolor: "background.backdrop",
         borderRadius: "16px",
         overflow: "hidden"
@@ -20,11 +29,11 @@ const styles = () => ({
     avatarContainer: { display: "flex", flexDirection: "column", alignSelf: "center", bgcolor: "background.primary", borderRadius: "50%", padding: "5px" },
     subspaceAvatar: { fontSize: { xs: "32px", sm: "48px" }, height: { xs: "80px", sm: "125px" }, width: { xs: "80px", sm: "125px" } },
     subspaceTitle: { fontSize: { xs: "24px", sm: "34px" }, fontWeight: "bold" },
-    subspaceName: { fontSize: { xs: "18px", sm: "24px" } },
+    subspaceName: { fontSize: { xs: "18px", sm: "22px" } },
     subspaceDescription: { fontSize: { xs: "14px", sm: "16px" }, maxHeight: "50px", overflow: "scroll", wordBreak: "break-all", hyphens: "auto" },
     subspaceOperation: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px" },
     subspaceBtn: { float: "right", display: "flex", gap: "8px", alignItems: "center" },
-    subspaceString: { fontSize: "12px", width: "18px", minWidth: "18px" },
+    subspaceString: { fontSize: "14px", width: "18px", minWidth: "18px" },
     btn: { width: { xs: "110px", sm: "125px" }, borderRadius: "100px", fontSize: { xs: "12px", sm: "16px" } },
     notJoinedBtn: {
         bgcolor: "#0090c1",
@@ -36,6 +45,14 @@ const styles = () => ({
         }
     },
     joinedBtn: { padding: "3px 24px", border: "1px solid #0090c1" },
+    deleteBtn: {
+        padding: "4px 24px",
+        "&:hover": {
+            backgroundColor: "button.secondary",
+            color: "#f44336"
+        }
+    },
+    subspaceDeletedContainer: { display: "flex", justifyContent: "center", marginTop: "15vh" },
     noContentContainer: {
         display: "flex",
         justifyContent: "center",

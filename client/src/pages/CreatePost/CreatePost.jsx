@@ -78,7 +78,7 @@ function CreatePost(props) {
                                     onChange={(event, newValue) => {
                                         setSubspace(newValue);
                                         setPostData(prevPostData => {
-                                            return { ...prevPostData, "subspaceId": newValue._id, "subspaceName": newValue.label }
+                                            return { ...prevPostData, "subspaceId": newValue?._id, "subspaceName": newValue?.label }
                                         })
                                     }}
                                 />
@@ -89,7 +89,7 @@ function CreatePost(props) {
                 <PostForm
                     user={user}
                     postData={postData} setPostData={setPostData}
-                    hasPredefinedSubspace={hasPredefinedSubspace}
+                    hasPredefinedSubspace={hasPredefinedSubspace} subspacesArray={subspacesArray}
                     snackbar={snackbar} confirmationDialog={confirmationDialog}
                 />
             </Box>

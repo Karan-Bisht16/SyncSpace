@@ -188,7 +188,7 @@ function SubspaceForm(props) {
             const { status, result } = await dispatch(createSubspace(subspaceData));
             closeDialog();
             if (status === 200) {
-                navigate("/", { state: { status: "success", message: "Subspace created successfully!" } });
+                navigate("/", { state: { status: "success", message: "Subspace created successfully!", time: new Date().getTime() } });
             } else {
                 setSnackbarValue({ message: result.message, status: "error" });
                 setSnackbarState(true);

@@ -164,13 +164,10 @@ const changePassword = async (req, res) => {
 const deleteProfile = async (req, res) => {
     try {
         const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
-        await User.updateOne(
-            { email: email },
-            {
-                $unset: { email: "", password: "", googleId: "", avatar: "", dateJoined: "", credits: "", bio: "", subspacesJoined: "", subspacesJoinedCount: "", postsCount: "" },
-                isDeleted: true,
-            }
-        );
+        await User.updateOne({ email: email }, {
+            $unset: { email: "", password: "", googleId: "", avatar: "", dateJoined: "", credits: "", bio: "", subspacesJoined: "", subspacesJoinedCount: "", postsCount: "" },
+            isDeleted: true,
+        });
         res.sendStatus(200);
     } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }

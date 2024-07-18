@@ -13,7 +13,7 @@ import { createPost } from "../../actions/post";
 import styles from "./styles";
 
 function PostForm(props) {
-    const { postData, hasPredefinedSubspace, setPostData, snackbar, confirmationDialog } = props;
+    const { postData, hasPredefinedSubspace, subspacesArray, setPostData, snackbar, confirmationDialog } = props;
     const [setSnackbarValue, setSnackbarState] = snackbar;
     const [dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar] = confirmationDialog
     const classes = styles();
@@ -107,9 +107,16 @@ function PostForm(props) {
             setSnackbarValue({ message: "Select a file.", status: "error" });
             setSnackbarState(true);
             return false;
-        } if (!hasPredefinedSubspace && postData.subspaceId === "") {
-            setSnackbarValue({ message: "Select a subspace.", status: "error" });
-            setSnackbarState(true);
+        
+        }
+        if (!hasPredefinedSubspace && (!postData.subspaceId || postData.subspaceId.trim() === "")) {
+            if (subspacesArray.length === 0) {
+                setSnackbarValue({ message: "Join a subspace first.", status: "error" });
+                setSnackbarState(true);
+            } else {
+                setSnackbarValue({ message: "Select a subspace.", status: "error" });
+                setSnackbarState(true);
+            }
             return false;
         }
         openDialog({ title: "Confirm Post", message: "Are you sure you want to post?", cancelBtnText: "Cancel", submitBtnText: "Post" });
@@ -128,7 +135,7 @@ function PostForm(props) {
             const { status, result } = await dispatch(createPost(updatedData));
             closeDialog();
             if (status === 200) {
-                navigate("/", { state: { status: "success", message: "Post added!" } });
+                navigate("/", { state: { status: "success", message: "Post added!", time: new Date().getTime() } });
             } else {
                 setSnackbarValue({ message: result.message, status: "error" });
                 setSnackbarState(true);

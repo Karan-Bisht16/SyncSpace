@@ -27,6 +27,7 @@ export const createSubspace = (subspaceData) => API.post("/subspace", subspaceDa
 export const joinSubspace = (actionData) => API.get("/subspace/join", { params: actionData });
 export const fetchAllSubspaceInfo = (subspaceName) => API.get("/subspace/info", { params: subspaceName });
 export const fetchSubspaceAvatar = (subspaceName) => API.get("/subspace/avatar", { params: subspaceName });
+export const deleteSubspace = (subspaceName) => API.delete("/subspace/delete", { params: subspaceName });
 
 // Post
 export const fetchPostInfo = (postId) => API.get(`/posts?id=${postId}`);

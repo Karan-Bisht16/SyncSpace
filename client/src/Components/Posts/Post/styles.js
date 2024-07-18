@@ -21,7 +21,7 @@ const styles = () => ({
         boxShadow: "rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px"
     },
     bodyText: { wordBreak: "break-word" },
-    author: { fontSize: "18px", textAlign: "right", cursor: "pointer" },
+    author: { fontSize: "18px", cursor: "pointer" },
     fileContainer: { display: "flex", justifyContent: "center", height: { xs: "auto", md: "625px" }, objectFit: "scale-down" },
     imageContainer: {
         display: "flex",

@@ -15,7 +15,7 @@ function ConfirmationDialog(props) {
             <DialogTitle id="alert-dialog-title" sx={{ padding: "8px 24px" }}>{title}</DialogTitle>
             <LinearProgress sx={{ opacity: linearProgressBar ? "1" : "0" }} />
             <DialogContent sx={{ padding: "8px 24px" }}>
-                <DialogContentText id="alert-dialog-description">{message}</DialogContentText>
+                <DialogContentText id="alert-dialog-description" sx={{ textAlign: "justify" }}>{message}</DialogContentText>
             </DialogContent>
             <DialogActions>
                 <Button onClick={closeDialog}>{cancelBtnText}</Button>

@@ -76,7 +76,7 @@ function Authentication(props) {
             setGoogleToken(response.credential);
             const { status, result } = await dispatch(getGoogleUser({ token: response.credential }));
             if (status === 200) {
-                navigate("/", { state: { status: "success", message: "Sign In successful!" } })
+                navigate("/", { state: { status: "success", message: "Sign In successful!", time: new Date().getTime() } })
             } else if (status === 409) {
                 handleClickOpenDialog();
             } else {
@@ -93,7 +93,7 @@ function Authentication(props) {
         try {
             const { status, result } = await dispatch(createGoogleUser({ token: token, name: authData.userName }));
             if (status === 200) {
-                navigate("/", { state: { status: "success", message: "Sign In successful!" } })
+                navigate("/", { state: { status: "success", message: "Sign In successful!", time: new Date().getTime() } })
             } else if (status === 400) {
                 setUniqueUserNameError(true);
                 setLinearProgressBar(false);
@@ -140,7 +140,7 @@ function Authentication(props) {
         if (isSignUp) {
             const { status, result } = await dispatch(signUp(authData));
             if (status === 200) {
-                navigate("/", { state: { status: "success", message: "Sign up successful!" } })
+                navigate("/", { state: { status: "success", message: "Sign up successful!", time: new Date().getTime() } })
             } else {
                 setSnackbarValue({ message: result.message, status: "error" });
                 setSnackbarState(true);
@@ -149,7 +149,7 @@ function Authentication(props) {
         } else {
             const { status, result } = await dispatch(signIn(authData));
             if (status === 200) {
-                navigate("/", { state: { status: "success", message: "Sign In successful!" } })
+                navigate("/", { state: { status: "success", message: "Sign In successful!", time: new Date().getTime() } })
             } else {
                 setSnackbarValue({ message: result.message, status: "error" });
                 setSnackbarState(true);

@@ -10,7 +10,7 @@ const condenseSubspaceSchema = mongoose.Schema({
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true, unique: true, trim: true },
     userName: { type: String, required: true, unique: true, trim: true },
-    email: { type: String, required: true, unique: true, trim: true },
+    email: { type: String, required: true, trim: true },
     password: { type: String },
     googleId: { type: String },
     avatar: { type: String },
