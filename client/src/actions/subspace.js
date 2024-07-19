@@ -1,5 +1,5 @@
 import * as api from "../api";
-import { CREATE_SUBSPACE, JOIN_SUBSPACE, DELETE_SUBSPACE } from "../constants/actionTypes";
+import { FETCH_SUBSPACES, CREATE_SUBSPACE, JOIN_SUBSPACE, DELETE_SUBSPACE } from "../constants/actionTypes";
 
 function handleError(error) {
     if (error.code === "ERR_NETWORK") {
@@ -7,6 +7,21 @@ function handleError(error) {
     } else {
         return { status: error.response.status, result: error.response.data };
     }
+}
+
+export const fetchSubspaceInfo = (subspaceName) => async () => {
+    try {
+        const { data } = await api.fetchSubspaceInfo(subspaceName);
+        return { status: 200, result: data };
+    } catch (error) { return handleError(error) }
+};
+
+export const fetchSubspaces = (searchParams) => async (dispatch) => {
+    try {
+        const { data } = await api.fetchSubspaces(searchParams);
+        dispatch({ type: FETCH_SUBSPACES, payload: data.results });
+        return data;
+    } catch (error) { return handleError(error) }
 }
 
 export const createSubspace = (subspaceData) => async (dispatch) => {
@@ -17,6 +32,13 @@ export const createSubspace = (subspaceData) => async (dispatch) => {
     } catch (error) { return handleError(error) }
 };
 
+export const isSubspaceJoined = (subspaceAndUserId) => async () => {
+    try {
+        const { data } = await api.isSubspaceJoined(subspaceAndUserId);
+        return { status: 200, result: data };
+    } catch (error) { return handleError(error) }
+}
+
 export const joinSubspace = (actionData) => async (dispatch) => {
     try {
         const { data } = await api.joinSubspace(actionData);
@@ -25,23 +47,16 @@ export const joinSubspace = (actionData) => async (dispatch) => {
     } catch (error) { return handleError(error); }
 };
 
-export const fetchAllSubspaceInfo = (subspaceName) => async () => {
+export const updateSubspace = (subspaceData) => async () => {
     try {
-        const { data } = await api.fetchAllSubspaceInfo(subspaceName);
-        return { status: 200, result: data };
-    } catch (error) { return handleError(error) }
-};
-
-export const fetchSubspaceAvatar = (subspaceName) => async () => {
-    try {
-        const { data } = await api.fetchSubspaceAvatar(subspaceName);
+        const { data } = await api.updateSubspace(subspaceData);
         return { status: 200, result: data };
     } catch (error) { return handleError(error) }
 }
 
-export const deleteSubspace = (subspaceName) => async (dispatch) => {
+export const deleteSubspace = (subspaceId) => async (dispatch) => {
     try {
-        const { data } = await api.deleteSubspace(subspaceName);
+        const { data } = await api.deleteSubspace(subspaceId);
         dispatch({ type: DELETE_SUBSPACE, payload: data });
         return { status: 200, result: data };
     } catch (error) { return handleError(error) }

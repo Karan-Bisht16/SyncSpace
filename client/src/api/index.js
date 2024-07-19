@@ -23,16 +23,19 @@ export const changePassword = (formData) => API.patch("/user/changePassword", fo
 export const deleteProfile = () => API.delete("/user/deleteProfile");
 
 // Subspace
-export const createSubspace = (subspaceData) => API.post("/subspace", subspaceData);
-export const joinSubspace = (actionData) => API.get("/subspace/join", { params: actionData });
-export const fetchAllSubspaceInfo = (subspaceName) => API.get("/subspace/info", { params: subspaceName });
-export const fetchSubspaceAvatar = (subspaceName) => API.get("/subspace/avatar", { params: subspaceName });
-export const deleteSubspace = (subspaceName) => API.delete("/subspace/delete", { params: subspaceName });
+export const fetchSubspaces = (searchParams) => API.post("/subspace", searchParams);
+export const fetchSubspaceInfo = (subspaceName) => API.get("/subspace/info", { params: subspaceName });
+export const createSubspace = (subspaceData) => API.post("/subspace/createSubspace", subspaceData);
+export const isSubspaceJoined = (subspaceAndUserId) => API.get("/subspace/isJoined", { params: subspaceAndUserId });
+export const joinSubspace = (actionData) => API.patch("/subspace/join", actionData);
+export const updateSubspace = (subspaceData) => API.put("/subspace/update", subspaceData);
+export const deleteSubspace = (subspaceId) => API.delete("/subspace/delete", { params: subspaceId });
 
 // Post
-export const fetchPostInfo = (postId) => API.get(`/posts?id=${postId}`);
-export const fetchPosts = (searchParams) => API.post("/posts/", searchParams);
-export const createPost = (newPost) => API.post("/posts/createPost", newPost);
-export const deletePost = (postId) => API.delete("/posts/deletePost", { params: postId });
-export const isPostLiked = (postAndUserId) => API.get("/posts/isPostLiked", { params: postAndUserId });
-export const likePost = (actionData) => API.patch("/posts/likePost", actionData);
+export const fetchPosts = (searchParams) => API.post("/post/", searchParams);
+export const fetchPostInfo = (postId) => API.get("/post/info", { params: postId });
+export const fetchAdditionalPostInfo = (postId) => API.get("/post/addInfo", { params: postId });
+export const createPost = (newPost) => API.post("/post/createPost", newPost);
+export const isPostLiked = (postAndUserId) => API.get("/post/isLiked", { params: postAndUserId });
+export const likePost = (actionData) => API.patch("/post/likePost", actionData);
+export const deletePost = (postId) => API.delete("/post/deletePost", { params: postId });

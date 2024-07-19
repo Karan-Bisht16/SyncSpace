@@ -24,13 +24,6 @@ export const fetchUserInfo = (userName) => async () => {
     } catch (error) { return handleError(error) }
 }
 
-// export const fetchUserPosts = () => async () => {
-//     try {
-//         const { data } = await api.fetchUserPosts();
-//         return { status: 200, result: data };
-//     } catch (error) { return handleError(error) }
-// }
-
 export const getGoogleUser = (token) => async (dispatch) => {
     try {
         const { data } = await api.getGoogleUser(token);

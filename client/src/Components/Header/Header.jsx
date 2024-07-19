@@ -1,10 +1,10 @@
-import React, { useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { AppBar, Typography, Button, Box, Drawer, Toolbar, IconButton, CssBaseline } from "@mui/material";
 import { Menu, Add } from "@mui/icons-material";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 // Importing my components
-import CustomDrawer from "./CustomDrawer/CustomDrawer";
+import CustomDrawer from "../CustomDrawer/CustomDrawer";
 import ToolBar from "../ToolBar/ToolBar";
 import { ColorModeContext } from "../../store";
 // Importing actions
@@ -31,11 +31,8 @@ function Header(props) {
         document.querySelector("body").setAttribute("data-theme", "light");
     }
     const toggleBodyTheme = useCallback((themeValue) => {
-        if (themeValue === "dark") {
-            setDarkMode();
-        } else {
-            setLightMode();
-        }
+        if (themeValue === "dark") { setDarkMode() }
+        else { setLightMode() }
     }, []);
     function handleToggleMode() {
         const newMode = mode === "light" ? "dark" : "light";
@@ -45,8 +42,8 @@ function Header(props) {
     };
     // JS for SideBar
     const drawerWidth = "275px";
-    const [mobileOpen, setMobileOpen] = React.useState(false);
-    const [isClosing, setIsClosing] = React.useState(false);
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
     function handleDrawerClose() {
         setIsClosing(true);
         setMobileOpen(false);
@@ -55,9 +52,7 @@ function Header(props) {
         setIsClosing(false);
     };
     function handleDrawerToggle() {
-        if (!isClosing) {
-            setMobileOpen(!mobileOpen);
-        }
+        if (!isClosing) { setMobileOpen(!mobileOpen) }
     };
     async function handleLogout() {
         const { status, result } = await dispatch(logoutUser());
@@ -65,15 +60,13 @@ function Header(props) {
             navigate("/");
             window.location.reload();
         } else {
-            navigate("/", { state: { status: "error", message: result.message } });
+            navigate("/", { state: { status: "error", message: result.message, time: new Date().getTime() } });
         }
     }
     useEffect(() => {
         const selectedTheme = localStorage.getItem("selectedTheme");
         toggleBodyTheme(selectedTheme);
-        if (selectedTheme && selectedTheme !== mode) {
-            toggleMode();
-        }
+        if (selectedTheme && selectedTheme !== mode) { toggleMode() }
         if (location.state && location.state.status) {
             const arrivalTime = location.state.time;
             const now = new Date().getTime();

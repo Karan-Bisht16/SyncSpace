@@ -1,6 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useContext, useRef, useEffect } from "react";
 import { Button, Box, Chip, Divider, Grid, Stepper, Step, StepLabel, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import imageCompression from "browser-image-compression";
 // Importing my components
@@ -9,33 +9,29 @@ import ConfirmationDialog from "../ConfirmationDialog/ConfirmationDialog";
 import preDefinedTopics from "../../assets/preDefinedTopics";
 import InputField from "../InputField/InputField";
 import FileUpload from "../FileUpload/FileUpload";
+import { ReRenderContext } from "../../store";
 // Importing actions
-import { createSubspace } from "../../actions/subspace";
+import { createSubspace, fetchSubspaceInfo, updateSubspace } from "../../actions/subspace";
 // Importing styling
 import styles from "./styles"
 
 function SubspaceForm(props) {
-    const { user, snackbar, confirmationDialog } = props;
+    const { user, type, subspaceFormData, snackbar, confirmationDialog } = props;
     const [setSnackbarValue, setSnackbarState] = snackbar;
     const [dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar] = confirmationDialog;
     const classes = styles();
+    const { subspaceName } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { setReRender } = useContext(ReRenderContext);
 
     const nameField = useRef(null);
     const descriptionField = useRef(null);
-    const creator = {
-        userId: user._id,
-        name: user.name,
-        userName: user.userName
-    };
     const [subspaceData, setSubspaceData] = useState({
         name: "",
         description: "",
-        creator: creator,
+        creator: user._id,
         avatar: "",
-        members: [creator.userId],
-        moderators: [creator],
         topics: [],
     });
     // JS for Stepper
@@ -47,7 +43,6 @@ function SubspaceForm(props) {
                 setActiveStep(1);
             } else {
                 return false;
-                // setActiveStep(0);
             }
         } else {
             setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -82,6 +77,41 @@ function SubspaceForm(props) {
             return (<Chip key={data.key} label={data.label} onClick={() => handleTopicSelection(data)} />);
         }
     }
+    const [updateSubspaceId, setUpdateSubspaceId] = useState(null);
+    useEffect(() => {
+        async function getSubspaceInfo() {
+            const { status, result } = await dispatch(fetchSubspaceInfo({ subspaceName }));
+            if (status === 200) {
+                setSubspaceData({
+                    name: result.name,
+                    description: result.description,
+                    creator: user._id,
+                    avatar: result.avatar,
+                    topics: result.topics,
+                });
+                setUpdateSubspaceId(result._id);
+                setTopicsArray(result.topics);
+            } else {
+                setSnackbarValue({ message: result.message, status: "error" });
+                setSnackbarState(true);
+            }
+        }
+        if (type.toUpperCase() === "UPDATE") {
+            if (subspaceFormData) {
+                setSubspaceData({
+                    name: subspaceFormData.name,
+                    description: subspaceFormData.description,
+                    creator: user._id,
+                    avatar: subspaceFormData.avatar,
+                    topics: subspaceFormData.topics,
+                });
+                setUpdateSubspaceId(subspaceFormData._id);
+                setTopicsArray(subspaceFormData.topics);
+            } else {
+                getSubspaceInfo();
+            }
+        }
+    }, [type, user._id, subspaceFormData, subspaceName, dispatch, setSnackbarValue, setSnackbarState]);
     // File Upload
     const fileUploadOptions = {
         maxSizeMB: 0.05,
@@ -179,8 +209,21 @@ function SubspaceForm(props) {
             setActiveStep(2);
             return false;
         }
-        console.log(subspaceData);
-        openDialog({ title: "Create Subspace", message: "Create a new subspace?", cancelBtnText: "Cancel", submitBtnText: "Create" });
+        if (type.toUpperCase() === "CREATE") {
+            openDialog({ title: "Create Subspace", message: "Create a new subspace?", cancelBtnText: "Cancel", submitBtnText: "Create" });
+        } else if (type.toUpperCase() === "UPDATE") {
+            handleUpdateSubspace();
+        }
+    }
+    async function handleUpdateSubspace() {
+        const { status, result } = await dispatch(updateSubspace({ subspaceId: updateSubspaceId, subspaceData }));
+        if (status === 200) {
+            setReRender(prevReRender => !prevReRender);
+            navigate("/", { state: { status: "success", message: "Subspace updated successfully!", time: new Date().getTime() } });
+        } else {
+            setSnackbarValue({ message: result.message, status: "error" });
+            setSnackbarState(true);
+        }
     }
     async function handleDialog() {
         setLinearProgressBar(true);
@@ -188,6 +231,7 @@ function SubspaceForm(props) {
             const { status, result } = await dispatch(createSubspace(subspaceData));
             closeDialog();
             if (status === 200) {
+                setReRender(prevReRender => !prevReRender);
                 navigate("/", { state: { status: "success", message: "Subspace created successfully!", time: new Date().getTime() } });
             } else {
                 setSnackbarValue({ message: result.message, status: "error" });
@@ -206,10 +250,10 @@ function SubspaceForm(props) {
                 <Grid item xs={12} lg={8.75}>
                     <Box>
                         {(activeStep === 0 || activeStep === 1) &&
-                            <Typography variant="h4" sx={{ marginBottom: { xs: "241px", lg: "24px" } }}>Create Subspace</Typography>
+                            <Typography variant="h4" sx={{ marginBottom: { xs: "241px", lg: "24px" } }}>{type} Subspace</Typography>
                         }
                         {(activeStep === 2) &&
-                            <Typography variant="h4" sx={{ marginBottom: { xs: "24px", sm: "241px", lg: "24px" } }}>Create Subspace</Typography>
+                            <Typography variant="h4" sx={{ marginBottom: { xs: "24px", sm: "241px", lg: "24px" } }}>{type} Subspace</Typography>
                         }
                         <form noValidate onSubmit={handleSubmit}>
                             {(activeStep === 0) &&
@@ -221,6 +265,7 @@ function SubspaceForm(props) {
                                     <InputField
                                         name="description" label="Description" value={subspaceData.description} type="text"
                                         handleChange={handleChange} reference={descriptionField} multiline={true} rows={4}
+                                        sx={{ height: "131px" }}
                                     />
                                     <hr />
                                 </>
@@ -261,9 +306,8 @@ function SubspaceForm(props) {
                                         </Box>
                                         <Box sx={{ float: "right", top: "150px" }}>
                                             <Button variant="outlined" size="large" sx={classes.resetBtn} onClick={handleClear}>Reset</Button>
-                                            <Button variant="contained" color="primary" size="large" type="submit" sx={classes.createBtn}>Create</Button>
+                                            <Button variant="contained" color="primary" size="large" type="submit" sx={classes.createBtn}>{type}</Button>
                                         </Box>
-
                                     </Box>
                                 </Box>
                             } {(activeStep === 1) &&

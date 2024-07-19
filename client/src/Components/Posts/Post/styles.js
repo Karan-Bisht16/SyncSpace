@@ -29,10 +29,10 @@ const styles = () => ({
         lineHeight: "300px",
         margin: "8px 0",
         borderRadius: "16px",
-        objectFit: "scale-down",
+        objectFit: "contain",
         overflow: "hidden"
     },
-    imageBox: { height: "100%", width: "100%", verticalAlign: "middle" },
+    imageBox: { height: "100%", width: "100%", verticalAlign: "middle", objectFit: "scale-down" },
     allPostActionsContainer: { display: "flex", justifyContent: "space-between", alignItems: "center" },
     majorPostActionsContainer: {
         color: "text.heading",

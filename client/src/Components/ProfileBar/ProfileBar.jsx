@@ -57,7 +57,7 @@ function ProfileBar(props) {
                 {gridItemContainer(5, updatedUser.postsCount, "Record", "Records")}
                 {gridItemContainer(2, " ", "")}
                 {gridItemContainer(5, updatedUser.credits, "Celestial Credit", "Celestial Credits")}
-                {gridItemContainer(12, updatedUser.subspacesJoinedCount, "Subspace joined", "Subspaces joined")}
+                {gridItemContainer(12, updatedUser.subspacesJoined, "Subspace joined", "Subspaces joined")}
             </Grid>
             <br />
             <Divider />

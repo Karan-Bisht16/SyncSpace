@@ -1,18 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { Avatar, Box, Button, Grid, IconButton, LinearProgress, ListItemIcon, Menu, MenuItem, Typography } from "@mui/material";
 import { DeleteTwoTone, EditNoteRounded, MoreVert } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Player } from "@lordicon/react";
 import { lineSpinner } from "ldrs";
-// Importing my components
 import ConfirmationDialog from "../../Components/ConfirmationDialog/ConfirmationDialog";
 import NotFound from "../../Components/NotFound/NotFound";
 import { formatMembersCount } from "../../utils/functions";
 import Posts from "../../Components/Posts/Posts";
-// Importing actions
-import { fetchAllSubspaceInfo, joinSubspace, deleteSubspace } from "../../actions/subspace";
-// Importing styling
+import { ReRenderContext } from "../../store";
+import { fetchSubspaceInfo, joinSubspace, deleteSubspace, isSubspaceJoined } from "../../actions/subspace";
 import styles from "./styles";
 
 function Subspace(props) {
@@ -21,48 +19,48 @@ function Subspace(props) {
     const [dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar] = confirmationDialog;
     const { subspaceName } = useParams();
     const classes = styles();
-    const dispatch = useDispatch();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { setReRender } = useContext(ReRenderContext);
 
     useEffect(() => {
-        // Setting webpage title
         document.title = "SyncSpace: ss/" + subspaceName;
     });
 
-    const [rerender, setRerender] = useState(false);
     const [primaryLoading, setPrimaryLoading] = useState(true);
     const [secondaryLoading, setSecondaryLoading] = useState(true);
     const [noSubspaceFound, setNoSubspaceFound] = useState(false);
     const [canModifySubspace, setCanModifySubspace] = useState(false);
     const [subspaceDeleted, setSubspaceDeleted] = useState(false);
+    const [subspacePostsCount, setSubspacePostsCount] = useState(0);
+    const [reRenderSubspacePosts, setReRenderSubspacePosts] = useState({});
     useEffect(() => {
+        setReRenderSubspacePosts({});
         setPrimaryLoading(true);
         setSecondaryLoading(true);
         setNoSubspaceFound(false);
         setCanModifySubspace(false);
         setSubspaceDeleted(false);
-        setRerender(subspaceName);
         setSubspacePostsCount(0);
     }, [subspaceName]);
-    const [subspaceData, setSubspaceData] = useState({
-        name: "Loading...",
-        subspaceName: "Loading...",
-        description: "Loading...",
-        avatar: "",
-    });
-    const [subspacePostsCount, setSubspacePostsCount] = useState(0);
+    const [subspaceData, setSubspaceData] = useState(null);
     useEffect(() => {
-        async function fetchSubspaceInfo() {
-            const { status, result } = await dispatch(fetchAllSubspaceInfo({ subspaceName: subspaceName }));
+        async function fetchAllSubspaceInfo() {
+            const { status, result } = await dispatch(fetchSubspaceInfo({ subspaceName }));
             if (status === 200) {
-                if (result.subspaceData.isDeleted) {
-                    setSubspaceDeleted(true);
-                } else {
-                    setSubspaceData(result.subspaceData);
-                    if (user && user.userName === result.subspaceData.creator.userName) {
-                        setCanModifySubspace(true);
+                const subspace = result;
+                if (subspace.isDeleted) { setSubspaceDeleted(true) }
+                else {
+                    setSubspaceData(subspace);
+                    setReRenderSubspacePosts(subspace._id);
+                    if (user) {
+                        if (user._id === subspace.creator) {
+                            setCanModifySubspace(true);
+                        }
+                        const { status, result } = await dispatch(isSubspaceJoined({ userId: user._id, subspaceId: subspace._id }));
+                        if (status === 200) { setJoined(result) }
                     }
-                    setSubspacePostsCount(result.subspaceData.postsCount);
+                    setSubspacePostsCount(subspace.postsCount);
                 }
                 setPrimaryLoading(false);
                 setSecondaryLoading(false);
@@ -75,22 +73,7 @@ function Subspace(props) {
                 setSnackbarState(true);
             }
         }
-        async function getSubspaceInfo() {
-            if (user) {
-                const desiredSubspace = user.subspacesJoined.filter(subspace => subspace.name.replace(/ /g, "-") === subspaceName)[0];
-                if (desiredSubspace) {
-                    setJoined(true);
-                    setSubspaceData(desiredSubspace);
-                    setPrimaryLoading(false);
-                    fetchSubspaceInfo();
-                } else {
-                    fetchSubspaceInfo();
-                }
-            } else {
-                fetchSubspaceInfo();
-            }
-        }
-        getSubspaceInfo();
+        fetchAllSubspaceInfo();
     }, [subspaceName, user, dispatch, setSnackbarValue, setSnackbarState]);
     // JS for Menu
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -115,7 +98,8 @@ function Subspace(props) {
         if (user) {
             const tempJoined = joined;
             setJoined(!joined);
-            const { status, result } = await dispatch(joinSubspace({ action: !tempJoined, subspaceName: subspaceName }));
+            const { status, result } = await dispatch(joinSubspace({ subspaceId: subspaceData._id, userId: user._id, action: !tempJoined, }));
+            setReRender(prevReRender => !prevReRender);
             if (status !== 200) {
                 setJoined(tempJoined);
                 setSnackbarValue({ message: result.message, status: "error" });
@@ -125,36 +109,39 @@ function Subspace(props) {
             navigate("/authentication");
         }
     }
+    function handleSubspaceUpdate() {
+        navigate(`/ss/update/${subspaceName}`, { state: { subspaceData } });
+    }
     function handleSubspaceDelete() {
         handleMenuClose();
         openDialog({
             title: "Delete Subspace",
-            message: 
-                <div>
+            message:
+                <span>
                     This action is irreversible. Once deleted, you will not be able to create a new subspace with the same name (i.e., ss/<b>{subspaceName}</b>).
                     If you intend to delete this subspace only to recreate it, please consider using the 'Update Subspace' option instead.
                     <br /><br />
                     Are you sure you want to proceed?
-                </div>,
+                </span>,
             cancelBtnText: "Cancel", submitBtnText: "Delete", type: "error"
         });
     }
     async function handleDialog() {
         setLinearProgressBar(true);
-        if (dialogValue.submitBtnText.toUpperCase() === "DELETE") {
-            console.log(dialogValue);
-            const { status, result } = await dispatch(deleteSubspace({ subspaceName }));
+        if (dialogValue.submitBtnText.toUpperCase() === "JOIN") {
+            await handleJoin();
+            closeDialog();
+            navigate("/create-post", { state: { subspaceName, subspaceId: subspaceData?._id } });
+        } else if (dialogValue.submitBtnText.toUpperCase() === "DELETE") {
+            const { status, result } = await dispatch(deleteSubspace({ subspaceId: subspaceData?._id }));
             closeDialog();
             if (status === 200) {
+                setReRender(prevReRender => !prevReRender);
                 navigate("/", { state: { message: "Subspace deleted successfully", status: "success", time: new Date().getTime() } });
             } else {
                 setSnackbarValue({ message: result.message, status: "error" });
                 setSnackbarValue(true);
             }
-        } else if (dialogValue.submitBtnText.toUpperCase() === "JOIN") {
-            await handleJoin();
-            closeDialog();
-            navigate("/create-post", { state: { subspaceName, subspaceId: subspaceData?._id } });
         }
     }
     const ICON = require("../../assets/animation-deleted.json");
@@ -223,7 +210,7 @@ function Subspace(props) {
                                                                 horizontal: "right",
                                                             }}
                                                         >
-                                                            <MenuItem onClick={() => navigate(`/ss/update/${subspaceName}`)}>
+                                                            <MenuItem onClick={handleSubspaceUpdate}>
                                                                 <ListItemIcon>
                                                                     <EditNoteRounded fontSize="small" />
                                                                 </ListItemIcon>
@@ -290,7 +277,11 @@ function Subspace(props) {
                                                     </Box>
                                                     :
                                                     <Box sx={classes.subspacePostContainer}>
-                                                        <Posts key={rerender} searchQuery={{ subspaceName: rerender }} snackbar={snackbar} confirmationDialog={confirmationDialog} />
+                                                        <Posts
+                                                            key={reRenderSubspacePosts}
+                                                            searchQuery={{ subspaceId: reRenderSubspacePosts }}
+                                                            snackbar={snackbar} confirmationDialog={confirmationDialog}
+                                                        />
                                                     </Box>
                                                 }
                                             </>
@@ -300,7 +291,6 @@ function Subspace(props) {
                             </>
                         }
                     </>
-
                 }
             </Box>
             <ConfirmationDialog dialog={dialog} closeDialog={closeDialog} handleDialog={handleDialog} linearProgressBar={linearProgressBar} dialogValue={dialogValue} />

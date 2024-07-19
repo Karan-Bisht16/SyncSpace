@@ -4,11 +4,8 @@ import { useDispatch } from "react-redux";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "react-infinite-scroller";
 import { lineSpinner } from "ldrs";
-// Importing my components
 import Post from "./Post/Post";
-// Importing actions
 import { fetchPosts } from "../../actions/post";
-// Importing styling
 import styles from "./styles";
 
 function Posts(props) {
@@ -21,6 +18,7 @@ function Posts(props) {
         const response = await dispatch(fetchPosts({ pageParams, searchQuery, customParams }));
         return response;
     };
+    
     const data = null;
     const {
         data: queryData = {},
@@ -43,7 +41,7 @@ function Posts(props) {
         return (
             <Box sx={classes.noContentContainer}>
                 <Typography variant="h4">Wow! You have reached the end of it all.</Typography>
-                <Typography variant="h5">Go. Touch some grass.</Typography>
+                <Typography variant="h5">Go, touch some grass.</Typography>
             </Box>
         );
     }

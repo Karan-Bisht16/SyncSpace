@@ -1,7 +1,63 @@
 import jwt from "jsonwebtoken";
+import { ObjectId } from "mongodb";
 import User from "../models/user.js";
+import Join from "../models/join.js";
 import Subspace from "../models/subspace.js";
-import { createUserSession } from "../utils/functions.js";
+
+let globalCount = 1;
+const LIMIT = process.env.SUBSPACES_LIMIT || 4;
+
+const fetchSubspaceInfo = async (req, res) => {
+    try {
+        console.log(req.query);
+        const { subspaceName } = req.query;
+        const subspace = await Subspace.findOne({ subspaceName: subspaceName });
+        if (subspace) { res.status(200).json(subspace) }
+        else { res.status(404).json({ message: "No subspace found." }) }
+    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+}
+
+const fetchSubspaces = async (req, res) => {
+    try {
+        const { pageParams, searchQuery } = req.body;
+        const startIndex = (Number(pageParams) - 1) * LIMIT;
+        const total = await Join.countDocuments(searchQuery);
+        const subspaces = await Join.aggregate([
+            { $match: { userId: new ObjectId(searchQuery.userId) } },
+            { $sort: { _id: -1 } },
+            { $skip: Number(startIndex) },
+            { $limit: Number(LIMIT) },
+            {
+                $lookup: {
+                    from: "subspaces",
+                    localField: "subspaceId",
+                    foreignField: "_id",
+                    as: "subspaceDetails"
+                }
+            },
+            { $unwind: "$subspaceDetails" },
+            {
+                $replaceRoot: { newRoot: "$subspaceDetails" }
+            }
+        ]);
+        const currentPage = Number(pageParams);
+        const count = Math.ceil(total / LIMIT);
+        console.log(`${globalCount} Limited subspaces: ${subspaces.length}`);
+        console.log(searchQuery);
+        globalCount++;
+        if (currentPage === 1) {
+            if (total > LIMIT) {
+                res.status(200).json({ count: count, previous: null, next: currentPage + 1, results: subspaces });
+            } else {
+                res.status(200).json({ count: count, previous: null, next: null, results: subspaces });
+            }
+        } else if (currentPage === count) {
+            res.status(200).json({ count: count, previous: currentPage - 1, next: null, results: subspaces });
+        } else {
+            res.status(200).json({ count: count, previous: currentPage - 1, next: currentPage + 1, results: subspaces });
+        }
+    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+}
 
 const createSubspace = async (req, res) => {
     try {
@@ -9,123 +65,84 @@ const createSubspace = async (req, res) => {
         const subspace = { ...tempSubspace, subspaceName: tempSubspace.name.replace(/ /g, "-") };
         const isSubspaceNameUnique = await Subspace.findOne({ name: subspace.name });
         if (isSubspaceNameUnique) {
-            res.status(409).json({ message: "Subspace already exists." })
+            res.status(409).json({ message: "Subspace with same name already exists." })
         } else {
             const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
-            const newSubspace = await Subspace.create(subspace);
-            const newSubspaceObj = {
-                subspaceId: newSubspace._id,
-                name: newSubspace.name,
-                description: newSubspace.description,
-                avatar: newSubspace.avatar,
-            };
             const user = await User.findOneAndUpdate({ email: email }, {
-                $push: { subspacesJoined: newSubspaceObj },
-                $inc: { subspacesJoinedCount: 1 }
+                $inc: { subspaceJoined: 1 }
             }, { new: true });
-            if (req.session.user) {
-                req.session.user.subspacesJoined = [...req.session.subspacesJoined, newSubspaceObj];
-                res.status(200).json(req.session.user);
-            } else {
-                res.status(200).json(createUserSession(user));
-            }
+            const newSubspace = await Subspace.create(subspace);
+            await Join.create({
+                userId: user._id,
+                subspaceId: newSubspace._id
+            });
+            res.status(200).json(newSubspace);
         }
-    } catch (error) { res.status(404).json({ message: "Network error. Try again." }) }
+    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+}
+
+const isSubspaceJoined = async (req, res) => {
+    try {
+        console.log(req.query);
+        const { subspaceId, userId } = req.query;
+        const isJoined = await Join.findOne({ subspaceId: subspaceId, userId: userId });
+        if (isJoined) { res.status(200).json(true) }
+        else { res.status(200).json(false) }
+    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
 }
 
 const joinSubspace = async (req, res) => {
     try {
-        const { action, subspaceName } = req.query;
-        const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
-        const subspace = await Subspace.findOne({ subspaceName: subspaceName });
-        if (action === "true") {
-            const newSubspaceObj = {
-                subspaceId: subspace._id,
-                name: subspace.name,
-                description: subspace.description,
-                avatar: subspace.avatar,
-            };
-            const user = await User.findOneAndUpdate({ email: email }, {
-                $push: { subspacesJoined: newSubspaceObj },
-                $inc: { subspacesJoinedCount: 1 }
-            }, { new: true });
-            await Subspace.updateOne({ _id: subspace._id }, {
-                $push: { members: user._id },
+        console.log(req.body);
+        const { subspaceId, userId, action } = req.body;
+        let subspace;
+        if (action) {
+            subspace = await Subspace.findByIdAndUpdate(subspaceId, {
                 $inc: { membersCount: 1 }
-            });
-            if (req.session.user) {
-                req.session.user.subspacesJoined = [...req.session.subspacesJoined, newSubspaceObj];
-                res.status(200).json(req.session.user);
-            } else {
-                res.status(200).json(createUserSession(user));
-            }
-        } else if (action === "false") {
-            const newSubspaceObj = {
-                subspaceId: subspace._id,
-                name: subspace.name,
-                description: subspace.description,
-                avatar: subspace.avatar,
-            };
-            const user = await User.findOneAndUpdate({ email: email }, {
-                $pull: { subspacesJoined: newSubspaceObj },
-                $inc: { subspacesJoinedCount: -1 }
             }, { new: true });
-            await Subspace.updateOne({ _id: subspace._id }, {
-                $pull: { members: user._id },
+            await User.findByIdAndUpdate(userId, { $inc: { subspacesJoined: 1 } })
+            await Join.create({ subspaceId: subspaceId, userId: userId });
+        } else {
+            subspace = await Subspace.findByIdAndUpdate(subspaceId, {
                 $inc: { membersCount: -1 }
-            });
-            if (req.session.user) {
-                req.session.user.subspacesJoined = req.session.user.subspacesJoined.filter(subspace => subspace.name.replace(/ /g, "-") !== subspaceName);
-                res.status(200).json(req.session.user);
-            } else {
-                res.status(200).json(createUserSession(user));
-            }
+            }, { new: true });
+            await User.findByIdAndUpdate(userId, { $inc: { subspacesJoined: -1 } })
+            await Join.findOneAndDelete({ subspaceId: subspaceId, userId: userId });
         }
-    } catch (error) { res.status(404).json({ message: "Network error. Try again." }) }
+        res.status(200).json({ joinedSubspace: { label: subspace.subspaceName, _id: subspace._id }, joined: action });
+    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
 }
 
-const fetchAllSubspaceInfo = async (req, res) => {
+const updateSubspace = async (req, res) => {
     try {
-        const { subspaceName } = req.query;
-        const subspace = await Subspace.findOne({ subspaceName: subspaceName });
-        res.status(200).json({ subspaceData: subspace, subspacePostsCount: subspace.postsCount });
-    } catch (error) { res.status(404).json({ message: "Network error. Try again." }) }
-}
+        const { subspaceId, subspaceData } = req.body;
+        const subspace = { ...subspaceData, subspaceName: subspaceData.name.replace(/ /g, "-") };
+        const isSubspaceNameUnique = await Subspace.findOne({ name: subspace.name });
+        if (isSubspaceNameUnique) {
+            res.status(409).json({ message: "Subspace with same name already exists." })
+        } else {
+            const updatedSubspace = await Subspace.findByIdAndUpdate(subspaceId, subspace, { new: true });
+            res.status(200).json({ label: subspaceData.name.replace(/ /g, "-"), _id: updatedSubspace._id });
+        }
+    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
 
-const fetchSubspaceAvatar = async (req, res) => {
-    try {
-        const { subspaceName } = req.query;
-        const subspace = await Subspace.findOne({ subspaceName: subspaceName });
-        res.status(200).json({ subspaceAvatar: subspace.avatar });
-    } catch (error) { res.status(404).json({ message: "Network error. Try again." }) }
 }
 
 const deleteSubspace = async (req, res) => {
     try {
-        const { subspaceName } = req.query;
+        const { subspaceId } = req.query;
         const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
-        const subspace = await Subspace.findOneAndUpdate({ subspaceName: subspaceName }, {
-            $unset: { description: "", avatar: "", creator: "", dateCreated: "", members: "", membersCount: "", moderators: "", topics: "", postsCount: "" },
+        const subspace = await Subspace.findByIdAndUpdate(subspaceId, {
+            $unset: { description: "", avatar: "", creator: "", dateCreated: "", membersCount: "", topics: "", postsCount: "" },
             isDeleted: true,
         }, { returnOriginal: true });
-        const subspaceObj = {
-            subspaceId: subspace._id,
-            name: subspace.name,
-            description: subspace.description,
-            avatar: subspace.avatar,
-        };
         const user = await User.findOneAndUpdate({ email: email }, {
-            $pull: { subspacesJoined: subspaceObj },
-            $inc: { subspacesJoinedCount: -1 }
+            $inc: { subspacesJoined: -1 }
         }, { new: true });
-        if (req.session.user) {
-            req.session.user.subspacesJoined = req.session.user.subspacesJoined.filter(subspace => subspace.name.replace(/ /g, "-") !== subspaceName);
-            res.status(200).json(req.session.user);
-        } else {
-            res.status(200).json(createUserSession(user));
-        }
-    } catch (error) { console.log(error); res.status(404).json({ message: "Network error. Try again." }) }
+        await Join.findOneAndDelete({ subspaceId: subspace._id, userId: user._id });
+        res.status(200).json({ label: subspace.subspaceName, _id: subspace._id });
+    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
 
 }
 
-export { createSubspace, joinSubspace, fetchAllSubspaceInfo, fetchSubspaceAvatar, deleteSubspace };
+export { fetchSubspaceInfo, fetchSubspaces, createSubspace, isSubspaceJoined, joinSubspace, updateSubspace, deleteSubspace };

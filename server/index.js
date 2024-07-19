@@ -50,7 +50,7 @@ app.use(session({
 import userRoutes from "./routes/userRoutes.js";
 app.use("/user", userRoutes);
 import postRoutes from "./routes/postRoutes.js";
-app.use("/posts", postRoutes);
+app.use("/post", postRoutes);
 import subspaceRoutes from "./routes/subspaceRoutes.js";
 app.use("/subspace", subspaceRoutes);
 

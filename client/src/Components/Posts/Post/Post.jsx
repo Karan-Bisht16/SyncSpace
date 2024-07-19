@@ -9,14 +9,13 @@ import parse from "html-react-parser";
 import ConfirmationDialog from "../../ConfirmationDialog/ConfirmationDialog";
 import { formatDate, formatTime } from "../../../utils/functions";
 // Importing actions
-import { fetchSubspaceAvatar } from "../../../actions/subspace";
-import { deletePost, isPostLiked, likePost } from "../../../actions/post";
+import { fetchAdditionalPostInfo, deletePost, isPostLiked, likePost } from "../../../actions/post";
 // Importing styling
 import styles from "./styles";
 
 function Post(props) {
     const { post, individual, redirect, snackbar, confirmationDialog } = props;
-    const { subspaceName, authorName, dateCreated, title, body, selectedFile, likesCount, commentsCount } = post;
+    const { _id, authorId, dateCreated, title, body, selectedFile, likesCount, commentsCount } = post;
     const [setSnackbarValue, setSnackbarState] = snackbar;
     const [dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar] = confirmationDialog;
     const classes = styles();
@@ -25,49 +24,48 @@ function Post(props) {
 
     const user = useSelector(state => state.user);
     const [postLiked, setPostLiked] = useState(false);
-    const [subspaceAvatar, setSubspaceAvatar] = useState(null);
+    const [additionalPostInfo, setAdditionalPostInfo] = useState({
+        authorName: "Loading...",
+        isAuthorDeleted: false,
+        subspaceName: "Loading...",
+        subspaceAvatar: "",
+        isSubspaceDeleted: false,
+    });
     useEffect(() => {
-        async function getSubspaceAvatar() {
-            const { status, result } = await dispatch(fetchSubspaceAvatar({ subspaceName }));
-            if (status === 200) {
-                setSubspaceAvatar(result.subspaceAvatar);
-            }
+        async function getAdditionalPostInfo() {
+            const { status, result } = await dispatch(fetchAdditionalPostInfo({ postId: _id }));
+            if (status === 200) { setAdditionalPostInfo(result) }
         }
         async function checkIfPostIsLiked() {
             const { status, result } = await dispatch(isPostLiked({ postId: post._id, userId: user._id }));
-            if (status === 200) {
-                setPostLiked(result);
-            }
+            if (status === 200) { setPostLiked(result) }
         }
-        if (user) {
-            checkIfPostIsLiked();
-            const desiredSubspace = user.subspacesJoined.filter(subspace => subspace.name.replace(/ /g, "-") === subspaceName)[0];
-            if (desiredSubspace) {
-                setSubspaceAvatar(desiredSubspace.avatar);
-            } else {
-                getSubspaceAvatar();
-            }
+        if (user) { checkIfPostIsLiked() }
+        if (individual) {
+            setAdditionalPostInfo({
+                authorName: post.authorName,
+                isAuthorDeleted: post.isAuthorDeleted,
+                subspaceName: post.subspaceName,
+                subspaceAvatar: post.subspaceAvatar,
+                isSubspaceDeleted: post.isSubspaceDeleted,
+            })
         } else {
-            getSubspaceAvatar();
+            getAdditionalPostInfo()
+
         }
-        // check if post is liked: in 'like' collection check for a recod where you have both postId and userId
-        // change styling spread out post actions on mobile
-    }, [post._id, user, subspaceName, dispatch]);
-    function handleSubspaceClick() {
+    }, [_id, user, dispatch]);
+    function handleSubspaceClick(subspaceName) {
         navigate("/ss/" + subspaceName);
     }
-    function handleUserProfileClick() {
+    function handleUserProfileClick(authorName) {
         navigate("/e/" + authorName);
     }
     function handlePostClick() {
-        navigate("/post/" + post._id, { state: { post } });
+        navigate("/post/" + _id, { state: { postData: { post, additionalPostInfo } } });
     }
     function handlePostClose() {
-        if (redirect) {
-            navigate("/");
-        } else {
-            navigate(-1);
-        }
+        if (redirect) { navigate("/") }
+        else { navigate(-1) }
     }
     const [index, setIndex] = useState(0);
     function handleSelect(selectedIndex) {
@@ -156,14 +154,18 @@ function Post(props) {
                 <Box sx={classes.subContainer}>
                     <Box sx={classes.postHeader}>
                         <Box sx={classes.avatarContainer}>
-                            <Avatar sx={classes.avatar} src={subspaceAvatar} alt="Subspace avatar">
-                                {subspaceName.charAt(0)}
+                            <Avatar sx={classes.avatar} alt="Subspace avatar" src={additionalPostInfo.subspaceAvatar}>
+                                {additionalPostInfo.subspaceName.charAt(0)}
                             </Avatar>
                         </Box>
                         <Box sx={classes.postHeaderDetails}>
-                            <Typography sx={classes.postSubspace} onClick={handleSubspaceClick}>
-                                <span style={classes.headerText}>ss/</span>{subspaceName}
-                            </Typography>
+                            {additionalPostInfo.isSubspaceDeleted ?
+                                <Typography sx={classes.postSubspace}><span style={classes.headerText}>ss/</span>[Deleted]</Typography>
+                                :
+                                <Typography sx={classes.postSubspace} onClick={() => handleSubspaceClick(additionalPostInfo.subspaceName)}>
+                                    <span style={classes.headerText}>ss/</span>{additionalPostInfo.subspaceName}
+                                </Typography>
+                            }
                             <FiberManualRecordTwoTone sx={{ fontSize: "8px" }} />
                             <Tooltip title={formatDate(dateCreated)}>
                                 <Typography sx={classes.headerText}>{formatTime(dateCreated)} ago</Typography>
@@ -180,9 +182,13 @@ function Post(props) {
                 <Box sx={classes.bodyContainer}>
                     <Typography sx={classes.bodyText} component={"div"}>{bodyText()}</Typography>
                     <Box sx={{ width: "100%", display: "flex", justifyContent: "end" }}>
-                        <span style={classes.author} onClick={handleUserProfileClick}>
-                            <span style={{ fontSize: "13px" }}>e/</span>{authorName}
-                        </span>
+                        {additionalPostInfo.isAuthorDeleted ?
+                            <span style={classes.author}><span style={{ fontSize: "13px" }}>e/</span>[Deleted]</span>
+                            :
+                            <span style={classes.author} onClick={() => handleUserProfileClick(additionalPostInfo.authorName)}>
+                                <span style={{ fontSize: "13px" }}>e/</span>{additionalPostInfo.authorName}
+                            </span>
+                        }
                     </Box>
                 </Box>
                 :
@@ -192,7 +198,7 @@ function Post(props) {
                             <Carousel slide={false} activeIndex={index} onSelect={handleSelect} style={classes.imageContainer}>
                                 {selectedFile.map((file, index) =>
                                     file.type.includes("image") &&
-                                    <Carousel.Item key={index} style={{ objectFit: "scale-down" }}>
+                                    <Carousel.Item key={index} style={{ objectFit: "scale-down", height: "100%" }}>
                                         <img
                                             src={file.file} alt="post related img init"
                                             style={classes.imageBox}
@@ -207,7 +213,13 @@ function Post(props) {
                         }
                     </Box>
                     <Box sx={{ width: "100%", display: "flex", justifyContent: "end", paddingRight: "16px" }}>
-                        <span style={classes.author} onClick={handleUserProfileClick}>e/{authorName}</span>
+                        {additionalPostInfo.isAuthorDeleted ?
+                            <span style={classes.author}><span style={{ fontSize: "13px" }}>e/</span>[Deleted]</span>
+                            :
+                            <span style={classes.author} onClick={() => handleUserProfileClick(additionalPostInfo.authorName)}>
+                                <span style={{ fontSize: "13px" }}>e/</span>{additionalPostInfo.authorName}
+                            </span>
+                        }
                     </Box>
                 </>
             }
@@ -244,7 +256,7 @@ function Post(props) {
                         }
                     </Tooltip>
                 </Paper>
-                {individual && user && (user.userName === authorName) &&
+                {individual && user && (user._id === authorId) &&
                     <Box>
                         <IconButton onClick={handleClickMenu}>
                             <MoreHoriz />

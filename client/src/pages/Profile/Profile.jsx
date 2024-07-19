@@ -47,8 +47,7 @@ function Profile(props) {
         dateJoined: "Loading...",
         avatar: "",
         credits: "Loading...",
-        subspacesJoined: [],
-        subspacesJoinedCount: "Loading...",
+        subspacesJoined: "Loading...",
         postsCount: "Loading...",
     });
     const [userPostsCount, setUserPostsCount] = useState(0);

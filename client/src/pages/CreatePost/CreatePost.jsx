@@ -3,6 +3,7 @@ import { Autocomplete, Box, Grid, LinearProgress, TextField, Typography } from "
 import { useLocation } from "react-router-dom";
 // Importing my components
 import PostForm from "../../Components/PostForm/PostForm";
+import { useSelector } from "react-redux";
 // Importing styling
 import styles from "./styles";
 
@@ -12,15 +13,12 @@ function CreatePost(props) {
     const location = useLocation();
 
     useEffect(() => {
-        // Setting webpage title
         document.title = "SyncSpace: Create Post";
     }, []);
 
     const [postData, setPostData] = useState({
         subspaceId: "",
-        subspaceName: "",
         authorId: user._id,
-        authorName: user.userName,
         title: "",
         body: "",
         selectedFile: [],
@@ -41,13 +39,11 @@ function CreatePost(props) {
     const [subspace, setSubspace] = useState(null);
     const [subspacesArray, setSubspacesArray] = useState(null);
     const [loadingSubspace, setLoadingSubspace] = useState(true);
+    const joinedSubspaces = useSelector(state => state.subspaces);
     useEffect(() => {
-        const userSubspaces = user.subspacesJoined.map((subspace) => {
-            return { label: subspace.name, _id: subspace._id }
-        });
-        setSubspacesArray(userSubspaces);
+        setSubspacesArray(joinedSubspaces);
         setLoadingSubspace(false);
-    }, [user.subspacesJoined]);
+    }, [joinedSubspaces]);
 
     return (
         <Grid container sx={{ display: "flex" }}>

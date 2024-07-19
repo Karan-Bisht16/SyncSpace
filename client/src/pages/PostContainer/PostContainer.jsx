@@ -24,36 +24,41 @@ function PostContainer(props) {
     const [primaryLoading, setPrimaryLoading] = useState(true);
     const [secondaryLoading, setSecondaryLoading] = useState(true);
     const [noPostFound, setNoPostFound] = useState(false);
-    const [commentsFound, setCommentsFound] = useState([]);
+    const [comments, setComments] = useState([]);
     const [postData, setPostData] = useState({
-        authorName: "Loading...",
-        subspaceName: "",
+        _id: id,
         title: "Loading...",
         body: "Loading...",
         selectedFile: [],
         dateCreated: "Loading...",
         edited: false,
-        likes: "",
-        comments: [],
-        commentsCount: "",
+        likesCount: 0,
+        commentsCount: 0,
+        authorId: "Loading...",
+        authorName: "Loading...",
+        isAuthorDeleted: false,
+        subspaceName: "Loading...",
+        subspaceAvatar: "",
+        isSubspaceDeleted: false,
     });
     useEffect(() => {
+        async function fetchCommentsInfo() {
+            // change this
+            setComments([]);
+            setSecondaryLoading(false);
+        }
         async function fetchAllPostInfo() {
             const { status, result } = await dispatch(fetchPostInfo(id));
             if (status === 200) {
-                if (result) {
-                    setPostData(result);
-                    setPrimaryLoading(false);
-                    // change this
-                    setCommentsFound([]);
-                    setSecondaryLoading(false);
-                    document.title = "SyncSpace: " + result.title;
-                } else {
-                    setNoPostFound(true);
-                    setPrimaryLoading(false);
-                    setSecondaryLoading(false);
-                    document.title = "SyncSpace: No such post";
-                }
+                console.log(result);
+                setPostData(result);
+                setPrimaryLoading(false);
+                document.title = "SyncSpace: " + result.title;
+            } else if (status === 404) {
+                setNoPostFound(true);
+                setPrimaryLoading(false);
+                setSecondaryLoading(false);
+                document.title = "SyncSpace: No such post";
             } else {
                 setSnackbarValue({ message: result.message, status: "error" });
                 setSnackbarState(true);
@@ -61,12 +66,26 @@ function PostContainer(props) {
         }
         async function getPostInfo() {
             if (location && location.state) {
-                const desiredPost = location.state.post;
-                if (desiredPost) {
-                    setPostData(desiredPost);
+                const { post, additionalPostInfo } = location.state.postData;
+                if (post && additionalPostInfo) {
+                    setPostData({
+                        _id: id,
+                        title: post.title,
+                        body: post.body,
+                        selectedFile: post.selectedFile,
+                        dateCreated: post.dateCreated,
+                        edited: post.edited,
+                        likesCount: post.likesCount,
+                        commentsCount: post.commentsCount,
+                        authorId: post.authorId,
+                        authorName: additionalPostInfo.authorName,
+                        isAuthorDeleted: additionalPostInfo.isAuthorDeleted,
+                        subspaceName: additionalPostInfo.subspaceName,
+                        subspaceAvatar: additionalPostInfo.subspaceAvatar,
+                        isSubspaceDeleted: additionalPostInfo.isSubspaceDeleted,
+                    });
                     setPrimaryLoading(false);
                     setRedirect(false);
-                    fetchAllPostInfo();
                 } else {
                     fetchAllPostInfo();
                 }
@@ -75,18 +94,15 @@ function PostContainer(props) {
             }
         }
         getPostInfo();
+        fetchCommentsInfo();
     }, [id, location, dispatch, setSnackbarValue, setSnackbarState]);
-
     const [addComment, setAddComment] = useState(false);
     function handleAddComment() {
         console.log("hey");
     }
     function handleOpenComment() {
-        if (user) {
-            setAddComment(true);
-        } else {
-            navigate("/authentication");
-        }
+        if (user) { setAddComment(true) }
+        else { navigate("/authentication") }
     }
     function handleCancelComment() {
         setAddComment(false);
@@ -127,8 +143,7 @@ function PostContainer(props) {
                                                         <TextField
                                                             label="Your comment"
                                                             sx={{ bgcolor: "background.secondary", width: "95%" }}
-                                                            autofocus multiline rows={3}
-                                                            resize={true}
+                                                            autoFocus multiline rows={3}
                                                         />
                                                     </Box>
                                                     <Box sx={{ display: "flex", gap: "8px", justifyContent: "end", width: "95%", margin: "8px auto" }}>
@@ -141,7 +156,7 @@ function PostContainer(props) {
                                                     <Button sx={classes.addCommentBtn} onClick={handleOpenComment}>+ Add a comment</Button>
                                                 </Box>
                                             }
-                                            {commentsFound.length === 0 ?
+                                            {comments.length === 0 ?
                                                 <Box sx={classes.noCommentsContainer}>
                                                     <NotFound
                                                         mainText="No comments"

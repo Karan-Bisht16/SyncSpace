@@ -2,7 +2,6 @@ const saltRounds = 10;
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
-import Like from "../models/like.js";
 import { createUserSession } from "../utils/functions.js";
 
 const fetchUserSession = async (req, res) => {

@@ -15,6 +15,13 @@ export const fetchPostInfo = (postId) => async () => {
     } catch (error) { return handleError(error) }
 }
 
+export const fetchAdditionalPostInfo = (postId) => async () => {
+    try {
+        const { data } = await api.fetchAdditionalPostInfo(postId);
+        return { status: 200, result: data };
+    } catch (error) { return handleError(error) }
+}
+
 export const fetchPosts = (searchParams) => async () => {
     try {
         const { data } = await api.fetchPosts(searchParams);

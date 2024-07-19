@@ -35,7 +35,7 @@ function RealTimeProfileViwer(props) {
                 {gridItemContainer(5, user.postsCount, "Record", "Records")}
                 {gridItemContainer(2, "", "")}
                 {gridItemContainer(5, user.credits, "Celestial Credit", "Celestial Credits")}
-                {gridItemContainer(12, user.subspacesJoinedCount, "Subspace joined", "Subspaces joined")}
+                {gridItemContainer(12, user.subspacesJoined, "Subspace joined", "Subspaces joined")}
             </Grid>
             <br />
             <Divider />

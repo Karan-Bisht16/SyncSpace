@@ -19,6 +19,7 @@ import Home from "./pages/Home/Home";
 import CreatePost from "./pages/CreatePost/CreatePost";
 import PostContainer from "./pages/PostContainer/PostContainer";
 import CreateSubspace from "./pages/CreateSubspace/CreateSubspace";
+import UpdateSubspace from "./pages/UpdateSubspace/UpdateSubspace";
 import Subspace from "./pages/Subspace/Subspace";
 import Profile from "./pages/Profile/Profile";
 import Settings from "./pages/Settings/Settings";
@@ -34,9 +35,7 @@ function App() {
     const [snackbarState, setSnackbarState] = useState(false);
     const [snackbarValue, setSnackbarValue] = useState({ message: "", status: "" });
     function handleSnackbarState(event, reason) {
-        if (reason === "clickaway") {
-            return;
-        }
+        if (reason === "clickaway") { return}
         setSnackbarState(false);
     }
     // JS for Confirmation Dialog
@@ -63,6 +62,7 @@ function App() {
         width: "100hw", height: "100vh", bgcolor: "background.default",
         display: "flex", justifyContent: "center", alignItems: "center",
     }
+    
     if (loading) {
         return (
             <Box sx={loadingScreenStyling}>
@@ -113,6 +113,16 @@ function App() {
                             element={
                                 <ProtectedRoute
                                     Component={CreateSubspace} user={user}
+                                    snackbar={[setSnackbarValue, setSnackbarState]}
+                                    confirmationDialog={[dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar]}
+                                />
+                            }
+                        />
+                        <Route
+                            path="/ss/update/:subspaceName"
+                            element={
+                                <ProtectedRoute
+                                    Component={UpdateSubspace} user={user}
                                     snackbar={[setSnackbarValue, setSnackbarState]}
                                     confirmationDialog={[dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar]}
                                 />
