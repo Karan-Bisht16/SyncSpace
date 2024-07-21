@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { Box, Button, Tab, Tabs, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -8,12 +8,12 @@ import CustomJoditEditor from "../CustomJoditEditor/CustomJoditEditor";
 import FileUpload from "../FileUpload/FileUpload";
 import { ColorModeContext } from "../../store";
 // Importing actions
-import { createPost } from "../../actions/post";
+import { createPost, updatePost } from "../../actions/post";
 // Importing styling
 import styles from "./styles";
 
 function PostForm(props) {
-    const { postData, hasPredefinedSubspace, subspacesArray, setPostData, snackbar, confirmationDialog } = props;
+    const { postData, predefinedTabIndex, type, hasPredefinedSubspace, postId, subspacesArray, setPostData, snackbar, confirmationDialog } = props;
     const [setSnackbarValue, setSnackbarState] = snackbar;
     const [dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar] = confirmationDialog
     const classes = styles();
@@ -38,26 +38,42 @@ function PostForm(props) {
         });
     }
     // File Upload
+    useEffect(() => {
+        if (type.toUpperCase() === "EDIT" && predefinedTabIndex === "2") {
+            const filesArrayLength = postData.selectedFile.length;
+            let string = filesArrayLength + (filesArrayLength === 1 ? " file selected" : " files selected");
+            document.querySelector("#fileChosen").textContent = string;
+        }
+    });
     function handleFileUpload(event) {
         let filesArray = [];
-        let flag = false;
+        let flagForSize = false;
+        let flagForType = false;
         let cummulativeFileSize = 0;
         event.forEach(file => {
-            let fileSize = Number(file.size.slice(0, file.size.length - 2));
-            cummulativeFileSize += fileSize;
-            if (fileSize <= process.env.REACT_APP_POST_FILE_SIZE && cummulativeFileSize <= process.env.REACT_APP_POST_FILE_SIZE) {
-                filesArray.push({ file: file.base64, type: file.type });
+            const isValidFileType = /image|video|audio/.test(file.type)
+            if (isValidFileType) {
+                let fileSize = Number(file.size.slice(0, file.size.length - 2));
+                cummulativeFileSize += fileSize;
+                if (fileSize <= process.env.REACT_APP_POST_FILE_SIZE && cummulativeFileSize <= process.env.REACT_APP_POST_FILE_SIZE) {
+                    filesArray.push({ file: file.base64, type: file.type });
+                } else {
+                    flagForSize = true;
+                }
             } else {
-                flag = true;
+                flagForType = true;
             }
         });
-        if (flag) {
+        if (flagForType) {
+            setSnackbarValue({ message: "Invalid file type", status: "error" });
+            setSnackbarState(true);
+        } else if (flagForSize) {
             if (cummulativeFileSize > process.env.REACT_APP_POST_FILE_SIZE) {
                 setSnackbarValue({ message: `Cummulative file size must be less than ${process.env.REACT_APP_POST_FILE_SIZE / 1000}MB!`, status: "error" });
             } else {
                 setSnackbarValue({ message: `File size must be less than ${process.env.REACT_APP_POST_FILE_SIZE / 1000}MB!`, status: "error" });
             }
-            setSnackbarState(flag);
+            setSnackbarState(true);
         }
         setPostData(prevPostData => {
             return { ...prevPostData, "selectedFile": filesArray };
@@ -74,7 +90,7 @@ function PostForm(props) {
         });
     }
     // Tab Change
-    const [tabIndex, setTabIndex] = useState("1");
+    const [tabIndex, setTabIndex] = useState(predefinedTabIndex);
     function handleTabChange(event, newTabIndex) {
         setTabIndex(newTabIndex);
         if (newTabIndex === "1") {
@@ -92,6 +108,23 @@ function PostForm(props) {
         });
         resetSelectedFiles();
     }
+    async function handleEdit() {
+        let updatedData;
+        if (tabIndex === "1") {
+            const { selectedFile, ...rest } = postData;
+            updatedData = rest;
+        } else if (tabIndex === "2") {
+            const { body, ...rest } = postData;
+            updatedData = rest;
+        }
+        const { status, result } = await dispatch(updatePost({ postId: postId, updatedData }));
+        if (status === 200) {
+            navigate("/post/" + postId);
+        } else {
+            setSnackbarValue({ message: result.message, status: "error" });
+            setSnackbarState(true);
+        }
+    }
     // Submit Form
     function handleSubmit(event) {
         event.preventDefault();
@@ -107,7 +140,7 @@ function PostForm(props) {
             setSnackbarValue({ message: "Select a file.", status: "error" });
             setSnackbarState(true);
             return false;
-        
+
         }
         if (!hasPredefinedSubspace && (!postData.subspaceId || postData.subspaceId.trim() === "")) {
             if (subspacesArray.length === 0) {
@@ -167,7 +200,7 @@ function PostForm(props) {
                         aria-label="wrapped label tabs example"
                     >
                         <Tab value="1" label="Text" wrapped />
-                        <Tab value="2" label="Images & Videos" />
+                        <Tab value="2" label="Media" />
                     </Tabs>
                 </Box>
                 <Box sx={{ display: tabIndex === "1" ? "block" : "none" }}>
@@ -180,12 +213,25 @@ function PostForm(props) {
                     />
                 </Box>
                 <Box sx={{ display: tabIndex === "2" ? "block" : "none" }}>
-                    <FileUpload isMultiple={true} handleFileUpload={handleFileUpload} resetSelectedFiles={resetSelectedFiles} />
+                    <FileUpload
+                        isMultiple={true}
+                        handleFileUpload={handleFileUpload} resetSelectedFiles={resetSelectedFiles}
+                        message="Acceptable file types are image/*, video/* and audio/*"
+                    />
                 </Box>
                 <br />
+                {type.toUpperCase() === "EDIT" &&
+                    <Box sx={{ float: "left" }}>
+                        <Button variant="outlined" size="large" onClick={() => navigate(-1)} sx={classes.clearBtn}>Cancel</Button>
+                    </Box>
+                }
                 <Box sx={{ float: "right" }}>
                     <Button variant="outlined" size="large" onClick={handleClear} sx={classes.clearBtn}>Clear</Button>
-                    <Button variant="contained" color="primary" size="large" type="submit" sx={classes.postBtn}>Post</Button>
+                    {type.toUpperCase() === "EDIT" ?
+                        <Button variant="contained" color="primary" size="large" onClick={handleEdit} sx={classes.postBtn}>Edit</Button>
+                        :
+                        <Button variant="contained" color="primary" size="large" type="submit" sx={classes.postBtn}>Post</Button>
+                    }
                 </Box>
             </form>
             <ConfirmationDialog dialog={dialog} closeDialog={closeDialog} handleDialog={handleDialog} linearProgressBar={linearProgressBar} dialogValue={dialogValue} />

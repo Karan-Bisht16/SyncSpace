@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post("/", auth, fetchSubspaces);
 router.get("/info", fetchSubspaceInfo);
-router.post("/createSubspace", auth, createSubspace);
+router.post("/create", auth, createSubspace);
 router.get("/isJoined", auth, isSubspaceJoined);
 router.patch("/join", auth, joinSubspace);
 router.put("/update", auth, updateSubspace);

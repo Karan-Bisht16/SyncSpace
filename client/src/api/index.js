@@ -25,7 +25,7 @@ export const deleteProfile = () => API.delete("/user/deleteProfile");
 // Subspace
 export const fetchSubspaces = (searchParams) => API.post("/subspace", searchParams);
 export const fetchSubspaceInfo = (subspaceName) => API.get("/subspace/info", { params: subspaceName });
-export const createSubspace = (subspaceData) => API.post("/subspace/createSubspace", subspaceData);
+export const createSubspace = (subspaceData) => API.post("/subspace/create", subspaceData);
 export const isSubspaceJoined = (subspaceAndUserId) => API.get("/subspace/isJoined", { params: subspaceAndUserId });
 export const joinSubspace = (actionData) => API.patch("/subspace/join", actionData);
 export const updateSubspace = (subspaceData) => API.put("/subspace/update", subspaceData);
@@ -34,8 +34,8 @@ export const deleteSubspace = (subspaceId) => API.delete("/subspace/delete", { p
 // Post
 export const fetchPosts = (searchParams) => API.post("/post/", searchParams);
 export const fetchPostInfo = (postId) => API.get("/post/info", { params: postId });
-export const fetchAdditionalPostInfo = (postId) => API.get("/post/addInfo", { params: postId });
-export const createPost = (newPost) => API.post("/post/createPost", newPost);
+export const createPost = (newPost) => API.post("/post/create", newPost);
 export const isPostLiked = (postAndUserId) => API.get("/post/isLiked", { params: postAndUserId });
-export const likePost = (actionData) => API.patch("/post/likePost", actionData);
-export const deletePost = (postId) => API.delete("/post/deletePost", { params: postId });
+export const likePost = (actionData) => API.patch("/post/like", actionData);
+export const updatePost = (postData) => API.put("/post/update", postData);
+export const deletePost = (postId) => API.delete("/post/delete", { params: postId });

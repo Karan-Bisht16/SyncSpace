@@ -5,53 +5,56 @@ import Like from "../models/like.js"
 import Subspace from "../models/subspace.js";
 import { ObjectId } from "mongodb"
 
-let globalCount = 1;
 const LIMIT = process.env.POSTS_LIMIT || 2;
 
 const fetchPostInfo = async (req, res) => {
     try {
-        console.log(req.query);
         const { id } = req.query;
-        const post = await Post.findById(id);
-        if (post) {
-            const user = await User.findById(post.authorId);
-            const subspace = await Subspace.findById(post.subspaceId);
-            res.status(200).json({
-                _id: post._id,
-                title: post.title,
-                body: post.body,
-                selectedFile: post.selectedFile,
-                dateCreated: post.dateCreated,
-                edited: post.edited,
-                likesCount: post.likesCount,
-                commentsCount: post.commentsCount,
-                authorId: post.authorId,
-                authorName: user.userName,
-                isAuthorDeleted: user.isDeleted,
-                subspaceName: subspace.subspaceName,
-                subspaceAvatar: subspace.avatar,
-                isSubspaceDeleted: subspace.isDeleted,
-            });
-        } else {
+        try {
+            const post = await Post.aggregate([
+                { $match: { _id: new ObjectId(id) } },
+                {
+                    $lookup: {
+                        from: "subspaces",
+                        localField: "subspaceId",
+                        foreignField: "_id",
+                        as: "subspaceDetails",
+                    },
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "authorId",
+                        foreignField: "_id",
+                        as: "authorDetails",
+                    },
+                },
+                { $unwind: "$subspaceDetails" },
+                { $unwind: "$authorDetails" },
+                {
+                    $project: {
+                        title: 1,
+                        body: 1,
+                        selectedFile: 1,
+                        authorId: 1,
+                        subspaceId: 1,
+                        dateCreated: 1,
+                        likesCount: 1,
+                        commentsCount: 1,
+                        edited: 1,
+                        "subspaceDetails.avatar": 1,
+                        "subspaceDetails.subspaceName": 1,
+                        "subspaceDetails.isDeleted": 1,
+                        "authorDetails.userName": 1,
+                        "authorDetails.isDeleted": 1,
+                    },
+                },
+            ]);
+            res.status(200).json(post[0]);
+        } catch (BSONError) {
             res.status(404).json({ message: "No post found" });
         }
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
-}
-
-const fetchAdditionalPostInfo = async (req, res) => {
-    try {
-        const { postId } = req.query;
-        const post = await Post.findById(postId);
-        const user = await User.findById(post.authorId);
-        const subspace = await Subspace.findById(post.subspaceId);
-        res.status(200).json({
-            authorName: user.userName,
-            isAuthorDeleted: user.isDeleted,
-            subspaceName: subspace.subspaceName,
-            subspaceAvatar: subspace.avatar,
-            isSubspaceDeleted: subspace.isDeleted,
-        });
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try ogain." }) }
 }
 
 const fetchPosts = async (req, res) => {
@@ -61,7 +64,47 @@ const fetchPosts = async (req, res) => {
         let posts = [];
         let total = 0;
         if (customParams === "HOME_PAGE") {
-            posts = await Post.find({}).sort({ _id: -1 }).limit(LIMIT).skip(startIndex);
+            posts = await Post.aggregate([
+                { $sort: { _id: -1, } },
+                { $skip: Number(startIndex) },
+                { $limit: Number(LIMIT) },
+                {
+                    $lookup: {
+                        from: "subspaces",
+                        localField: "subspaceId",
+                        foreignField: "_id",
+                        as: "subspaceDetails",
+                    },
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "authorId",
+                        foreignField: "_id",
+                        as: "authorDetails",
+                    },
+                },
+                { $unwind: "$subspaceDetails" },
+                { $unwind: "$authorDetails" },
+                {
+                    $project: {
+                        title: 1,
+                        body: 1,
+                        selectedFile: 1,
+                        authorId: 1,
+                        subspaceId: 1,
+                        dateCreated: 1,
+                        likesCount: 1,
+                        commentsCount: 1,
+                        edited: 1,
+                        "subspaceDetails.avatar": 1,
+                        "subspaceDetails.subspaceName": 1,
+                        "subspaceDetails.isDeleted": 1,
+                        "authorDetails.userName": 1,
+                        "authorDetails.isDeleted": 1,
+                    },
+                },
+            ]);
             total = await Post.countDocuments({});
         } else if (customParams === "LIKED_POSTS") {
             posts = await Like.aggregate([
@@ -74,24 +117,140 @@ const fetchPosts = async (req, res) => {
                         from: "posts",
                         localField: "postId",
                         foreignField: "_id",
-                        as: "postDetails"
-                    }
+                        as: "postDetails",
+                    },
                 },
                 { $unwind: "$postDetails" },
                 {
-                    $replaceRoot: { newRoot: "$postDetails" }
-                }
+                    $replaceRoot: { newRoot: "$postDetails" },
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "authorId",
+                        foreignField: "_id",
+                        as: "authorDetails",
+                    },
+                },
+                { $unwind: "$authorDetails" },
+                {
+                    $lookup: {
+                        from: "subspaces",
+                        localField: "subspaceId",
+                        foreignField: "_id",
+                        as: "subspaceDetails",
+                    },
+                },
+                { $unwind: "$subspaceDetails" },
+                {
+                    $project: {
+                        title: 1,
+                        body: 1,
+                        selectedFile: 1,
+                        authorId: 1,
+                        subspaceId: 1,
+                        dateCreated: 1,
+                        likesCount: 1,
+                        commentsCount: 1,
+                        edited: 1,
+                        "subspaceDetails.avatar": 1,
+                        "subspaceDetails.subspaceName": 1,
+                        "authorDetails.userName": 1,
+                    },
+                },
             ]);
             total = await Like.countDocuments(searchQuery);
-        } else {
-            posts = await Post.find(searchQuery).sort({ _id: -1 }).limit(LIMIT).skip(startIndex);
+        } else if (searchQuery.subspaceId) {
+            posts = await Post.aggregate([
+                { $match: { subspaceId: new ObjectId(searchQuery.subspaceId) } },
+                { $sort: { _id: -1 } },
+                { $skip: Number(startIndex) },
+                { $limit: Number(LIMIT) },
+                {
+                    $lookup: {
+                        from: "subspaces",
+                        localField: "subspaceId",
+                        foreignField: "_id",
+                        as: "subspaceDetails",
+                    },
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "authorId",
+                        foreignField: "_id",
+                        as: "authorDetails",
+                    },
+                },
+                { $unwind: "$subspaceDetails" },
+                { $unwind: "$authorDetails" },
+                {
+                    $project: {
+                        title: 1,
+                        body: 1,
+                        selectedFile: 1,
+                        authorId: 1,
+                        subspaceId: 1,
+                        dateCreated: 1,
+                        likesCount: 1,
+                        commentsCount: 1,
+                        edited: 1,
+                        "subspaceDetails.avatar": 1,
+                        "subspaceDetails.subspaceName": 1,
+                        "subspaceDetails.isDeleted": 1,
+                        "authorDetails.userName": 1,
+                        "authorDetails.isDeleted": 1,
+                    },
+                },
+            ]);
+            total = await Post.countDocuments(searchQuery);
+        } else if (searchQuery.authorId) {
+            posts = await Post.aggregate([
+                { $match: { authorId: new ObjectId(searchQuery.authorId) } },
+                { $sort: { _id: -1 } },
+                { $skip: Number(startIndex) },
+                { $limit: Number(LIMIT) },
+                {
+                    $lookup: {
+                        from: "subspaces",
+                        localField: "subspaceId",
+                        foreignField: "_id",
+                        as: "subspaceDetails",
+                    },
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "authorId",
+                        foreignField: "_id",
+                        as: "authorDetails",
+                    },
+                },
+                { $unwind: "$subspaceDetails" },
+                { $unwind: "$authorDetails" },
+                {
+                    $project: {
+                        title: 1,
+                        body: 1,
+                        selectedFile: 1,
+                        authorId: 1,
+                        subspaceId: 1,
+                        dateCreated: 1,
+                        likesCount: 1,
+                        commentsCount: 1,
+                        edited: 1,
+                        "subspaceDetails.avatar": 1,
+                        "subspaceDetails.subspaceName": 1,
+                        "subspaceDetails.isDeleted": 1,
+                        "authorDetails.userName": 1,
+                        "authorDetails.isDeleted": 1,
+                    },
+                },
+            ]);
             total = await Post.countDocuments(searchQuery);
         }
         const currentPage = Number(pageParams);
         const count = Math.ceil(total / LIMIT);
-        console.log(`${globalCount} Limited posts: ${posts.length}`);
-        console.log(searchQuery);
-        globalCount++;
         if (currentPage === 1) {
             if (total > LIMIT) {
                 res.status(200).json({ count: count, previous: null, next: currentPage + 1, results: posts });
@@ -110,24 +269,11 @@ const createPost = async (req, res) => {
     try {
         const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
         const post = req.body;
-        console.log(post);
-        console.log(`${post.subspaceName}, ${post.authorName}, ${post.title}, `);
         const newPost = new Post(post);
         await newPost.save();
         await User.findOneAndUpdate({ email: email }, { $inc: { postsCount: 1 } });
         await Subspace.findByIdAndUpdate(post.subspaceId, { $inc: { postsCount: 1 } });
         res.status(200).json(newPost);
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
-}
-
-const deletePost = async (req, res) => {
-    try {
-        const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
-        const { postId } = req.query;
-        const post = await Post.findByIdAndDelete(postId);
-        await User.findOneAndUpdate({ email: email }, { $inc: { postsCount: -1 } });
-        await Subspace.findOneAndUpdate({ subspaceName: post.subspaceName }, { $inc: { postsCount: -1 } });
-        res.sendStatus(200);
     } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
 }
 
@@ -159,4 +305,31 @@ const likePost = async (req, res) => {
     } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
 }
 
-export { fetchPosts, fetchPostInfo, fetchAdditionalPostInfo, createPost, deletePost, isPostLiked, likePost };
+const updatePost = async (req, res) => {
+    try {
+        const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
+        const user = await User.findOne({ email: email });
+        const { postId, updatedData } = req.body;
+        const tempUpdatedData = { ...updatedData, edited: true };
+        const post = await Post.findById(postId);
+        if (post.authorId.equals(user._id)) {
+            await Post.findByIdAndUpdate(postId, tempUpdatedData);
+            res.sendStatus(200);
+        } else {
+            res.status(409).json({ message: "Unauthorised access" });
+        }
+    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+}
+
+const deletePost = async (req, res) => {
+    try {
+        const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
+        const { postId } = req.query;
+        const post = await Post.findByIdAndDelete(postId);
+        await User.findOneAndUpdate({ email: email }, { $inc: { postsCount: -1 } });
+        await Subspace.findOneAndUpdate({ subspaceName: post.subspaceName }, { $inc: { postsCount: -1 } });
+        res.sendStatus(200);
+    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+}
+
+export { fetchPosts, fetchPostInfo, createPost, isPostLiked, likePost, updatePost, deletePost };

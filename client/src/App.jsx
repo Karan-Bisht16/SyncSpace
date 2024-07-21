@@ -17,6 +17,7 @@ import useFetchUser from "./utils/useFetchUser";
 // Importing all webpages
 import Home from "./pages/Home/Home";
 import CreatePost from "./pages/CreatePost/CreatePost";
+import EditPost from "./pages/EditPost/EditPost";
 import PostContainer from "./pages/PostContainer/PostContainer";
 import CreateSubspace from "./pages/CreateSubspace/CreateSubspace";
 import UpdateSubspace from "./pages/UpdateSubspace/UpdateSubspace";
@@ -35,7 +36,7 @@ function App() {
     const [snackbarState, setSnackbarState] = useState(false);
     const [snackbarValue, setSnackbarValue] = useState({ message: "", status: "" });
     function handleSnackbarState(event, reason) {
-        if (reason === "clickaway") { return}
+        if (reason === "clickaway") { return }
         setSnackbarState(false);
     }
     // JS for Confirmation Dialog
@@ -62,7 +63,7 @@ function App() {
         width: "100hw", height: "100vh", bgcolor: "background.default",
         display: "flex", justifyContent: "center", alignItems: "center",
     }
-    
+
     if (loading) {
         return (
             <Box sx={loadingScreenStyling}>
@@ -92,6 +93,16 @@ function App() {
                             element={
                                 <ProtectedRoute
                                     Component={CreatePost} user={user}
+                                    snackbar={[setSnackbarValue, setSnackbarState]}
+                                    confirmationDialog={[dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar]}
+                                />
+                            }
+                        />
+                        <Route
+                            path="/edit-post/:id"
+                            element={
+                                <ProtectedRoute
+                                    Component={EditPost} user={user}
                                     snackbar={[setSnackbarValue, setSnackbarState]}
                                     confirmationDialog={[dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar]}
                                 />

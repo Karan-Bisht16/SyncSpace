@@ -4,18 +4,20 @@ import { FiberManualRecordTwoTone, CloseRounded, CommentOutlined, DeleteTwoTone,
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Carousel from "react-bootstrap/Carousel";
+import AudioPlayer from 'react-h5-audio-player';
+import 'react-h5-audio-player/lib/styles.css';
 import parse from "html-react-parser";
 // Importing my components
 import ConfirmationDialog from "../../ConfirmationDialog/ConfirmationDialog";
 import { formatDate, formatTime } from "../../../utils/functions";
 // Importing actions
-import { fetchAdditionalPostInfo, deletePost, isPostLiked, likePost } from "../../../actions/post";
+import { deletePost, isPostLiked, likePost } from "../../../actions/post";
 // Importing styling
 import styles from "./styles";
 
 function Post(props) {
     const { post, individual, redirect, snackbar, confirmationDialog } = props;
-    const { _id, authorId, dateCreated, title, body, selectedFile, likesCount, commentsCount } = post;
+    const { _id, authorId, authorDetails, subspaceDetails, dateCreated, title, body, selectedFile, likesCount, commentsCount, edited } = post;
     const [setSnackbarValue, setSnackbarState] = snackbar;
     const [dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar] = confirmationDialog;
     const classes = styles();
@@ -24,44 +26,22 @@ function Post(props) {
 
     const user = useSelector(state => state.user);
     const [postLiked, setPostLiked] = useState(false);
-    const [additionalPostInfo, setAdditionalPostInfo] = useState({
-        authorName: "Loading...",
-        isAuthorDeleted: false,
-        subspaceName: "Loading...",
-        subspaceAvatar: "",
-        isSubspaceDeleted: false,
-    });
+
     useEffect(() => {
-        async function getAdditionalPostInfo() {
-            const { status, result } = await dispatch(fetchAdditionalPostInfo({ postId: _id }));
-            if (status === 200) { setAdditionalPostInfo(result) }
-        }
         async function checkIfPostIsLiked() {
-            const { status, result } = await dispatch(isPostLiked({ postId: post._id, userId: user._id }));
+            const { status, result } = await dispatch(isPostLiked({ postId: _id, userId: user._id }));
             if (status === 200) { setPostLiked(result) }
         }
         if (user) { checkIfPostIsLiked() }
-        if (individual) {
-            setAdditionalPostInfo({
-                authorName: post.authorName,
-                isAuthorDeleted: post.isAuthorDeleted,
-                subspaceName: post.subspaceName,
-                subspaceAvatar: post.subspaceAvatar,
-                isSubspaceDeleted: post.isSubspaceDeleted,
-            })
-        } else {
-            getAdditionalPostInfo()
-
-        }
     }, [_id, user, dispatch]);
     function handleSubspaceClick(subspaceName) {
         navigate("/ss/" + subspaceName);
     }
-    function handleUserProfileClick(authorName) {
-        navigate("/e/" + authorName);
+    function handleUserProfileClick(userName) {
+        navigate("/e/" + userName);
     }
     function handlePostClick() {
-        navigate("/post/" + _id, { state: { postData: { post, additionalPostInfo } } });
+        navigate("/post/" + _id, { state: { postData: { post } } });
     }
     function handlePostClose() {
         if (redirect) { navigate("/") }
@@ -101,6 +81,10 @@ function Post(props) {
     function handleCloseMenu() {
         setAnchorEl(null);
     };
+    function handleEdit() {
+        handleCloseMenu();
+        navigate("/edit-post/" + _id, { state: { post } });
+    }
     const [postLikesCount, setPostLikesCount] = useState(likesCount);
     async function handleLike() {
         if (user) {
@@ -149,21 +133,21 @@ function Post(props) {
     }
 
     return (
-        <Grid item sx={Object.assign({ bgcolor: !individual && "background.backdrop" }, classes.mainContainer)}>
+        <Grid item sx={classes.mainContainer}>
             <Box>
                 <Box sx={classes.subContainer}>
                     <Box sx={classes.postHeader}>
                         <Box sx={classes.avatarContainer}>
-                            <Avatar sx={classes.avatar} alt="Subspace avatar" src={additionalPostInfo.subspaceAvatar}>
-                                {additionalPostInfo.subspaceName.charAt(0)}
+                            <Avatar sx={classes.avatar} alt="Subspace avatar" src={subspaceDetails.avatar}>
+                                {subspaceDetails.subspaceName.charAt(0)}
                             </Avatar>
                         </Box>
                         <Box sx={classes.postHeaderDetails}>
-                            {additionalPostInfo.isSubspaceDeleted ?
+                            {subspaceDetails.isDeleted ?
                                 <Typography sx={classes.postSubspace}><span style={classes.headerText}>ss/</span>[Deleted]</Typography>
                                 :
-                                <Typography sx={classes.postSubspace} onClick={() => handleSubspaceClick(additionalPostInfo.subspaceName)}>
-                                    <span style={classes.headerText}>ss/</span>{additionalPostInfo.subspaceName}
+                                <Typography sx={classes.postSubspace} onClick={() => handleSubspaceClick(subspaceDetails.subspaceName)}>
+                                    <span style={classes.headerText}>ss/</span>{subspaceDetails.subspaceName}
                                 </Typography>
                             }
                             <FiberManualRecordTwoTone sx={{ fontSize: "8px" }} />
@@ -179,51 +163,91 @@ function Post(props) {
                 <Typography sx={classes.link} onClick={handlePostClick} variant="h6">{title}</Typography>
             </Box>
             {body ?
-                <Box sx={classes.bodyContainer}>
-                    <Typography sx={classes.bodyText} component={"div"}>{bodyText()}</Typography>
-                    <Box sx={{ width: "100%", display: "flex", justifyContent: "end" }}>
-                        {additionalPostInfo.isAuthorDeleted ?
-                            <span style={classes.author}><span style={{ fontSize: "13px" }}>e/</span>[Deleted]</span>
-                            :
-                            <span style={classes.author} onClick={() => handleUserProfileClick(additionalPostInfo.authorName)}>
-                                <span style={{ fontSize: "13px" }}>e/</span>{additionalPostInfo.authorName}
-                            </span>
-                        }
+                <>
+                    <Paper sx={classes.bodyContainer}>
+                        <Typography sx={classes.bodyText} component={"div"}>{bodyText()}</Typography>
+                    </Paper>
+                    <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 16px 8px 16px" }}>
+                        <Box>
+                            {edited ?
+                                <span style={{ fontSize: "10px" }}>[Edited]</span>
+                                :
+                                <span></span>
+                            }
+                        </Box>
+                        <Box>
+                            {authorDetails.isDeleted ?
+                                <span style={classes.author}><span style={{ fontSize: "13px" }}>e/</span>[Deleted]</span>
+                                :
+                                <span style={classes.author} onClick={() => handleUserProfileClick(authorDetails.userName)}>
+                                    <span style={{ fontSize: "13px" }}>e/</span>{authorDetails.userName}
+                                </span>
+                            }
+                        </Box>
                     </Box>
-                </Box>
+                </>
                 :
                 <>
-                    <Box sx={classes.fileContainer} >
-                        {selectedFile.length > 1 ?
-                            <Carousel slide={false} activeIndex={index} onSelect={handleSelect} style={classes.imageContainer}>
+                    {selectedFile.length > 1 ?
+                        <Box sx={classes.fileContainer}>
+                            <Carousel slide={false} interval={null} activeIndex={index} onSelect={handleSelect} style={classes.imageContainer}>
                                 {selectedFile.map((file, index) =>
-                                    file.type.includes("image") &&
-                                    <Carousel.Item key={index} style={{ objectFit: "scale-down", height: "100%" }}>
-                                        <img
-                                            src={file.file} alt="post related img init"
-                                            style={classes.imageBox}
-                                        />
-                                    </Carousel.Item>
+                                    file.type.includes("image") ?
+                                        <Carousel.Item key={index} style={{ objectFit: "scale-down", height: "100%", textAlign: "center" }}>
+                                            <img src={file.file} alt={title} style={classes.multipleImageBox} />
+                                        </Carousel.Item>
+                                        :
+                                        <Carousel.Item key={index} style={{ objectFit: "scale-down", width: "100%", lineHeight: "75px", height: "50px" }}>
+                                            <Box sx={{ textAlign: "center" }}>Multiple files of {file.type} are not implemented.</Box>
+                                        </Carousel.Item>
                                 )}
                             </Carousel>
-                            :
-                            <Box sx={classes.imageContainer}>
-                                <img style={classes.imageBox} src={selectedFile[0].file} alt="post related" />
-                            </Box>
-                        }
-                    </Box>
-                    <Box sx={{ width: "100%", display: "flex", justifyContent: "end", paddingRight: "16px" }}>
-                        {additionalPostInfo.isAuthorDeleted ?
-                            <span style={classes.author}><span style={{ fontSize: "13px" }}>e/</span>[Deleted]</span>
-                            :
-                            <span style={classes.author} onClick={() => handleUserProfileClick(additionalPostInfo.authorName)}>
-                                <span style={{ fontSize: "13px" }}>e/</span>{additionalPostInfo.authorName}
-                            </span>
-                        }
+                        </Box>
+                        :
+                        <Box sx={classes.singleFileContainer}>
+                            {selectedFile[0].type.includes("image") &&
+                                <Box sx={classes.imageContainer}>
+                                    <img style={classes.imageBox} src={selectedFile[0].file} alt="post related" />
+                                </Box>
+                            } {selectedFile[0].type.includes("video") &&
+                                <Box sx={classes.imageContainer}>
+                                    <video controls style={{ borderRadius: "16px" }}>
+                                        <source type={selectedFile[0].type} src={selectedFile[0].file} />
+                                    </video>
+                                </Box>
+                            }{selectedFile[0].type.includes("audio") &&
+                                <Box sx={{ bgcolor: "background.default", borderRadius: "16px", margin: "8px 0" }}>
+                                    <AudioPlayer
+                                        autoPlay={false}
+                                        src={selectedFile[0].file}
+                                        onPlay={e => console.log("")}
+                                        style={{ borderRadius: "16px", background: "inherit" }}
+                                    />
+                                </Box>
+                            }
+                        </Box>
+                    }
+                    <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between", padding: "0 16px 8px 16px" }}>
+                        <Box>
+                            {edited ?
+                                <span style={{ fontSize: "10px" }}>[Edited]</span>
+                                :
+                                <span></span>
+                            }
+                        </Box>
+                        <Box>
+                            {authorDetails.isDeleted ?
+                                <span style={classes.author}><span style={{ fontSize: "13px" }}>e/</span>[Deleted]</span>
+                                :
+                                <span style={classes.author} onClick={() => handleUserProfileClick(authorDetails.userName)}>
+                                    <span style={{ fontSize: "13px" }}>e/</span>{authorDetails.userName}
+                                </span>
+                            }
+                        </Box>
                     </Box>
                 </>
             }
-            <Box elevation={2} sx={classes.allPostActionsContainer}>
+            <Box sx={classes.allPostActionsContainer}>
                 <Paper sx={classes.majorPostActionsContainer}>
                     <Box>
                         <Checkbox onClick={handleLike} checked={postLiked} icon={<FavoriteBorderOutlined sx={classes.iconColor} />} checkedIcon={<Favorite sx={{ color: "#0090c1" }} />} />
@@ -282,7 +306,7 @@ function Post(props) {
                                 </ListItemIcon>
                                 Delete post
                             </MenuItem>
-                            <MenuItem disabled>
+                            <MenuItem onClick={handleEdit}>
                                 <ListItemIcon>
                                     <EditNoteRounded fontSize="small" />
                                 </ListItemIcon>

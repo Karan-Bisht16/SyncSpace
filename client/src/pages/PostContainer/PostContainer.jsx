@@ -35,11 +35,15 @@ function PostContainer(props) {
         likesCount: 0,
         commentsCount: 0,
         authorId: "Loading...",
-        authorName: "Loading...",
-        isAuthorDeleted: false,
-        subspaceName: "Loading...",
-        subspaceAvatar: "",
-        isSubspaceDeleted: false,
+        subspaceDetails: {
+            subspaceName: "Loading...",
+            avatar: "",
+            isDeleted: false,
+        },
+        authorDetails: {
+            userName: "Loading...",
+            isDeleted: false,
+        }
     });
     useEffect(() => {
         async function fetchCommentsInfo() {
@@ -48,9 +52,8 @@ function PostContainer(props) {
             setSecondaryLoading(false);
         }
         async function fetchAllPostInfo() {
-            const { status, result } = await dispatch(fetchPostInfo(id));
+            const { status, result } = await dispatch(fetchPostInfo({ id }));
             if (status === 200) {
-                console.log(result);
                 setPostData(result);
                 setPrimaryLoading(false);
                 document.title = "SyncSpace: " + result.title;
@@ -66,24 +69,9 @@ function PostContainer(props) {
         }
         async function getPostInfo() {
             if (location && location.state) {
-                const { post, additionalPostInfo } = location.state.postData;
-                if (post && additionalPostInfo) {
-                    setPostData({
-                        _id: id,
-                        title: post.title,
-                        body: post.body,
-                        selectedFile: post.selectedFile,
-                        dateCreated: post.dateCreated,
-                        edited: post.edited,
-                        likesCount: post.likesCount,
-                        commentsCount: post.commentsCount,
-                        authorId: post.authorId,
-                        authorName: additionalPostInfo.authorName,
-                        isAuthorDeleted: additionalPostInfo.isAuthorDeleted,
-                        subspaceName: additionalPostInfo.subspaceName,
-                        subspaceAvatar: additionalPostInfo.subspaceAvatar,
-                        isSubspaceDeleted: additionalPostInfo.isSubspaceDeleted,
-                    });
+                const { post } = location.state.postData;
+                if (post) {
+                    setPostData(post);
                     setPrimaryLoading(false);
                     setRedirect(false);
                 } else {

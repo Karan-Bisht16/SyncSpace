@@ -4,12 +4,10 @@ import User from "../models/user.js";
 import Join from "../models/join.js";
 import Subspace from "../models/subspace.js";
 
-let globalCount = 1;
 const LIMIT = process.env.SUBSPACES_LIMIT || 4;
 
 const fetchSubspaceInfo = async (req, res) => {
     try {
-        console.log(req.query);
         const { subspaceName } = req.query;
         const subspace = await Subspace.findOne({ subspaceName: subspaceName });
         if (subspace) { res.status(200).json(subspace) }
@@ -42,9 +40,6 @@ const fetchSubspaces = async (req, res) => {
         ]);
         const currentPage = Number(pageParams);
         const count = Math.ceil(total / LIMIT);
-        console.log(`${globalCount} Limited subspaces: ${subspaces.length}`);
-        console.log(searchQuery);
-        globalCount++;
         if (currentPage === 1) {
             if (total > LIMIT) {
                 res.status(200).json({ count: count, previous: null, next: currentPage + 1, results: subspaces });
@@ -83,7 +78,6 @@ const createSubspace = async (req, res) => {
 
 const isSubspaceJoined = async (req, res) => {
     try {
-        console.log(req.query);
         const { subspaceId, userId } = req.query;
         const isJoined = await Join.findOne({ subspaceId: subspaceId, userId: userId });
         if (isJoined) { res.status(200).json(true) }
@@ -93,7 +87,6 @@ const isSubspaceJoined = async (req, res) => {
 
 const joinSubspace = async (req, res) => {
     try {
-        console.log(req.body);
         const { subspaceId, userId, action } = req.body;
         let subspace;
         if (action) {
@@ -115,14 +108,21 @@ const joinSubspace = async (req, res) => {
 
 const updateSubspace = async (req, res) => {
     try {
+        const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
         const { subspaceId, subspaceData } = req.body;
-        const subspace = { ...subspaceData, subspaceName: subspaceData.name.replace(/ /g, "-") };
-        const isSubspaceNameUnique = await Subspace.findOne({ name: subspace.name });
-        if (isSubspaceNameUnique) {
-            res.status(409).json({ message: "Subspace with same name already exists." })
+        const user = await User.findOne({ email: email });
+        const subspace = await Subspace.findById(subspaceId);
+        if (subspace.creator.equals(user._id)) {
+            const updatedSubspaceData = { ...subspaceData, subspaceName: subspaceData.name.replace(/ /g, "-") };
+            const isSubspaceNameUnique = await Subspace.findOne({ name: updatedSubspaceData.name });
+            if (isSubspaceNameUnique) {
+                res.status(409).json({ message: "Subspace with same name already exists." })
+            } else {
+                const updatedSubspace = await Subspace.findByIdAndUpdate(subspaceId, updatedSubspaceData, { new: true });
+                res.status(200).json({ label: subspaceData.name.replace(/ /g, "-"), _id: updatedSubspace._id });
+            }
         } else {
-            const updatedSubspace = await Subspace.findByIdAndUpdate(subspaceId, subspace, { new: true });
-            res.status(200).json({ label: subspaceData.name.replace(/ /g, "-"), _id: updatedSubspace._id });
+            res.status(409).json({ message: "Unauthorised access" });
         }
     } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
 

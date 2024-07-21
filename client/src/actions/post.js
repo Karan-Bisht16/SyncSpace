@@ -15,13 +15,6 @@ export const fetchPostInfo = (postId) => async () => {
     } catch (error) { return handleError(error) }
 }
 
-export const fetchAdditionalPostInfo = (postId) => async () => {
-    try {
-        const { data } = await api.fetchAdditionalPostInfo(postId);
-        return { status: 200, result: data };
-    } catch (error) { return handleError(error) }
-}
-
 export const fetchPosts = (searchParams) => async () => {
     try {
         const { data } = await api.fetchPosts(searchParams);
@@ -32,13 +25,6 @@ export const fetchPosts = (searchParams) => async () => {
 export const createPost = (postData) => async () => {
     try {
         const { data } = await api.createPost(postData);
-        return { status: 200, result: data };
-    } catch (error) { return handleError(error) }
-};
-
-export const deletePost = (postId) => async () => {
-    try {
-        const { data } = await api.deletePost(postId);
         return { status: 200, result: data };
     } catch (error) { return handleError(error) }
 };
@@ -56,3 +42,17 @@ export const likePost = (actionData) => async () => {
         return { status: 200, result: data };
     } catch (error) { return handleError(error) }
 }
+
+export const updatePost = (postData) => async () => {
+    try {
+        const { data } = await api.updatePost(postData);
+        return { status: 200, result: data };
+    } catch (error) { return handleError(error) }
+};
+
+export const deletePost = (postId) => async () => {
+    try {
+        const { data } = await api.deletePost(postId);
+        return { status: 200, result: data };
+    } catch (error) { return handleError(error) }
+};

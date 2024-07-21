@@ -83,7 +83,7 @@ function CreatePost(props) {
                     }
                 </div>
                 <PostForm
-                    user={user}
+                    user={user} predefinedTabIndex="1" type="Post"
                     postData={postData} setPostData={setPostData}
                     hasPredefinedSubspace={hasPredefinedSubspace} subspacesArray={subspacesArray}
                     snackbar={snackbar} confirmationDialog={confirmationDialog}
