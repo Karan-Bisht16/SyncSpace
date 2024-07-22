@@ -1,15 +1,18 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import { useDispatch } from "react-redux";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "react-infinite-scroller";
+import { useDispatch } from "react-redux";
 import { lineSpinner } from "ldrs";
+// Importing my components
 import Post from "./Post/Post";
+// Importing actions
 import { fetchPosts } from "../../actions/post";
+// Importing styling
 import styles from "./styles";
 
 function Posts(props) {
-    const { searchQuery, customParams, snackbar, confirmationDialog } = props;
+    const { searchQuery, customParams } = props;
     const classes = styles();
     const dispatch = useDispatch();
     lineSpinner.register("l-loader");
@@ -18,7 +21,7 @@ function Posts(props) {
         const response = await dispatch(fetchPosts({ pageParams, searchQuery, customParams }));
         return response;
     };
-    
+
     const data = null;
     const {
         data: queryData = {},
@@ -57,8 +60,8 @@ function Posts(props) {
     return (
         <div className="mx-auto my-10">
             {data &&
-                data.results.map((item, index) => (
-                    <Post key={index} post={item} snackbar={snackbar} confirmationDialog={confirmationDialog} />
+                data?.results?.map((item, index) => (
+                    <Post key={index} post={item} />
                 ))}
 
             <InfiniteScroll
@@ -69,8 +72,8 @@ function Posts(props) {
             >
                 {queryData.pages.map((page, index) => (
                     <div key={index}>
-                        {page.results.map((item, index) => (
-                            <Post key={index} post={item} snackbar={snackbar} confirmationDialog={confirmationDialog} />
+                        {page?.results?.map((item, index) => (
+                            <Post key={index} post={item} />
                         ))}
                     </div>
                 ))}

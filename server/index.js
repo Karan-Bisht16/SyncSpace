@@ -49,10 +49,12 @@ app.use(session({
 
 import userRoutes from "./routes/userRoutes.js";
 app.use("/user", userRoutes);
-import postRoutes from "./routes/postRoutes.js";
-app.use("/post", postRoutes);
 import subspaceRoutes from "./routes/subspaceRoutes.js";
 app.use("/subspace", subspaceRoutes);
+import postRoutes from "./routes/postRoutes.js";
+app.use("/post", postRoutes);
+import commentRoutes from "./routes/commentRoutes.js";
+app.use("/comment", commentRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server working on PORT ${PORT}.`);

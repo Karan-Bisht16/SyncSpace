@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Autocomplete, Box, Grid, LinearProgress, TextField, Typography } from "@mui/material";
 import { useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 // Importing my components
 import PostForm from "../../Components/PostForm/PostForm";
-import { useSelector } from "react-redux";
 // Importing styling
 import styles from "./styles";
 
 function CreatePost(props) {
-    const { user, snackbar, confirmationDialog } = props;
+    const { user } = props;
     const classes = styles();
     const location = useLocation();
 
@@ -50,18 +50,18 @@ function CreatePost(props) {
             <Grid item xs={0} md={2} sx={classes.leftContainer}></Grid>
             <Box id="postForm" sx={classes.mainContainer}>
                 <Typography variant="h4">Create Post</Typography>
-                <div style={{ width: 300, padding: "16px 0" }}>
+                <div style={classes.autocompleteField}>
                     {hasPredefinedSubspace ?
                         <TextField
                             readOnly disabled id="standard-basic" label={previousSubspace} variant="standard"
-                            sx={{ width: 300 }}
+                            sx={classes.autocompleteWidth}
                         />
                         :
                         <>
                             {loadingSubspace ?
                                 <>
                                     <TextField disabled id="standard-basic" label="Subspace" variant="standard" />
-                                    <LinearProgress sx={{ top: "-2.5px", height: "2.5px" }} />
+                                    <LinearProgress sx={classes.progressBar} />
                                 </>
                                 :
                                 <Autocomplete
@@ -69,7 +69,7 @@ function CreatePost(props) {
                                     value={subspace}
                                     id="combo-box-demo"
                                     options={subspacesArray}
-                                    sx={{ width: 300 }}
+                                    sx={classes.autocompleteWidth}
                                     renderInput={(params) => <TextField {...params} variant="standard" label="Subspace" />}
                                     onChange={(event, newValue) => {
                                         setSubspace(newValue);
@@ -83,10 +83,8 @@ function CreatePost(props) {
                     }
                 </div>
                 <PostForm
-                    user={user} predefinedTabIndex="1" type="Post"
-                    postData={postData} setPostData={setPostData}
+                    user={user} predefinedTabIndex="1" type="Post" postData={postData} setPostData={setPostData}
                     hasPredefinedSubspace={hasPredefinedSubspace} subspacesArray={subspacesArray}
-                    snackbar={snackbar} confirmationDialog={confirmationDialog}
                 />
             </Box>
         </Grid>

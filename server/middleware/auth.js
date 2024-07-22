@@ -16,12 +16,10 @@ const auth = (req, res, next) => {
             }
             next();
         } catch (error) {
-            console.log(error.message);
             res.status(409).json({ message: "Invalid token credentials." })
         }
     } catch (error) {
-        console.log(error.message);
-        res.status(404).json({ message: "No token found" })
+        res.status(404).json({ message: "No token found." })
     }
 }
 

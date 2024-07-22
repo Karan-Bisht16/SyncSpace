@@ -6,9 +6,16 @@ const styles = () => ({
         justifyContent: "center",
         alignItems: "center",
         borderRadius: "10px",
-        bgcolor: "background.tertiary"
+        bgcolor: "background.tertiary",
     },
-    noContentContainer: { display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }
+    noContentContainer: {
+        height: "460px",
+        bgcolor: "background.secondary",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: "10px",
+    },
 });
 
 export default styles;

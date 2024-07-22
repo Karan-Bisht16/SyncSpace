@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+// Importing actions
 import { fetchUserSession } from "../actions/user";
 
 const useFetchUser = (setSnackbarValue, setSnackbarState) => {
@@ -34,7 +35,8 @@ const useFetchUser = (setSnackbarValue, setSnackbarState) => {
                     }
                     setLoading(false);
                 } catch (error) {
-                    console.log(error);
+                    setSnackbarValue({ message: "Server is down. Try again later.", status: "error" });
+                    setSnackbarState(true);
                 }
             }
         }

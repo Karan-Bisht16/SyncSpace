@@ -1,7 +1,5 @@
 import React from "react";
 import { Avatar, Box, Grid, Typography } from "@mui/material";
-// Importing my components
-// Importing actions
 // Importing styling
 import styles from "./styles"
 

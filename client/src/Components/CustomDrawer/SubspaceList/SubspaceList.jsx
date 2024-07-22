@@ -58,7 +58,7 @@ function SubspaceList(props) {
                 }}
                 hasMore={hasNextPage}
             >
-                {queryData.pages.map((page, index) => (
+                {queryData?.pages?.map((page, index) => (
                     <div key={index}>
                         {page.results.map((subspace, index) => (
                             <ListItem key={index} disablePadding onClick={() => handleSubspaceClick(subspace)}>

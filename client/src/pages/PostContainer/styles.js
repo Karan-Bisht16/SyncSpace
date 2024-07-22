@@ -14,11 +14,25 @@ const styles = () => ({
         borderRadius: "16px"
     },
     addCommentContainer: { width: "100%", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" },
-    commentBtn: {},
+    commentCancelBtn: {
+        "&:hover": {
+            backgroundColor: "button.secondary",
+            color: "button.primary"
+        }
+    },
+    commentAddBtn: {
+        bgcolor: "#0090c1",
+        color: "#ffffff",
+        marginLeft: "8px",
+        "&:hover": {
+            backgroundColor: "button.secondary",
+            color: "button.primary"
+        }
+    },
     addCommentBtnContainer: { width: "100%", display: "flex", justifyContent: { xs: "center", md: "start" } },
     addCommentBtn: { color: "text.heading", borderRadius: "32px", border: "2px solid", margin: { xs: "0", md: "0 16px" }, width: { xs: "95%", md: "auto" }, padding: "4px 16px" },
     link: { color: "#0090c1", fontSize: "20px", textDecoration: "none", cursor: "pointer" },
-    commentsContainer: { width: "auto", minWidth: { xs: "99%", md: "65%", lg: "75%" }, margin: "0 auto", padding: "32px 16px" }
+    commentsContainer: { minWidth: { xs: "100%", md: "65%", lg: "75%" }, margin: "0 auto", padding: { xs: "8px", md: "16px" } }
 });
 
 export default styles;

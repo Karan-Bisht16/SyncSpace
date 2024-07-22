@@ -12,7 +12,7 @@ const fetchSubspaceInfo = async (req, res) => {
         const subspace = await Subspace.findOne({ subspaceName: subspaceName });
         if (subspace) { res.status(200).json(subspace) }
         else { res.status(404).json({ message: "No subspace found." }) }
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
 const fetchSubspaces = async (req, res) => {
@@ -51,7 +51,7 @@ const fetchSubspaces = async (req, res) => {
         } else {
             res.status(200).json({ count: count, previous: currentPage - 1, next: currentPage + 1, results: subspaces });
         }
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
 const createSubspace = async (req, res) => {
@@ -73,7 +73,7 @@ const createSubspace = async (req, res) => {
             });
             res.status(200).json(newSubspace);
         }
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
 const isSubspaceJoined = async (req, res) => {
@@ -82,7 +82,7 @@ const isSubspaceJoined = async (req, res) => {
         const isJoined = await Join.findOne({ subspaceId: subspaceId, userId: userId });
         if (isJoined) { res.status(200).json(true) }
         else { res.status(200).json(false) }
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
 const joinSubspace = async (req, res) => {
@@ -103,7 +103,7 @@ const joinSubspace = async (req, res) => {
             await Join.findOneAndDelete({ subspaceId: subspaceId, userId: userId });
         }
         res.status(200).json({ joinedSubspace: { label: subspace.subspaceName, _id: subspace._id }, joined: action });
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
 const updateSubspace = async (req, res) => {
@@ -115,7 +115,7 @@ const updateSubspace = async (req, res) => {
         if (subspace.creator.equals(user._id)) {
             const updatedSubspaceData = { ...subspaceData, subspaceName: subspaceData.name.replace(/ /g, "-") };
             const isSubspaceNameUnique = await Subspace.findOne({ name: updatedSubspaceData.name });
-            if (isSubspaceNameUnique) {
+            if (isSubspaceNameUnique && JSON.stringify(isSubspaceNameUnique) !== JSON.stringify(subspace)) {
                 res.status(409).json({ message: "Subspace with same name already exists." })
             } else {
                 const updatedSubspace = await Subspace.findByIdAndUpdate(subspaceId, updatedSubspaceData, { new: true });
@@ -124,7 +124,7 @@ const updateSubspace = async (req, res) => {
         } else {
             res.status(409).json({ message: "Unauthorised access" });
         }
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 
 }
 
@@ -141,7 +141,7 @@ const deleteSubspace = async (req, res) => {
         }, { new: true });
         await Join.findOneAndDelete({ subspaceId: subspace._id, userId: user._id });
         res.status(200).json({ label: subspace.subspaceName, _id: subspace._id });
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 
 }
 

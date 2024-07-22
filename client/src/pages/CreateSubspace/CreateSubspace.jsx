@@ -6,21 +6,19 @@ import SubspaceForm from "../../Components/SubspaceForm/SubspaceForm";
 import styles from "./styles";
 
 function CreateSubspace(props) {
-    const { user, snackbar, confirmationDialog } = props;
+    const { user } = props;
     const classes = styles();
+
     useEffect(() => {
         document.title = "SyncSpace: Create Subspace";
     }, []);
 
     return (
-        <Grid container sx={{ display: "flex" }}>
+        <Grid container sx={classes.flexContainer}>
             <Grid item xs={0} md={2} sx={classes.leftContainer}></Grid>
             <Box sx={classes.mainContainer}>
-                <SubspaceForm
-                    user={user} type="Create"
-                    snackbar={snackbar} confirmationDialog={confirmationDialog}
-                />
-                <Box sx={Object.assign({ display: "none" }, classes.postContainer)} />
+                <SubspaceForm user={user} type="Create" />
+                <Box sx={classes.postContainer} />
             </Box>
         </Grid>
     );

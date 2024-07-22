@@ -1,24 +1,31 @@
-import React, { useState, useEffect } from "react";
-import { Box, Button, Grid, LinearProgress, TextField, Typography } from "@mui/material";
+import React, { useState, useEffect, useContext } from "react";
+import { Box, Button, Grid, LinearProgress, Typography } from "@mui/material";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { lineSpinner } from "ldrs"
 // Importing my components
+import ConfirmationDialog from "../../Components/ConfirmationDialog/ConfirmationDialog";
+import InputField from "../../Components/InputField/InputField";
 import NotFound from "../../Components/NotFound/NotFound";
+import Comment from "../../Components/Comment/Comment";
 import Post from "../../Components/Posts/Post/Post";
+// Importing contexts
+import { ConfirmationDialogContext, SnackBarContext } from "../../store";
 // Importing actions
 import { fetchPostInfo } from "../../actions/post";
+import { createComment, fetchComments } from "../../actions/comment";
 // Importing styling
 import styles from "./styles";
 
 function PostContainer(props) {
     const { user, snackbar, confirmationDialog } = props;
-    const [setSnackbarValue, setSnackbarState] = snackbar;
     const { id } = useParams();
+    const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
+    const { dialog, dialogValue, openDialog, closeDialog, linearProgressBar } = useContext(ConfirmationDialogContext);
     const classes = styles();
-    const navigate = useNavigate();
     const dispatch = useDispatch();
     const location = useLocation();
+    const navigate = useNavigate();
 
     const [redirect, setRedirect] = useState(true);
     const [primaryLoading, setPrimaryLoading] = useState(true);
@@ -47,8 +54,14 @@ function PostContainer(props) {
     });
     useEffect(() => {
         async function fetchCommentsInfo() {
-            // change this
-            setComments([]);
+            const { status, result } = await dispatch(fetchComments({ id }));
+            if (status === 200) {
+                setComments(result);
+            } else {
+                setComments([]);
+                setSnackbarValue({ message: result.message, status: "error" });
+                setSnackbarState(true);
+            }
             setSecondaryLoading(false);
         }
         async function fetchAllPostInfo() {
@@ -74,6 +87,7 @@ function PostContainer(props) {
                     setPostData(post);
                     setPrimaryLoading(false);
                     setRedirect(false);
+                    document.title = "SyncSpace: " + post.title;
                 } else {
                     fetchAllPostInfo();
                 }
@@ -84,16 +98,49 @@ function PostContainer(props) {
         getPostInfo();
         fetchCommentsInfo();
     }, [id, location, dispatch, setSnackbarValue, setSnackbarState]);
-    const [addComment, setAddComment] = useState(false);
-    function handleAddComment() {
-        console.log("hey");
+    const [comment, setComment] = useState("");
+    function handleCommentChange(event) {
+        const { value } = event.target;
+        setComment(value);
     }
+    const [addComment, setAddComment] = useState(false);
     function handleOpenComment() {
         if (user) { setAddComment(true) }
         else { navigate("/authentication") }
     }
     function handleCancelComment() {
+        if (comment.trim() !== "") {
+            openDialog({
+                title: "Discard comment",
+                message: "Discard comment?",
+                cancelBtnText: "Cancel", submitBtnText: "Discard"
+            });
+        }
+        else {
+            setAddComment(false);
+        }
+    }
+    function handleDialog() {
+        closeDialog();
         setAddComment(false);
+        setComment("");
+    }
+    async function handleAddComment() {
+        const { status, result } = await dispatch(createComment({ postId: id, userId: user._id, comment: comment }));
+        if (status === 200) {
+            setComments(prevComments => {
+                prevComments.push(result);
+                return prevComments;
+            });
+            setPostData(prevPostData => {
+                return { ...prevPostData, "commentsCount": prevPostData.commentsCount + 1 };
+            })
+            setAddComment(false);
+            setComment("");
+        } else {
+            setSnackbarValue({ message: result.message, status: "error" });
+            setSnackbarState(true);
+        }
     }
     lineSpinner.register("l-loader");
 
@@ -127,16 +174,15 @@ function PostContainer(props) {
                                             {addComment ?
                                                 <>
                                                     <Box sx={classes.addCommentContainer}>
-                                                        {/* use InputField here after you make it a controlled input */}
-                                                        <TextField
-                                                            label="Your comment"
+                                                        <InputField
+                                                            name="comment" label="Your comment" value={comment} type="text"
+                                                            handleChange={handleCommentChange} autoFocus={true} multiline={true} rows={3}
                                                             sx={{ bgcolor: "background.secondary", width: "95%" }}
-                                                            autoFocus multiline rows={3}
                                                         />
                                                     </Box>
                                                     <Box sx={{ display: "flex", gap: "8px", justifyContent: "end", width: "95%", margin: "8px auto" }}>
-                                                        <Button variant="outlined" sx={classes.commentBtn} onClick={handleCancelComment}>Cancel</Button>
-                                                        <Button variant="contained" sx={classes.commentBtn} onClick={handleAddComment}>Add</Button>
+                                                        <Button variant="outlined" sx={classes.commentCancelBtn} onClick={handleCancelComment}>Cancel</Button>
+                                                        <Button variant="contained" sx={classes.commentAddBtn} onClick={handleAddComment}>Add</Button>
                                                     </Box>
                                                 </>
                                                 :
@@ -158,7 +204,16 @@ function PostContainer(props) {
                                                 </Box>
                                                 :
                                                 <Box sx={classes.commentsContainer}>
-                                                    hey
+                                                    {comments.map((individualComment, index) => {
+                                                        return (
+                                                            <Box key={index}>
+                                                                <Comment
+                                                                    user={user} authorId={postData?.authorId}
+                                                                    commentData={individualComment} intendation={0}
+                                                                />
+                                                            </Box>
+                                                        )
+                                                    })}
                                                 </Box>
                                             }
                                         </>
@@ -169,6 +224,7 @@ function PostContainer(props) {
                     }
                 </div>
             </Box>
+            <ConfirmationDialog dialog={dialog} closeDialog={closeDialog} handleDialog={handleDialog} linearProgressBar={linearProgressBar} dialogValue={dialogValue} />
         </Grid>
     );
 }

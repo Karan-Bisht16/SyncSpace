@@ -9,7 +9,7 @@ const styles = () => ({
         boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
         marginBottom: { xs: "20px", lg: "0" },
         display: { xs: "none", lg: "block" },
-        position: "relative"
+        position: "relative",
     },
     bioContainer: {
         height: "auto",
@@ -19,11 +19,11 @@ const styles = () => ({
         wordBreak: "break-all",
         overflow: "auto",
         overflowWrap: "break-word",
-        hyphens: "auto"
+        hyphens: "auto",
     },
     formDataContainer: { position: "absolute", transform: "translateY(-100%)" },
     gridItemBox: { padding: "8px 0" },
-    gridItemTitle: { fontSize: "12px" }
+    gridItemTitle: { fontSize: "12px" },
 });
 
 export default styles;

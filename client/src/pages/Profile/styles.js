@@ -19,7 +19,7 @@ const styles = () => ({
             color: "#0090c1",
             bgcolor: "#fefefe",
             transition: "0.2s"
-        }
+        },
     },
     postContainer: {
         minHeight: "50vh",
@@ -36,7 +36,7 @@ const styles = () => ({
     progressBar: { width: { xs: "80%", md: "500px" }, color: "#0090c1", marginTop: "7.5px" },
     titleField: { marginBottom: "4px" },
     clearBtn: { color: "#0090c1", marginBottom: "16px" },
-    updateBtn: { bgcolor: "#0090c1", color: "#ffffff", marginLeft: "8px", marginBottom: "16px" }
+    updateBtn: { bgcolor: "#0090c1", color: "#ffffff", marginLeft: "8px", marginBottom: "16px" },
 });
 
 export default styles;

@@ -9,19 +9,22 @@ import ConfirmationDialog from "../../Components/ConfirmationDialog/Confirmation
 import NotFound from "../../Components/NotFound/NotFound";
 import { formatMembersCount } from "../../utils/functions";
 import Posts from "../../Components/Posts/Posts";
-import { ReRenderContext } from "../../store";
+import { ReRenderContext, ConfirmationDialogContext, SnackBarContext } from "../../store";
 import { fetchSubspaceInfo, joinSubspace, deleteSubspace, isSubspaceJoined } from "../../actions/subspace";
 import styles from "./styles";
 
 function Subspace(props) {
-    const { user, snackbar, confirmationDialog } = props;
-    const [setSnackbarValue, setSnackbarState] = snackbar;
-    const [dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar] = confirmationDialog;
+    const { user } = props;
     const { subspaceName } = useParams();
+    const { setReRender } = useContext(ReRenderContext);
+    const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
+    const { dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar } = useContext(ConfirmationDialogContext);
     const classes = styles();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { setReRender } = useContext(ReRenderContext);
+    const ICON = require("../../assets/animation-deleted.json");
+    const playerRef = useRef(null);
+    lineSpinner.register("l-loader");
 
     useEffect(() => {
         document.title = "SyncSpace: ss/" + subspaceName;
@@ -54,9 +57,7 @@ function Subspace(props) {
                     setSubspaceData(subspace);
                     setReRenderSubspacePosts(subspace._id);
                     if (user) {
-                        if (user._id === subspace.creator) {
-                            setCanModifySubspace(true);
-                        }
+                        if (user._id === subspace.creator) { setCanModifySubspace(true) }
                         const { status, result } = await dispatch(isSubspaceJoined({ userId: user._id, subspaceId: subspace._id }));
                         if (status === 200) { setJoined(result) }
                     }
@@ -90,7 +91,10 @@ function Subspace(props) {
         } else if (joined) {
             navigate("/create-post", { state: { subspaceName, subspaceId: subspaceData?._id } });
         } else {
-            openDialog({ title: "Join Subspace", message: `Join ss/${subspaceName} to create posts.`, cancelBtnText: "Cancel", submitBtnText: "Join" });
+            openDialog({
+                title: "Join Subspace", message: `Join ss/${subspaceName} to create posts.`,
+                cancelBtnText: "Cancel", submitBtnText: "Join"
+            });
         }
     }
     const [joined, setJoined] = useState(false);
@@ -144,9 +148,6 @@ function Subspace(props) {
             }
         }
     }
-    const ICON = require("../../assets/animation-deleted.json");
-    const playerRef = useRef(null);
-    lineSpinner.register("l-loader");
 
     return (
         <Grid container sx={classes.flexContainer}>
@@ -154,8 +155,7 @@ function Subspace(props) {
             <Box sx={classes.mainContainer}>
                 {noSubspaceFound ?
                     <NotFound
-                        img={true}
-                        mainText="No such subspace found"
+                        img={true} mainText="No such subspace found"
                         link={{ linkText: "Go home", to: "/", state: {} }}
                     />
                     :
@@ -167,7 +167,6 @@ function Subspace(props) {
                                     {playerRef.current?.playFromBeginning()}
                                 </Box>
                                 <NotFound
-                                    img={false}
                                     mainText={`s/${subspaceName} was deleted`}
                                     link={{ linkText: "Go home", to: "/", state: {} }}
                                 />
@@ -251,7 +250,7 @@ function Subspace(props) {
                                             </Box>
                                         </Box>
                                         {secondaryLoading ?
-                                            <Box sx={{ display: "flex", justifyContent: "center", marginTop: "24px" }}>
+                                            <Box sx={classes.secondaryLoadingScreenStyling}>
                                                 <l-loader size="75" speed="1.75" color="#0090c1" />
                                             </Box>
                                             :
@@ -280,7 +279,6 @@ function Subspace(props) {
                                                         <Posts
                                                             key={reRenderSubspacePosts}
                                                             searchQuery={{ subspaceId: reRenderSubspacePosts }}
-                                                            snackbar={snackbar} confirmationDialog={confirmationDialog}
                                                         />
                                                     </Box>
                                                 }

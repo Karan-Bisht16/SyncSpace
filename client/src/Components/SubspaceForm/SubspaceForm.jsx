@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { Button, Box, Chip, Divider, Grid, Stepper, Step, StepLabel, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -9,24 +9,26 @@ import ConfirmationDialog from "../ConfirmationDialog/ConfirmationDialog";
 import preDefinedTopics from "../../assets/preDefinedTopics";
 import InputField from "../InputField/InputField";
 import FileUpload from "../FileUpload/FileUpload";
-import { ReRenderContext } from "../../store";
+// Importing contexts
+import { ReRenderContext, ConfirmationDialogContext, SnackBarContext } from "../../store";
 // Importing actions
 import { createSubspace, fetchSubspaceInfo, updateSubspace } from "../../actions/subspace";
 // Importing styling
 import styles from "./styles"
 
 function SubspaceForm(props) {
-    const { user, type, subspaceFormData, snackbar, confirmationDialog } = props;
-    const [setSnackbarValue, setSnackbarState] = snackbar;
-    const [dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar] = confirmationDialog;
-    const classes = styles();
+    const { user, type, subspaceFormData } = props;
     const { subspaceName } = useParams();
+    const { setReRender } = useContext(ReRenderContext);
+    const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
+    const { dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar } = useContext(ConfirmationDialogContext);
+    const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { setReRender } = useContext(ReRenderContext);
 
     const nameField = useRef(null);
     const descriptionField = useRef(null);
+
     const [subspaceData, setSubspaceData] = useState({
         name: "",
         description: "",
@@ -39,11 +41,8 @@ function SubspaceForm(props) {
     const [activeStep, setActiveStep] = useState(0);
     function handleNext() {
         if (activeStep === 0) {
-            if (handleFirstSubmit()) {
-                setActiveStep(1);
-            } else {
-                return false;
-            }
+            if (handleFirstSubmit()) { setActiveStep(1) }
+            else { return false }
         } else {
             setActiveStep((prevActiveStep) => prevActiveStep + 1);
         }
@@ -60,13 +59,9 @@ function SubspaceForm(props) {
         setTopicsArray(prevTopicsArray => {
             let flag = true;
             prevTopicsArray.forEach(topic => {
-                if (topicToSelect.key === topic.key) {
-                    flag = false;
-                }
+                if (topicToSelect.key === topic.key) { flag = false }
             });
-            if (flag) {
-                prevTopicsArray.push(topicToSelect);
-            }
+            if (flag) { prevTopicsArray.push(topicToSelect) }
             return [...prevTopicsArray];
         });
     }
@@ -133,7 +128,10 @@ function SubspaceForm(props) {
         let fileSize = Number(file.size.slice(0, file.size.length - 2));
         let fileType = file.type.includes("image");
         if (fileSize > process.env.REACT_APP_SUBSPACE_AVATAR_SIZE) {
-            setSnackbarValue({ message: `File size must be less than ${process.env.REACT_APP_SUBSPACE_AVATAR_SIZE / 1000}MB!`, status: "error" });
+            setSnackbarValue({
+                message: `File size must be less than ${process.env.REACT_APP_SUBSPACE_AVATAR_SIZE / 1000}MB!`,
+                status: "error"
+            });
             setSnackbarState(true);
             resetSelectedFiles();
         } else if (!fileType) {
@@ -210,7 +208,17 @@ function SubspaceForm(props) {
             return false;
         }
         if (type.toUpperCase() === "CREATE") {
-            openDialog({ title: "Create Subspace", message: "Create a new subspace?", cancelBtnText: "Cancel", submitBtnText: "Create" });
+            openDialog({
+                title: "Create Subspace",
+                message:
+                    <div>
+                        Are you sure you want to create this new subspace?
+                        As the creator, you will automatically become the moderator of this subspace.
+                        <br /><br />
+                        Proceed?
+                    </div>,
+                cancelBtnText: "Cancel", submitBtnText: "Create"
+            });
         } else if (type.toUpperCase() === "UPDATE") {
             handleUpdateSubspace();
         }
@@ -232,7 +240,7 @@ function SubspaceForm(props) {
             closeDialog();
             if (status === 200) {
                 setReRender(prevReRender => !prevReRender);
-                navigate("/", { state: { status: "success", message: "Subspace created successfully!", time: new Date().getTime() } });
+                navigate("/", { state: { status: "success", message: `ss/${subspaceData.name.replace(/ /g, "-")} is now live!`, time: new Date().getTime() } });
             } else {
                 setSnackbarValue({ message: result.message, status: "error" });
                 setSnackbarState(true);
@@ -279,8 +287,8 @@ function SubspaceForm(props) {
                                     <Box sx={classes.selectedChipContainer}>
                                         <Box>
                                             {!topicsArray.length ?
-                                                <p>Choose atleast 5 topics from below</p> :
-                                                <div style={{ padding: "12px 0", display: "flex", flexWrap: "wrap", gap: "5px" }}>
+                                                <p>Choose atleast 5 topics from the following: </p> :
+                                                <div style={classes.selectedChipContainerArray}>
                                                     {topicsArray.map(data => {
                                                         return (
                                                             <Chip

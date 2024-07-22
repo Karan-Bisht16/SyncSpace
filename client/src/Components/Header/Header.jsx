@@ -6,7 +6,8 @@ import { useDispatch } from "react-redux";
 // Importing my components
 import CustomDrawer from "../CustomDrawer/CustomDrawer";
 import ToolBar from "../ToolBar/ToolBar";
-import { ColorModeContext } from "../../store";
+// Importing contexts
+import { ColorModeContext, SnackBarContext } from "../../store";
 // Importing actions
 import { logoutUser } from "../../actions/user";
 // Importing styling
@@ -15,12 +16,12 @@ import styles from "./styles";
 import SyncSpaceLogo from "../../assets/img-syncspace-logo.avif";
 
 function Header(props) {
-    const { user, snackbar } = props;
-    const [setSnackbarValue, setSnackbarState] = snackbar;
+    const { user } = props;
+    const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
     const classes = styles();
     const dispatch = useDispatch();
-    const navigate = useNavigate();
     const location = useLocation();
+    const navigate = useNavigate();
 
     // JS for Toggle Theme
     const { mode, toggleMode } = useContext(ColorModeContext);

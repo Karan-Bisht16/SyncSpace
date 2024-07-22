@@ -8,7 +8,7 @@ import NotFound from "../../Components/NotFound/NotFound";
 import styles from "./styles";
 
 function UpdateSubspace(props) {
-    const { user, snackbar, confirmationDialog } = props;
+    const { user } = props;
     const { subspaceName } = useParams();
     const classes = styles();
     const location = useLocation();
@@ -30,22 +30,18 @@ function UpdateSubspace(props) {
     }, [location, user._id]);
 
     return (
-        <Grid container sx={{ display: "flex" }}>
+        <Grid container sx={classes.flexContainer}>
             <Grid item xs={0} md={2} sx={classes.leftContainer}></Grid>
             <Box sx={classes.mainContainer}>
                 {validation ?
-                    <SubspaceForm
-                        user={user} type="Update" subspaceFormData={subspaceFormData}
-                        snackbar={snackbar} confirmationDialog={confirmationDialog}
-                    />
+                    <SubspaceForm user={user} type="Update" subspaceFormData={subspaceFormData} />
                     :
                     <NotFound
-                        img={false}
                         mainText="Unauthorised access"
                         link={{ linkText: "Go home", to: "/", state: {} }}
                     />
                 }
-                <Box sx={Object.assign({ display: "none" }, classes.postContainer)} />
+                <Box sx={classes.postContainer} />
             </Box>
         </Grid>
     );

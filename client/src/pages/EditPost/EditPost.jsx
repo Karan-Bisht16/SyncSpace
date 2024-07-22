@@ -1,20 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Box, Grid, TextField, Typography } from "@mui/material";
 import { useLocation, useParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { lineSpinner } from "ldrs";
 // Importing my components
 import PostForm from "../../Components/PostForm/PostForm";
 import NotFound from "../../Components/NotFound/NotFound";
+// Importing contexts
+import { SnackBarContext } from "../../store";
+// Importing actions
+import { fetchPostInfo } from "../../actions/post";
 // Importing styling
 import styles from "./styles";
-import { fetchPostInfo } from "../../actions/post";
-import { useDispatch } from "react-redux";
 
 function EditPost(props) {
-    const { user, snackbar, confirmationDialog } = props;
-    const { setSnackbarValue, setSnackbarState } = snackbar;
-    const classes = styles();
+    const { user } = props;
     const { id } = useParams();
+    const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
+    const classes = styles();
     const dispatch = useDispatch();
     const location = useLocation();
     lineSpinner.register("l-loader");
@@ -66,12 +69,10 @@ function EditPost(props) {
         }
     }, [location.state, id, user._id, dispatch, setSnackbarValue, setSnackbarState]);
     return (
-        <Grid container sx={{ display: "flex" }}>
+        <Grid container sx={classes.flexContainer}>
             <Grid item xs={0} md={2} sx={classes.leftContainer}></Grid>
             <Box id="postFormForm" sx={classes.mainContainer}>
                 <Typography variant="h4">Edit Post</Typography>
-                <div style={{ width: 300, padding: "16px 0" }}>
-                </div>
                 {allPostFormDataSet ?
                     <>
                         {validation ?
@@ -84,19 +85,17 @@ function EditPost(props) {
                                     user={user} predefinedTabIndex={predefinedTabIndex} type="Edit"
                                     postData={postFormData} setPostData={setPostFormData}
                                     hasPredefinedSubspace={true} postId={id}
-                                    snackbar={snackbar} confirmationDialog={confirmationDialog}
                                 />
                             </>
                             :
                             <NotFound
-                                img={false}
                                 mainText="Unauthorised access"
                                 link={{ linkText: "Go home", to: "/", state: {} }}
                             />
                         }
                     </>
                     :
-                    <Box sx={{ display: "flex", justifyContent: "center" }}>
+                    <Box sx={classes.loadingContainer}>
                         <l-loader size="75" speed="1.75" color="#0090c1" />
                     </Box>
                 }

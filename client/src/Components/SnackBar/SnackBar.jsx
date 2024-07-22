@@ -1,5 +1,5 @@
 import React from "react";
-import { Snackbar, Alert } from "@mui/material";
+import { Alert, Snackbar } from "@mui/material";
 
 function SnackBar(props) {
     const { openSnackbar, timeOut, handleClose, type, message, sx, vertical, horizontal } = props;

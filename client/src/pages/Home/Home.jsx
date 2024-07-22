@@ -5,20 +5,18 @@ import Posts from "../../Components/Posts/Posts";
 // Importing styling
 import styles from "./styles";
 
-function Home(props) {
-    const { snackbar, confirmationDialog } = props;
+function Home() {
     const classes = styles();
 
     useEffect(() => {
-        // Setting webpage title
         document.title = "SyncSpace";
     });
 
     return (
-        <Grid container sx={{ display: "flex" }}>
+        <Grid container sx={classes.flexContainer}>
             <Grid item xs={0} md={2} sx={classes.leftContainer}></Grid>
             <Box sx={classes.mainContainer}>
-                <Posts searchQuery={null} customParams="HOME_PAGE" snackbar={snackbar} confirmationDialog={confirmationDialog} />
+                <Posts searchQuery={null} customParams="HOME_PAGE" />
             </Box>
         </Grid>
     );

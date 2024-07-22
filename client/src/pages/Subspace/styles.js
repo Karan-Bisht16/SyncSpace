@@ -4,6 +4,7 @@ const styles = () => ({
     mainContainer: { width: { xs: "100%", md: "65%", lg: "75%" }, margin: "0 auto", padding: { xs: "32px 8px", md: "32px 16px" } },
     flexContainer: { display: "flex" },
     primaryLoadingScreenStyling: { height: "80vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" },
+    secondaryLoadingScreenStyling: { display: "flex", justifyContent: "center", marginTop: "24px" },
     primaryProgressBar: { width: { xs: "80%", md: "500px" }, color: "#0090c1", marginTop: "7.5px" },
     titleFont: { fontSize: { xs: "24px", md: "36px" } },
     mainDialog: {
@@ -14,7 +15,7 @@ const styles = () => ({
         padding: { xs: "8px", sm: "24px" },
         bgcolor: "background.backdrop",
         borderRadius: "16px",
-        overflow: "hidden"
+        overflow: "hidden",
     },
     mainText: {
         display: "flex",
@@ -24,13 +25,20 @@ const styles = () => ({
         maxHeight: "160px",
         bgcolor: "background.backdrop",
         borderRadius: "16px",
-        overflow: "hidden"
+        overflow: "hidden",
     },
     avatarContainer: { display: "flex", flexDirection: "column", alignSelf: "center", bgcolor: "background.primary", borderRadius: "50%", padding: "5px" },
     subspaceAvatar: { fontSize: { xs: "32px", sm: "48px" }, height: { xs: "80px", sm: "125px" }, width: { xs: "80px", sm: "125px" } },
     subspaceTitle: { fontSize: { xs: "24px", sm: "34px" }, fontWeight: "bold" },
     subspaceName: { fontSize: { xs: "18px", sm: "22px" } },
-    subspaceDescription: { fontSize: { xs: "14px", sm: "16px" }, maxHeight: "50px", overflow: "scroll", wordBreak: "break-all", hyphens: "auto" },
+    subspaceDescription: { 
+        fontSize: { xs: "14px", sm: "16px" }, 
+        maxHeight: "50px", 
+        overflow: "scroll", 
+        wordBreak: "break-all", 
+        hyphens: "auto", 
+        whiteSpace: "pre-line",
+    },
     subspaceOperation: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px" },
     subspaceBtn: { float: "right", display: "flex", gap: "8px", alignItems: "center" },
     subspaceString: { fontSize: "14px", width: "18px", minWidth: "18px" },
@@ -42,7 +50,7 @@ const styles = () => ({
         "&:hover": {
             backgroundColor: "button.secondary",
             color: "button.primary"
-        }
+        },
     },
     joinedBtn: { padding: "3px 24px", border: "1px solid #0090c1" },
     deleteBtn: {
@@ -50,7 +58,7 @@ const styles = () => ({
         "&:hover": {
             backgroundColor: "button.secondary",
             color: "#f44336"
-        }
+        },
     },
     subspaceDeletedContainer: { display: "flex", justifyContent: "center", marginTop: "15vh" },
     noContentContainer: {

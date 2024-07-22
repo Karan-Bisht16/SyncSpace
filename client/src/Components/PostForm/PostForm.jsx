@@ -6,23 +6,24 @@ import { useDispatch } from "react-redux";
 import ConfirmationDialog from "../ConfirmationDialog/ConfirmationDialog";
 import CustomJoditEditor from "../CustomJoditEditor/CustomJoditEditor";
 import FileUpload from "../FileUpload/FileUpload";
-import { ColorModeContext } from "../../store";
+// Importing contexts
+import { ColorModeContext, ConfirmationDialogContext, SnackBarContext } from "../../store";
 // Importing actions
 import { createPost, updatePost } from "../../actions/post";
 // Importing styling
 import styles from "./styles";
 
 function PostForm(props) {
-    const { postData, predefinedTabIndex, type, hasPredefinedSubspace, postId, subspacesArray, setPostData, snackbar, confirmationDialog } = props;
-    const [setSnackbarValue, setSnackbarState] = snackbar;
-    const [dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar] = confirmationDialog
+    const { postData, predefinedTabIndex, type, hasPredefinedSubspace, postId, subspacesArray, setPostData } = props;
+    const { mode } = useContext(ColorModeContext);
+    const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
+    const { dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar } = useContext(ConfirmationDialogContext)
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const titleTextField = useRef(null);
     const bodyField = useRef(null);
-    const { mode } = useContext(ColorModeContext);
 
     // Title Field
     function handleTitleChange(event) {
@@ -69,9 +70,15 @@ function PostForm(props) {
             setSnackbarState(true);
         } else if (flagForSize) {
             if (cummulativeFileSize > process.env.REACT_APP_POST_FILE_SIZE) {
-                setSnackbarValue({ message: `Cummulative file size must be less than ${process.env.REACT_APP_POST_FILE_SIZE / 1000}MB!`, status: "error" });
+                setSnackbarValue({
+                    message: `Cummulative file size must be less than ${process.env.REACT_APP_POST_FILE_SIZE / 1000}MB!`,
+                    status: "error"
+                });
             } else {
-                setSnackbarValue({ message: `File size must be less than ${process.env.REACT_APP_POST_FILE_SIZE / 1000}MB!`, status: "error" });
+                setSnackbarValue({
+                    message: `File size must be less than ${process.env.REACT_APP_POST_FILE_SIZE / 1000}MB!`,
+                    status: "error"
+                });
             }
             setSnackbarState(true);
         }
@@ -93,13 +100,6 @@ function PostForm(props) {
     const [tabIndex, setTabIndex] = useState(predefinedTabIndex);
     function handleTabChange(event, newTabIndex) {
         setTabIndex(newTabIndex);
-        if (newTabIndex === "1") {
-            resetSelectedFiles();
-        } else if (newTabIndex === "2") {
-            setPostData(prevPostData => {
-                return { ...prevPostData, body: "" };
-            });
-        }
     }
     // Clear Form 
     function handleClear() {
@@ -152,7 +152,18 @@ function PostForm(props) {
             }
             return false;
         }
-        openDialog({ title: "Confirm Post", message: "Are you sure you want to post?", cancelBtnText: "Cancel", submitBtnText: "Post" });
+        openDialog({
+            title: "Confirm Post",
+            message:
+                <div>
+                    Are you sure you want to post this content?
+                    Please review your post to ensure it is free of any sensitive or personal information.
+                    Once posted, it can be viewed by all members of the subspace.
+                    <br /><br />
+                    Proceed?
+                </div>,
+            cancelBtnText: "Cancel", submitBtnText: "Post"
+        });
     }
     async function handleDialog() {
         setLinearProgressBar(true);
@@ -195,8 +206,7 @@ function PostForm(props) {
                 </>
                 <Box sx={{ width: "100%" }}>
                     <Tabs
-                        value={tabIndex}
-                        onChange={handleTabChange}
+                        value={tabIndex} onChange={handleTabChange}
                         aria-label="wrapped label tabs example"
                     >
                         <Tab value="1" label="Text" wrapped />

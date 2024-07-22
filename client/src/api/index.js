@@ -39,3 +39,10 @@ export const isPostLiked = (postAndUserId) => API.get("/post/isLiked", { params:
 export const likePost = (actionData) => API.patch("/post/like", actionData);
 export const updatePost = (postData) => API.put("/post/update", postData);
 export const deletePost = (postId) => API.delete("/post/delete", { params: postId });
+
+// Comment
+export const fetchComments = (postId) => API.get("/comment/", { params: postId });
+export const createComment = (newComment) => API.post("/comment/create", newComment);
+export const fetchReplies = (postAndParentId) => API.get("/comment/reply/", { params: postAndParentId });
+export const createReply = (newReply) => API.post("/comment/reply/create", newReply);
+export const deleteComment = (commentId) => API.delete("/comment/delete", { params: commentId });

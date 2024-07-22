@@ -17,10 +17,11 @@ const styles = () => ({
         bgcolor: "background.default",
         borderRadius: "16px",
         padding: "12px 16px",
-        margin: "4px 0 8px 0",
+        margin: "4px 0",
         boxShadow: "rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px"
     },
     bodyText: { wordBreak: "break-word" },
+    bodyFooter: { width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 16px 8px 16px" },
     author: { fontSize: "18px", cursor: "pointer" },
     fileContainer: {
         display: "flex",
@@ -37,8 +38,13 @@ const styles = () => ({
         overflow: "hidden",
         width: "100%"
     },
-    imageBox: { maxWidth: "100%", maxHeight: "800px", borderRadius: "16px", verticalAlign: "middle", objectFit: "scale-down" },
+    carouselImageItem: { objectFit: "scale-down", height: "100%", textAlign: "center" },
+    carouselMiscItem: { objectFit: "scale-down", width: "100%", lineHeight: "75px", height: "50px" },
+    audioContainer: { bgcolor: "background.default", borderRadius: "16px", margin: "8px 0" },
     multipleImageBox: { height: "100%", borderRadius: "16px", verticalAlign: "middle", objectFit: "scale-down" },
+    imageBox: { maxWidth: "100%", maxHeight: "800px", borderRadius: "16px", verticalAlign: "middle", objectFit: "scale-down" },
+    videoBox: { borderRadius: "16px" },
+    audioBox: { borderRadius: "16px", background: "inherit" },
     allPostActionsContainer: { display: "flex", justifyContent: "space-between", alignItems: "center" },
     majorPostActionsContainer: {
         color: "text.heading",

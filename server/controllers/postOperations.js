@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
+import { ObjectId } from "mongodb";
 import Post from "../models/post.js";
 import User from "../models/user.js";
 import Like from "../models/like.js"
 import Subspace from "../models/subspace.js";
-import { ObjectId } from "mongodb"
 
 const LIMIT = process.env.POSTS_LIMIT || 2;
 
@@ -54,7 +54,7 @@ const fetchPostInfo = async (req, res) => {
         } catch (BSONError) {
             res.status(404).json({ message: "No post found" });
         }
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try ogain." }) }
+    } catch (error) { res.status(503).json({ message: "Network error. Try ogain." }) }
 }
 
 const fetchPosts = async (req, res) => {
@@ -262,7 +262,7 @@ const fetchPosts = async (req, res) => {
         } else {
             res.status(200).json({ count: count, previous: currentPage - 1, next: currentPage + 1, results: posts });
         }
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
 const createPost = async (req, res) => {
@@ -274,7 +274,7 @@ const createPost = async (req, res) => {
         await User.findOneAndUpdate({ email: email }, { $inc: { postsCount: 1 } });
         await Subspace.findByIdAndUpdate(post.subspaceId, { $inc: { postsCount: 1 } });
         res.status(200).json(newPost);
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
 const isPostLiked = async (req, res) => {
@@ -286,7 +286,7 @@ const isPostLiked = async (req, res) => {
         } else {
             res.status(200).json(false);
         }
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
 const likePost = async (req, res) => {
@@ -302,7 +302,7 @@ const likePost = async (req, res) => {
             await Like.findOneAndDelete({ postId: postId, userId: userId });
         }
         res.sendStatus(200);
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
 const updatePost = async (req, res) => {
@@ -318,7 +318,7 @@ const updatePost = async (req, res) => {
         } else {
             res.status(409).json({ message: "Unauthorised access" });
         }
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
 const deletePost = async (req, res) => {
@@ -329,7 +329,7 @@ const deletePost = async (req, res) => {
         await User.findOneAndUpdate({ email: email }, { $inc: { postsCount: -1 } });
         await Subspace.findOneAndUpdate({ subspaceName: post.subspaceName }, { $inc: { postsCount: -1 } });
         res.sendStatus(200);
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
 export { fetchPosts, fetchPostInfo, createPost, isPostLiked, likePost, updatePost, deletePost };

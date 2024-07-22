@@ -4,7 +4,7 @@ import App from "./App";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import { reducers } from "./reducers";
-import { ColorContextProvider, ReRenderProvider } from "./store";
+import { ColorContextProvider, ReRenderProvider, ConfirmationDialogProvider, SnackBarProvider } from "./store";
 
 const store = configureStore({ reducer: reducers });
 
@@ -14,7 +14,11 @@ root.render(
         <ColorContextProvider>
             <Provider store={store}>
                 <ReRenderProvider>
-                    <App />
+                    <ConfirmationDialogProvider>
+                        <SnackBarProvider>
+                            <App />
+                        </SnackBarProvider>
+                    </ConfirmationDialogProvider>
                 </ReRenderProvider>
             </Provider>
         </ColorContextProvider>

@@ -8,17 +8,15 @@ import styles from "./styles";
 function PageNotFound() {
     const classes = styles();
     useEffect(() => {
-        // Setting webpage title
         document.title = "SyncSpace: 404";
     }, []);
 
     return (
-        <Grid container sx={{ display: "flex" }}>
+        <Grid container sx={classes.flexContainer}>
             <Grid item xs={0} md={2} sx={classes.leftContainer}></Grid>
             <Box sx={classes.mainContainer}>
                 <NotFound
-                    img={true}
-                    mainText="Page Not Found"
+                    img={true} mainText="Page Not Found"
                     link={{ linkText: "Go home", to: "/", state: {} }}
                 />
             </Box>

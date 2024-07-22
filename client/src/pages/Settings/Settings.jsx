@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { Box, Button, Divider, Grid, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -6,20 +6,21 @@ import { useDispatch } from "react-redux";
 import ConfirmationDialog from "../../Components/ConfirmationDialog/ConfirmationDialog";
 import InputField from "../../Components/InputField/InputField";
 // Importing actions
+import { ConfirmationDialogContext, SnackBarContext } from "../../store/index";
+// Importing actions
 import { changePassword, deleteProfile } from "../../actions/user";
 // Importing styling
 import styles from "./styles";
 
 function Settings(props) {
-    const { user, snackbar, confirmationDialog } = props;
-    const [setSnackbarValue, setSnackbarState] = snackbar;
-    const [dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar] = confirmationDialog;
+    const { user } = props;
+    const [setSnackbarValue, setSnackbarState] = useContext(SnackBarContext);
+    const [dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar] = useContext(ConfirmationDialogContext);
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Setting webpage title
         document.title = "SyncSpace: Settings";
     });
 
@@ -29,6 +30,7 @@ function Settings(props) {
     const currentPasswordField = useRef(null);
     const newPasswordField = useRef(null);
     const confirmPasswordField = useRef(null);
+
     const [formData, setFormData] = useState({
         currentPassword: "",
         newPassword: "",
@@ -64,16 +66,26 @@ function Settings(props) {
             return false;
         } else if (formData.confirmPassword.trim() !== formData.newPassword.trim()) {
             confirmPasswordField.current.focus();
-            setSnackbarValue({ message: "Password doesn't match", status: "error" });
+            setSnackbarValue({ message: "Password do not match.", status: "error" });
             setSnackbarState(true);
             return false;
         } else if (formData.currentPassword.trim() === formData.newPassword.trim()) {
             newPasswordField.current.focus();
-            setSnackbarValue({ message: "New password cannot be same as old password", status: "error" });
+            setSnackbarValue({ message: "New password cannot be the same as your old password.", status: "error" });
             setSnackbarState(true);
             return false;
         }
-        openDialog({ title: "Change Password", message: "Be sure to remember your new password", cancelBtnText: "Cancel", submitBtnText: "Change" });
+        openDialog({
+            title: "Change Password",
+            message:
+                <div>
+                    Are you sure you want to change your password?
+                    Please ensure your new password is strong and memorable.
+                    <br /><br />
+                    Proceed?
+                </div>,
+            cancelBtnText: "Cancel", submitBtnText: "Change"
+        });
     }
     function handleResult(status, result, type) {
         closeDialog();
@@ -120,7 +132,7 @@ function Settings(props) {
     }
 
     return (
-        <Grid container sx={{ display: "flex" }}>
+        <Grid container sx={classes.flexContainer}>
             <Grid item xs={0} md={2} sx={classes.leftContainer}></Grid>
             <Box sx={classes.mainContainer}>
                 <Typography variant="h4">Settings</Typography>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { Avatar, Box, Button, Divider, Grid, LinearProgress, Tab, Tabs, Typography } from "@mui/material";
 import { CloseRounded, ModeEdit } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
@@ -10,30 +10,33 @@ import InputField from "../../Components/InputField/InputField";
 import ProfileBar from "../../Components/ProfileBar/ProfileBar";
 import UserPostsBlock from "./UserPostsBlock/UserPostsBlock";
 import NotFound from "../../Components/NotFound/NotFound";
+// Importing contexts
+import { SnackBarContext } from "../../store";
 // Importing actions
 import { fetchUserInfo, updateProfile } from "../../actions/user";
 // Importing styling
 import styles from "./styles";
 
 function Profile(props) {
-    const { user, snackbar, confirmationDialog } = props;
-    const [setSnackbarValue, setSnackbarState] = snackbar;
+    const { user } = props;
+    const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
     const { userName } = useParams();
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const ICON = require("../../assets/animation-deleted.json");
+    const playerRef = useRef(null);
 
     useEffect(() => {
-        // Setting webpage title
         document.title = "SyncSpace: e/" + userName;
-    });
-    useEffect(() => {
         setNoUserFound(false);
         setUserProfileDeleted(false);
     }, [userName]);
+
     const nameField = useRef(null);
     const emailField = useRef(null);
     const bioField = useRef(null);
+
     // Fetching user info
     const [primaryLoading, setPrimaryLoading] = useState(true);
     const [secondaryLoading, setSecondaryLoading] = useState(true);
@@ -137,8 +140,6 @@ function Profile(props) {
             setSnackbarState(true);
         }
     }
-    const ICON = require("../../assets/animation-deleted.json");
-    const playerRef = useRef(null);
 
     return (
         <Grid container sx={classes.flexContainer}>
@@ -146,8 +147,7 @@ function Profile(props) {
             <Box sx={classes.mainContainer}>
                 {noUserFound ?
                     <NotFound
-                        img={true}
-                        mainText="No user found"
+                        img={true} mainText="No user found"
                         link={{ linkText: "Go home", to: "/", state: {} }}
                     />
                     :
@@ -155,15 +155,10 @@ function Profile(props) {
                         {userProfileDeleted ?
                             <Box>
                                 <Box sx={classes.profileDeletedContainer}>
-                                    <Player
-                                        ref={playerRef}
-                                        icon={ICON}
-                                        size={250}
-                                    />
+                                    <Player ref={playerRef} icon={ICON} size={250} />
                                     {playerRef.current?.playFromBeginning()}
                                 </Box>
                                 <NotFound
-                                    img={false}
                                     mainText="This profile has been deleted"
                                     link={{ linkText: "Go home", to: "/", state: {} }}
                                 />
@@ -250,19 +245,17 @@ function Profile(props) {
                                                 <Grid container sx={classes.subContainer}>
                                                     <Grid item xs={12} lg={8.75} sx={{ display: { xs: "none", lg: "block" } }}>
                                                         <UserPostsBlock
-                                                            user={updatedUser} userPostsBlock={userPostsCount}
+                                                            user={updatedUser} userPostsCount={userPostsCount}
                                                             secondaryLoading={secondaryLoading} tabIndex={tabIndex} handleTabChange={handleTabChange}
-                                                            snackbar={snackbar} confirmationDialog={confirmationDialog}
                                                         />
                                                     </Grid>
                                                     <Grid item md={0.25}></Grid>
-                                                    <ProfileBar updatedUser={updatedUser} snackbar={snackbar} />
+                                                    <ProfileBar user={updatedUser} />
                                                 </Grid>
                                                 <Box sx={{ display: { xs: "block", lg: "none" } }}>
                                                     <UserPostsBlock
-                                                        user={updatedUser} userPostsBlock={userPostsCount}
+                                                        user={updatedUser} userPostsCount={userPostsCount}
                                                         secondaryLoading={secondaryLoading} tabIndex={tabIndex} handleTabChange={handleTabChange}
-                                                        snackbar={snackbar} confirmationDialog={confirmationDialog}
                                                     />
                                                 </Box>
                                             </>

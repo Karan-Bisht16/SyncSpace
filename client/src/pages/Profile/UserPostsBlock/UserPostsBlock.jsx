@@ -8,7 +8,6 @@ import styles from "./styles";
 
 function UserPostsBlock(props) {
     const { user, userPostsCount, secondaryLoading, tabIndex, handleTabChange } = props;
-    const { snackbar, confirmationDialog } = props;
     const classes = styles();
 
     return (
@@ -32,15 +31,13 @@ function UserPostsBlock(props) {
                                     <NotFound mainText="You haven't posted anything" />
                                 </Box>
                                 :
-                                <Posts searchQuery={{ authorId: user._id }} snackbar={snackbar} confirmationDialog={confirmationDialog} />
+                                <Posts searchQuery={{ authorId: user._id }} />
                             }
                         </>
                     }
                 </>
                 :
-                <>
-                    <Posts searchQuery={{ userId: user._id }} customParams="LIKED_POSTS" snackbar={snackbar} confirmationDialog={confirmationDialog} />
-                </>
+                <Posts searchQuery={{ userId: user._id }} customParams="LIKED_POSTS" />
             }
         </>
     );

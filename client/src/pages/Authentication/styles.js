@@ -6,10 +6,11 @@ const styles = () => ({
         margin: "0 auto",
         padding: "60px 16px 16px 16px",
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
     },
-    title: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "10px", padding: "24px 0 16px 0" },
     subContainer: { display: "flex", justifyContent: "center" },
+    title: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "10px", padding: "24px 0 16px 0" },
+    formContainer: { width: { xs: "100%", sm: "550px" }, justifyContent: "center", paddingBottom: "16px" },
     showPasswordGrid: { display: "flex", justifyContent: "center", color: "text.primary" },
     showPasswordBtn: {
         height: "100%",
@@ -19,7 +20,7 @@ const styles = () => ({
         position: "relative",
         transform: "translate(-100%, 15%)",
         cursor: "pointer",
-        outline: "none"
+        outline: "none",
     },
     bottomGroup: { display: "flex", flexDirection: "column", alignItems: "center", padding: "8px 0 16px 0" },
     signBtn: {
@@ -31,8 +32,9 @@ const styles = () => ({
         "&:hover": {
             backgroundColor: "button.secondary",
             color: "button.primary"
-        }
+        },
     },
+    linkContainer: { marginTop: "4px", fontSize: { xs: "15px", sm: "18px" } },
     toggleLink: { color: "#0090c1", cursor: "pointer" },
     boxBottomGroup: { width: "100%", display: "flex", justifyContent: "center" },
     positionalOr: { padding: "0 8px", position: "absolute", transform: "translateY(-20%)", bgcolor: "background.secondary" },

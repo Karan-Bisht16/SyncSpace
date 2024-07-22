@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { Avatar, Box, Button, Container, Grid, Paper, Typography, TextField, LinearProgress } from "@mui/material";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 import { LockOutlined, Visibility, VisibilityOff } from "@mui/icons-material";
 import { GoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+// Importing contexts
+import { SnackBarContext } from "../../store/index";
 // Importing my components
 import InputField from "../../Components/InputField/InputField";
 // Importing actions
@@ -12,23 +14,22 @@ import { getGoogleUser, createGoogleUser, signUp, signIn } from "../../actions/u
 // Importing styling
 import styles from "./styles";
 
-function Authentication(props) {
-    const { snackbar } = props;
-    const [setSnackbarValue, setSnackbarState] = snackbar;
+function Authentication() {
+    const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
     useEffect(() => {
-        // Setting webpage title
         document.title = "SyncSpace: Authentication";
-    });
+    }, []);
 
     const nameField = useRef(null);
     const emailField = useRef(null);
     const passwordField = useRef(null);
     const confirmPasswordField = useRef(null);
     const regexEmail = /^([a-zA-Z0-9_\.\-]+)@([a-zA-Z0-9_\.\-]+)\.([a-zA-Z]+)/;
-    // JS for Dialog
+    // JS for Form Dialog
     const [openDialog, setOpenDialog] = useState(false);
     function handleClickOpenDialog() {
         setOpenDialog(true);
@@ -76,7 +77,7 @@ function Authentication(props) {
             setGoogleToken(response.credential);
             const { status, result } = await dispatch(getGoogleUser({ token: response.credential }));
             if (status === 200) {
-                navigate("/", { state: { status: "success", message: "Sign In successful!", time: new Date().getTime() } })
+                navigate("/", { state: { status: "success", message: "Sign in successful!", time: new Date().getTime() } })
             } else if (status === 409) {
                 handleClickOpenDialog();
             } else {
@@ -90,19 +91,15 @@ function Authentication(props) {
         event.preventDefault();
         setLinearProgressBar(true);
         const token = googleToken;
-        try {
-            const { status, result } = await dispatch(createGoogleUser({ token: token, name: authData.userName }));
-            if (status === 200) {
-                navigate("/", { state: { status: "success", message: "Sign In successful!", time: new Date().getTime() } })
-            } else if (status === 400) {
-                setUniqueUserNameError(true);
-                setLinearProgressBar(false);
-            } else {
-                setSnackbarValue({ message: result.message, status: "error" });
-                setSnackbarState(true);
-            }
-        } catch (error) {
-            console.log(error.message);
+        const { status, result } = await dispatch(createGoogleUser({ token: token, name: authData.userName }));
+        if (status === 200) {
+            navigate("/", { state: { status: "success", message: "Sign in successful!", time: new Date().getTime() } })
+        } else if (status === 400) {
+            setUniqueUserNameError(true);
+            setLinearProgressBar(false);
+        } else {
+            setSnackbarValue({ message: result.message, status: "error" });
+            setSnackbarState(true);
         }
     }
     function googleErrorFunction() {
@@ -132,7 +129,7 @@ function Authentication(props) {
                 confirmPasswordField.current.focus();
                 return false;
             } else if (authData.confirmPassword.trim() !== authData.userPassword.trim()) {
-                setSnackbarValue({ message: "Password doesn't match.", status: "error" });
+                setSnackbarValue({ message: "Passwords do not match.", status: "error" });
                 setSnackbarState(true);
                 return false;
             }
@@ -149,7 +146,7 @@ function Authentication(props) {
         } else {
             const { status, result } = await dispatch(signIn(authData));
             if (status === 200) {
-                navigate("/", { state: { status: "success", message: "Sign In successful!", time: new Date().getTime() } })
+                navigate("/", { state: { status: "success", message: "Sign in successful!", time: new Date().getTime() } })
             } else {
                 setSnackbarValue({ message: result.message, status: "error" });
                 setSnackbarState(true);
@@ -165,13 +162,11 @@ function Authentication(props) {
                 <Container sx={classes.subContainer}>
                     <Paper elevation={3}>
                         <Box sx={classes.title}>
-                            <Avatar>
-                                <LockOutlined />
-                            </Avatar>
+                            <Avatar><LockOutlined /></Avatar>
                             <Typography variant="h5">{isSignUp ? "Sign Up" : "Sign In"}</Typography>
                         </Box>
                         <form noValidate onSubmit={handleSubmit}>
-                            <Grid container sx={{ width: { xs: "100%", sm: "550px" }, justifyContent: "center", paddingBottom: "16px" }}>
+                            <Grid container sx={classes.formContainer}>
                                 {isSignUp && (
                                     <Grid item xs={10} sm={7}>
                                         <InputField
@@ -230,7 +225,7 @@ function Authentication(props) {
                                         />
                                     </Box>
                                 </Grid>
-                                <Typography sx={{ marginTop: "4px", fontSize: { xs: "15px", sm: "18px" } }}>
+                                <Typography sx={classes.linkContainer}>
                                     {isSignUp ?
                                         <>Already have an account? <span onClick={handleIsSignUp} style={classes.toggleLink}> Sign in</span></>
                                         : <>Don't have an account? <span onClick={handleIsSignUp} style={classes.toggleLink}> Sign Up</span></>
@@ -260,16 +255,14 @@ function Authentication(props) {
                     </DialogContentText>
                     {uniqueUserNameError ?
                         <TextField
-                            id="name" name="userName" label="Username" type="text"
-                            margin="dense" variant="standard" autoComplete="off" onChange={handleChange}
+                            id="name" name="userName" label="Username" type="text" onChange={handleChange}
+                            margin="dense" variant="standard" autoComplete="off" autoFocus required fullWidth
                             error helperText="Username not available"
-                            autoFocus required fullWidth
                         />
                         :
                         <TextField
-                            id="name" name="userName" label="Username" type="text"
-                            margin="dense" variant="standard" autoComplete="off" onChange={handleChange}
-                            autoFocus required fullWidth
+                            id="name" name="userName" label="Username" type="text" onChange={handleChange}
+                            margin="dense" variant="standard" autoComplete="off" autoFocus required fullWidth
                         />
                     }
                 </DialogContent>
