@@ -211,12 +211,12 @@ function SubspaceForm(props) {
             openDialog({
                 title: "Create Subspace",
                 message:
-                    <div>
+                    <span>
                         Are you sure you want to create this new subspace?
                         As the creator, you will automatically become the moderator of this subspace.
                         <br /><br />
                         Proceed?
-                    </div>,
+                    </span>,
                 cancelBtnText: "Cancel", submitBtnText: "Create"
             });
         } else if (type.toUpperCase() === "UPDATE") {

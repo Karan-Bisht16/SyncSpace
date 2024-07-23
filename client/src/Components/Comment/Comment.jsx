@@ -75,7 +75,6 @@ function Comment(props) {
         async function fetchAllReplies() {
             const { status, result } = await dispatch(fetchReplies({ postId: postId, parentId: _id }));
             if (status === 200) {
-                console.log(result);
                 setReplies(result);
             }
         }
@@ -132,7 +131,7 @@ function Comment(props) {
                                 <Typography sx={{ fontSize: "14px", color: "#0090c1" }}> author</Typography>
                             }
                         </Box>
-                        <Typography sx={{ wordBreak: "break-all", whiteSpace: "pre-line" }}>{comment}</Typography>
+                        <Typography sx={{ wordBreak: "break-word", whiteSpace: "pre-line" }}>{comment}</Typography>
                         <Box sx={classes.replyContainer}>
                             {openReply ?
                                 <Box sx={{ width: "100%" }}>

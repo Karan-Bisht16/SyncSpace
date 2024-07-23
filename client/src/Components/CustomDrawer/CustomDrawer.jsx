@@ -1,19 +1,24 @@
 import React, { useState, useContext } from "react";
 import { Box, Collapse, Divider, List, ListItem, ListItemButton, ListItemText, ListItemIcon, Typography } from "@mui/material"
-import { ExpandLess, ExpandMore, ForumTwoTone, GroupAddOutlined, PersonAddAlt1, TrendingUpRounded } from "@mui/icons-material";
+import { ExpandLess, ExpandMore, ForumTwoTone, GroupAddOutlined, PersonAddAlt1 } from "@mui/icons-material";
 import { NavLink, useNavigate } from "react-router-dom";
 import { hatch } from "ldrs";
+// Importing my components
 import SubspaceList from "./SubspaceList/SubspaceList";
+// Importing contexts
 import { ReRenderContext } from "../../store";
+// Importing styling
 import styles from "./styles";
+// Importing images
 import SyncSpaceLogo from "../../assets/img-syncspace-logo.avif";
 
 function CustomDrawer(props) {
     const { user, handleDrawerClose } = props;
     const classes = styles();
+    const { reRender } = useContext(ReRenderContext);
     const navigate = useNavigate();
+    hatch.register("l-universe");
 
-    const mainSubspaces = [{ name: "Universe" }, { name: "Trending" }];
     const [openDropDown, setOpenDropDown] = useState(true);
     function handleDropDownClick() {
         setOpenDropDown(!openDropDown);
@@ -30,8 +35,10 @@ function CustomDrawer(props) {
         handleDrawerClose();
         navigate("/ss/" + subspace.subspaceName);
     }
-    const { reRender } = useContext(ReRenderContext);
-    hatch.register("l-universe");
+    function handleTrending() {
+        handleDrawerClose();
+        navigate("/Trending");
+    }
 
     return (
         <div>
@@ -45,18 +52,14 @@ function CustomDrawer(props) {
             </Box>
             <Divider />
             <List>
-                {mainSubspaces.map((subspace, index) => (
-                    <ListItem key={index} disablePadding onClick={() => handleSubspaceClick(subspace.name)}>
-                        <ListItemButton>
-                            <ListItemIcon>
-                                {index % 2 === 0 ?
-                                    <l-universe size="20" stroke="3" speed="7.5" color="#0090c1" style={{ marginLeft: "2.5px" }} />
-                                    : <TrendingUpRounded sx={classes.icon} />}
-                            </ListItemIcon>
-                            <ListItemText primary={subspace.name} />
-                        </ListItemButton>
-                    </ListItem>
-                ))}
+                <ListItem disablePadding onClick={handleTrending}>
+                    <ListItemButton>
+                        <ListItemIcon>
+                            <l-universe size="20" stroke="3" speed="7.5" color="#0090c1" style={{ marginLeft: "2.5px" }} />
+                        </ListItemIcon>
+                        <ListItemText primary="Trending" />
+                    </ListItemButton>
+                </ListItem>
             </List>
             <Divider />
             <List>

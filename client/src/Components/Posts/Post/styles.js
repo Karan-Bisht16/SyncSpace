@@ -36,7 +36,7 @@ const styles = () => ({
         borderRadius: "16px",
         objectFit: "contain",
         overflow: "hidden",
-        width: "100%"
+        width: "100%",
     },
     carouselImageItem: { objectFit: "scale-down", height: "100%", textAlign: "center" },
     carouselMiscItem: { objectFit: "scale-down", width: "100%", lineHeight: "75px", height: "50px" },

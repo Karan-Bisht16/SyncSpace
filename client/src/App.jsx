@@ -16,13 +16,14 @@ import Header from "./Components/Header/Header";
 import useFetchUser from "./utils/useFetchUser";
 // Importing all webpages
 import Home from "./pages/Home/Home";
-import CreatePost from "./pages/CreatePost/CreatePost";
-import EditPost from "./pages/EditPost/EditPost";
+import Trending from "./pages/Trending/Trending";
 import PostContainer from "./pages/PostContainer/PostContainer";
-import CreateSubspace from "./pages/CreateSubspace/CreateSubspace";
-import UpdateSubspace from "./pages/UpdateSubspace/UpdateSubspace";
 import Subspace from "./pages/Subspace/Subspace";
 import Profile from "./pages/Profile/Profile";
+import CreatePost from "./pages/CreatePost/CreatePost";
+import EditPost from "./pages/EditPost/EditPost";
+import CreateSubspace from "./pages/CreateSubspace/CreateSubspace";
+import UpdateSubspace from "./pages/UpdateSubspace/UpdateSubspace";
 import Settings from "./pages/Settings/Settings";
 import Authentication from "./pages/Authentication/Authentication";
 import PageNotFound from "./pages/PageNotFound/PageNotFound";
@@ -57,6 +58,10 @@ function App() {
                     <Header user={user} snackbar={[setSnackbarValue, setSnackbarState]} />
                     <Routes>
                         <Route exact path="/" element={<Home user={user} />} />
+                        <Route path="/Trending" element={<Trending user={user} />} />
+                        <Route path="/post/:id" element={<PostContainer user={user} />} />
+                        <Route path="/ss/:subspaceName" element={<Subspace user={user} />} />
+                        <Route path="/e/:userName" element={<Profile user={user} />} />
                         <Route
                             path="/create-post"
                             element={<ProtectedRoute Component={CreatePost} user={user} />}
@@ -64,10 +69,6 @@ function App() {
                         <Route
                             path="/edit-post/:id"
                             element={<ProtectedRoute Component={EditPost} user={user} />}
-                        />
-                        <Route
-                            path="/post/:id"
-                            element={<PostContainer user={user} />}
                         />
                         <Route
                             path="/create-subspace"
@@ -78,16 +79,8 @@ function App() {
                             element={<ProtectedRoute Component={UpdateSubspace} user={user} />}
                         />
                         <Route
-                            path="/ss/:subspaceName"
-                            element={<Subspace user={user} />}
-                        />
-                        <Route
                             path="/authentication"
                             element={<GuestRoute Component={Authentication} user={user} />}
-                        />
-                        <Route
-                            path="/e/:userName"
-                            element={<Profile user={user} />}
                         />
                         <Route
                             path="/settings"

@@ -76,7 +76,7 @@ const createGoogleUser = async (req, res) => {
 const signUp = async (req, res) => {
     try {
         const { userName, userEmail, userPassword } = req.body;
-        const isUserNameUnique = await User.findOne({ name: userName });
+        const isUserNameUnique = await User.findOne({ name: userName.replace(/ /g, "-") });
         if (isUserNameUnique) {
             res.status(400).json({ message: "Username not available" });
         } else {
@@ -149,7 +149,7 @@ const changePassword = async (req, res) => {
             if (await bcrypt.compare(currentPassword, existingUser.password)) {
                 const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
                 await User.findByIdAndUpdate(existingUser._id, { password: hashedPassword });
-                res.status(200);
+                res.sendStatus(200);
             } else {
                 res.status(409).json({ message: "Provided password is incorrect" });
             }

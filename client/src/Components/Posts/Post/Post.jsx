@@ -8,13 +8,12 @@ import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 import parse from "html-react-parser";
 // Importing my components
-import ConfirmationDialog from "../../ConfirmationDialog/ConfirmationDialog";
 import { formatDate, formatTime } from "../../../utils/functions";
 import BodyFooter from "./BodyFooter/BodyFooter";
 // Importing actions
 import { ConfirmationDialogContext, SnackBarContext } from "../../../store/index";
 // Importing actions
-import { deletePost, isPostLiked, likePost } from "../../../actions/post";
+import { isPostLiked, likePost } from "../../../actions/post";
 // Importing styling
 import styles from "./styles";
 
@@ -22,7 +21,7 @@ function Post(props) {
     const { post, individual, redirect } = props;
     const { _id, authorId, authorDetails, subspaceDetails, dateCreated, title, body, selectedFile, likesCount, commentsCount, edited } = post;
     const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
-    const { dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar } = useContext(ConfirmationDialogContext);
+    const { openDialog } = useContext(ConfirmationDialogContext);
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -112,26 +111,18 @@ function Post(props) {
             navigate("/authentication");
         }
     }
-    async function handleDelete() {
+    function handleDelete() {
         handleCloseMenu();
-        openDialog({ title: "Delete post", message: "This action is irreversible", cancelBtnText: "Cancel", submitBtnText: "Delete", type: "error" });
-    }
-    async function handleDialog() {
-        setLinearProgressBar(true);
-        try {
-            const { status, result } = await dispatch(deletePost({ postId: post._id }));
-            closeDialog();
-            if (status === 200) {
-                navigate("/", { state: { message: "Post deleted.", status: "success" } });
-            } else {
-                setSnackbarValue({ message: result.message, status: "error" });
-                setSnackbarState(true);
-            }
-        } catch (error) {
-            closeDialog();
-            setSnackbarValue({ message: error.message, status: "error" });
-            setSnackbarState(true);
-        }
+        openDialog({
+            title: "Delete post",
+            message:
+                <span>
+                    This action is irreversible.
+                    <br /><br />
+                    Are you sure you want to proceed?
+                </span>,
+            cancelBtnText: "Cancel", submitBtnText: "Delete", type: "error"
+        });
     }
 
     return (
@@ -140,16 +131,16 @@ function Post(props) {
                 <Box sx={classes.subContainer}>
                     <Box sx={classes.postHeader}>
                         <Box sx={classes.avatarContainer}>
-                            <Avatar sx={classes.avatar} alt="Subspace avatar" src={subspaceDetails.avatar}>
-                                {subspaceDetails.subspaceName.charAt(0)}
+                            <Avatar sx={classes.avatar} alt="Subspace avatar" src={subspaceDetails?.avatar}>
+                                {subspaceDetails?.subspaceName?.charAt(0)}
                             </Avatar>
                         </Box>
                         <Box sx={classes.postHeaderDetails}>
-                            {subspaceDetails.isDeleted ?
+                            {subspaceDetails?.isDeleted ?
                                 <Typography sx={classes.postSubspace}><span style={classes.headerText}>ss/</span>[Deleted]</Typography>
                                 :
-                                <Typography sx={classes.postSubspace} onClick={() => handleSubspaceClick(subspaceDetails.subspaceName)}>
-                                    <span style={classes.headerText}>ss/</span>{subspaceDetails.subspaceName}
+                                <Typography sx={classes.postSubspace} onClick={() => handleSubspaceClick(subspaceDetails?.subspaceName)}>
+                                    <span style={classes.headerText}>ss/</span>{subspaceDetails?.subspaceName}
                                 </Typography>
                             }
                             <FiberManualRecordTwoTone sx={{ fontSize: "8px" }} />
@@ -173,7 +164,7 @@ function Post(props) {
                 </>
                 :
                 <>
-                    {selectedFile.length > 1 ?
+                    {selectedFile && selectedFile?.length > 1 ?
                         <Box sx={classes.fileContainer}>
                             <Carousel slide={false} interval={null} activeIndex={index} onSelect={handleSelect} style={classes.imageContainer}>
                                 {selectedFile.map((file, index) =>
@@ -279,7 +270,6 @@ function Post(props) {
                     </Box>
                 }
             </Box>
-            <ConfirmationDialog dialog={dialog} closeDialog={closeDialog} handleDialog={handleDialog} linearProgressBar={linearProgressBar} dialogValue={dialogValue} />
         </Grid >
     );
 }

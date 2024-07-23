@@ -50,7 +50,11 @@ const fetchPostInfo = async (req, res) => {
                     },
                 },
             ]);
-            res.status(200).json(post[0]);
+            if (post.length === 0) {
+                res.status(404).json({ message: "No post found" });
+            } else {
+                res.status(200).json(post[0]);
+            }
         } catch (BSONError) {
             res.status(404).json({ message: "No post found" });
         }
@@ -160,6 +164,54 @@ const fetchPosts = async (req, res) => {
                 },
             ]);
             total = await Like.countDocuments(searchQuery);
+        } else if (customParams === "TRENDING_PAGE") {
+            posts = await Post.aggregate([
+                {
+                    $addFields: {
+                        metric: { $sum: ["$likesCount", "$commentsCount"] },
+                    },
+                },
+                { $sort: { metric: -1 } },
+                { $skip: Number(startIndex) },
+                { $limit: Number(LIMIT) },
+                {
+                    $lookup: {
+                        from: "subspaces",
+                        localField: "subspaceId",
+                        foreignField: "_id",
+                        as: "subspaceDetails",
+                    },
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "authorId",
+                        foreignField: "_id",
+                        as: "authorDetails",
+                    },
+                },
+                { $unwind: "$subspaceDetails" },
+                { $unwind: "$authorDetails" },
+                {
+                    $project: {
+                        title: 1,
+                        body: 1,
+                        selectedFile: 1,
+                        authorId: 1,
+                        subspaceId: 1,
+                        dateCreated: 1,
+                        likesCount: 1,
+                        commentsCount: 1,
+                        edited: 1,
+                        "subspaceDetails.avatar": 1,
+                        "subspaceDetails.subspaceName": 1,
+                        "subspaceDetails.isDeleted": 1,
+                        "authorDetails.userName": 1,
+                        "authorDetails.isDeleted": 1,
+                    },
+                },
+            ]);
+            total = await Post.countDocuments({});
         } else if (searchQuery.subspaceId) {
             posts = await Post.aggregate([
                 { $match: { subspaceId: new ObjectId(searchQuery.subspaceId) } },
@@ -327,7 +379,7 @@ const deletePost = async (req, res) => {
         const { postId } = req.query;
         const post = await Post.findByIdAndDelete(postId);
         await User.findOneAndUpdate({ email: email }, { $inc: { postsCount: -1 } });
-        await Subspace.findOneAndUpdate({ subspaceName: post.subspaceName }, { $inc: { postsCount: -1 } });
+        await Subspace.findByIdAndUpdate(post.subspaceId, { $inc: { postsCount: -1 } });
         res.sendStatus(200);
     } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }

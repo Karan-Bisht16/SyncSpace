@@ -155,13 +155,13 @@ function PostForm(props) {
         openDialog({
             title: "Confirm Post",
             message:
-                <div>
+                <span>
                     Are you sure you want to post this content?
                     Please review your post to ensure it is free of any sensitive or personal information.
                     Once posted, it can be viewed by all members of the subspace.
                     <br /><br />
                     Proceed?
-                </div>,
+                </span>,
             cancelBtnText: "Cancel", submitBtnText: "Post"
         });
     }

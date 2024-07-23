@@ -14,8 +14,8 @@ import styles from "./styles";
 
 function Settings(props) {
     const { user } = props;
-    const [setSnackbarValue, setSnackbarState] = useContext(SnackBarContext);
-    const [dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar] = useContext(ConfirmationDialogContext);
+    const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
+    const { dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar } = useContext(ConfirmationDialogContext);
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -78,12 +78,12 @@ function Settings(props) {
         openDialog({
             title: "Change Password",
             message:
-                <div>
+                <span>
                     Are you sure you want to change your password?
                     Please ensure your new password is strong and memorable.
                     <br /><br />
                     Proceed?
-                </div>,
+                </span>,
             cancelBtnText: "Cancel", submitBtnText: "Change"
         });
     }
@@ -121,12 +121,12 @@ function Settings(props) {
         openDialog({
             title: "Delete Profile",
             message:
-                <div>
+                <span>
                     This action is irreversible. Once deleted, you will not be able to create a new profile with the same name (i.e., e/<b>{user.userName}</b>).
                     If you intend to delete this profile only to recreate it, please consider using the 'Edit Profile' option instead.
                     <br /><br />
                     Are you sure you want to proceed?
-                </div>,
+                </span>,
             cancelBtnText: "Cancel", submitBtnText: "Delete", type: "error"
         });
     }
