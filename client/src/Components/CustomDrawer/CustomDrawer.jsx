@@ -10,7 +10,7 @@ import { ReRenderContext } from "../../store";
 // Importing styling
 import styles from "./styles";
 // Importing images
-import SyncSpaceLogo from "../../assets/img-syncspace-logo.avif";
+import SyncSpaceLogo from "../../assets/img-syncspace-logo.png";
 
 function CustomDrawer(props) {
     const { user, handleDrawerClose } = props;

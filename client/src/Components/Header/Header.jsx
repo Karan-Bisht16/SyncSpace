@@ -13,7 +13,7 @@ import { logoutUser } from "../../actions/user";
 // Importing styling
 import styles from "./styles";
 // Importing images
-import SyncSpaceLogo from "../../assets/img-syncspace-logo.avif";
+import SyncSpaceLogo from "../../assets/img-syncspace-logo.png";
 
 function Header(props) {
     const { user } = props;
