@@ -9,7 +9,7 @@ router.get("/", fetchComments);
 router.post("/create", auth, createComment);
 router.delete("/delete", auth, deleteComment);
 
-router.get("/reply/", auth, fetchReplies);
+router.get("/reply/", fetchReplies);
 router.post("/reply/create", auth, createReply);
 
 export default router;

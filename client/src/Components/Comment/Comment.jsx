@@ -44,7 +44,8 @@ function Comment(props) {
     }
     const [openReply, setOpenReply] = useState(false);
     function handleOpenReply() {
-        setOpenReply(true);
+        if (user) { setOpenReply(true) }
+        else { navigate("/authentication") }
     }
     const [reply, setReply] = useState("");
     function handleReplyChange(event) {
