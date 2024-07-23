@@ -22,7 +22,7 @@ import connection from "./database.js";
 connection();
 
 const corsOptions = {
-    origin: process.env.FRONT_END_DOMAIN, 
+    origin: true, 
     credentials: true,
     optionsSuccessStatus: 200,
 }
