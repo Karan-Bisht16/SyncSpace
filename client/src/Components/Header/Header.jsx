@@ -3,6 +3,7 @@ import { AppBar, Typography, Button, Box, Drawer, Toolbar, IconButton, CssBaseli
 import { Menu, Add } from "@mui/icons-material";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { Analytics } from "@vercel/analytics/react";
 // Importing my components
 import CustomDrawer from "../CustomDrawer/CustomDrawer";
 import ToolBar from "../ToolBar/ToolBar";
@@ -146,6 +147,7 @@ function Header(props) {
                     <Toolbar />
                 </Box>
             </Box>
+            <Analytics />
         </>
     );
 }
