@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Analytics } from "@vercel/analytics/react"
 import { square } from "ldrs";
 // Importing my components
 import SnackBar from "./Components/SnackBar/SnackBar";
@@ -89,6 +90,7 @@ function App() {
                         <Route path="*" element={<PageNotFound />} />
                     </Routes>
                 </Router>
+                <Analytics />
                 <SnackBar
                     openSnackbar={snackbarState} handleClose={handleSnackbarState} timeOut={5000}
                     message={snackbarValue.message} type={snackbarValue.status}
