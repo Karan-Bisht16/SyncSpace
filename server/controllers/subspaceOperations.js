@@ -9,9 +9,40 @@ const LIMIT = process.env.SUBSPACES_LIMIT || 4;
 const fetchSubspaceInfo = async (req, res) => {
     try {
         const { subspaceName } = req.query;
-        const subspace = await Subspace.findOne({ subspaceName: subspaceName });
-        if (subspace) { res.status(200).json(subspace) }
-        else { res.status(404).json({ message: "No subspace found." }) }
+        const subspace = await Subspace.aggregate([
+            { $match: { subspaceName: subspaceName } },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "creator",
+                    foreignField: "_id",
+                    as: "creatorDetails"
+                }
+            },
+            { $unwind: "$creatorDetails" },
+            {
+                $project: {
+                    name: 1,
+                    subspaceName: 1,
+                    membersCount: 1,
+                    description: 1,
+                    avatar: 1,
+                    postsCount: 1,
+                    dateCreated: 1,
+                    topics: 1,
+                    isDeleted: 1,
+                    creator: 1,
+                    "creatorDetails.userName": 1,
+                    "creatorDetails.name": 1,
+                    "creatorDetails.isDeleted": 1,
+                }
+            }
+        ]);
+        if (subspace.length === 0) {
+            res.status(404).json({ message: "No subspace found." });
+        } else {
+            res.status(200).json(subspace[0]);
+        }
     } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 

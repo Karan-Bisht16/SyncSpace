@@ -1,7 +1,7 @@
 // Styling for UserPostBlock.jsx 
 const styles = () => ({
     secondaryLoadingScreenStyling: {
-        height: "100%",
+        height: { xs: "240px", sm: "460px" },
         display: "flex",
         justifyContent: "center",
         alignItems: "center",

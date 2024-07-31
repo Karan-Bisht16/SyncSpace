@@ -32,7 +32,7 @@ function RealTimeProfileViwer(props) {
                 <Typography sx={classes.gridItemTitle}>Explorer since</Typography>
             </Box>
             <Grid container>
-                {gridItemContainer(5, user.postsCount, "Record", "Records")}
+                {gridItemContainer(5, user.postsCount, "Post", "Posts")}
                 {gridItemContainer(2, "", "")}
                 {gridItemContainer(5, user.credits, "Celestial Credit", "Celestial Credits")}
                 {gridItemContainer(12, user.subspacesJoined, "Subspace joined", "Subspaces joined")}

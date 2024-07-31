@@ -1,16 +1,21 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import { Avatar, Box, Button, Grid, IconButton, LinearProgress, ListItemIcon, Menu, MenuItem, Typography } from "@mui/material";
+import { Avatar, Box, Button, Grid, IconButton, LinearProgress, ListItemIcon, Menu, MenuItem, Tab, Tabs, Typography } from "@mui/material";
 import { DeleteTwoTone, EditNoteRounded, MoreVert } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Player } from "@lordicon/react";
 import { lineSpinner } from "ldrs";
+// Importing my components
 import ConfirmationDialog from "../../Components/ConfirmationDialog/ConfirmationDialog";
-import NotFound from "../../Components/NotFound/NotFound";
+import SubspaceProfileBar from "./SubspaceProfileBar/SubspaceProfileBar";
 import { formatMembersCount } from "../../utils/functions";
+import NotFound from "../../Components/NotFound/NotFound";
 import Posts from "../../Components/Posts/Posts";
+// Importing contexts
 import { ReRenderContext, ConfirmationDialogContext, SnackBarContext } from "../../store";
+// Importing actions
 import { fetchSubspaceInfo, joinSubspace, deleteSubspace, isSubspaceJoined } from "../../actions/subspace";
+// Importing styling
 import styles from "./styles";
 
 function Subspace(props) {
@@ -84,6 +89,11 @@ function Subspace(props) {
     };
     function handleMenuClose() {
         setAnchorEl(null);
+    };
+    // Tab Change
+    const [tabIndex, setTabIndex] = useState(0);
+    function handleTabChange(event, newTabIndex) {
+        setTabIndex(newTabIndex);
     };
     function handleCreate() {
         if (!user) {
@@ -188,7 +198,6 @@ function Subspace(props) {
                                                 <Box>
                                                     <Typography sx={classes.subspaceTitle}>{subspaceData.name}</Typography>
                                                     <Typography sx={classes.subspaceName}><span style={classes.subspaceString}>ss/</span>{subspaceData.name.replace(/ /g, "-")}</Typography>
-                                                    <Typography sx={classes.subspaceDescription}>{subspaceData.description}</Typography>
                                                 </Box>
                                             </Box>
                                             {canModifySubspace &&
@@ -249,38 +258,50 @@ function Subspace(props) {
                                                 >+</Button>
                                             </Box>
                                         </Box>
-                                        {secondaryLoading ?
-                                            <Box sx={classes.secondaryLoadingScreenStyling}>
-                                                <l-loader size="75" speed="1.75" color="#0090c1" />
-                                            </Box>
+                                        <Box sx={{ marginLeft: "16px" }}>
+                                            <Tabs value={tabIndex} onChange={handleTabChange}>
+                                                <Tab label="About" />
+                                                <Tab label="Posts" />
+                                            </Tabs>
+                                        </Box>
+                                        {tabIndex === 0 ?
+                                            <SubspaceProfileBar user={user} classes={classes} subspaceData={subspaceData} />
                                             :
                                             <>
-                                                {subspacePostsCount === 0 ?
-                                                    <Box sx={classes.noContentContainer}>
-                                                        <>
-                                                            {joined ?
-                                                                <NotFound
-                                                                    mainText="No post in this subspace"
-                                                                    link={{ linkText: "Create one", to: "/create-post", state: { subspaceName, subspaceId: subspaceData?._id } }}
-                                                                />
-                                                                :
-                                                                <Box sx={{ textAlign: "center" }}>
-                                                                    <NotFound
-                                                                        mainText="No post in this subspace"
-                                                                        link={false}
-                                                                    />
-                                                                    <Typography sx={classes.link} onClick={handleCreate}>Create one</Typography>
-                                                                </Box>
-                                                            }
-                                                        </>
+                                                {secondaryLoading ?
+                                                    <Box sx={classes.secondaryLoadingScreenStyling}>
+                                                        <l-loader size="75" speed="1.75" color="#0090c1" />
                                                     </Box>
                                                     :
-                                                    <Box sx={classes.subspacePostContainer}>
-                                                        <Posts
-                                                            key={reRenderSubspacePosts}
-                                                            searchQuery={{ subspaceId: reRenderSubspacePosts }}
-                                                        />
-                                                    </Box>
+                                                    <>
+                                                        {subspacePostsCount === 0 ?
+                                                            <Box sx={classes.noContentContainer}>
+                                                                <>
+                                                                    {joined ?
+                                                                        <NotFound
+                                                                            mainText="No post in this subspace"
+                                                                            link={{ linkText: "Create one", to: "/create-post", state: { subspaceName, subspaceId: subspaceData?._id } }}
+                                                                        />
+                                                                        :
+                                                                        <Box sx={{ textAlign: "center" }}>
+                                                                            <NotFound
+                                                                                mainText="No post in this subspace"
+                                                                                link={false}
+                                                                            />
+                                                                            <Typography sx={classes.link} onClick={handleCreate}>Create one</Typography>
+                                                                        </Box>
+                                                                    }
+                                                                </>
+                                                            </Box>
+                                                            :
+                                                            <Box sx={classes.subspacePostContainer}>
+                                                                <Posts
+                                                                    key={reRenderSubspacePosts}
+                                                                    searchQuery={{ subspaceId: reRenderSubspacePosts }}
+                                                                />
+                                                            </Box>
+                                                        }
+                                                    </>
                                                 }
                                             </>
                                         }

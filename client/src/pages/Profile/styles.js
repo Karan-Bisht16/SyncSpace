@@ -4,7 +4,7 @@ const styles = () => ({
     mainContainer: { width: { xs: "100%", md: "65%", lg: "75%" }, margin: "0 auto", padding: { xs: "4px", md: "32px 16px" } },
     flexContainer: { display: "flex" },
     heading: { display: "flex", justifyContent: "space-between", alignItems: "center" },
-    userContainer: { display: "flex", gap: "15px", alignItems: "center", margin: { xs: "16px 16px", md: "16px 0" } },
+    userContainer: { display: "flex", gap: "15px", alignItems: "center", margin: { xs: "12px", md: "16px 0" } },
     userAvatar: { width: { xs: "50px", sm: "75px" }, height: { xs: "50px", sm: "75px" }, fontSize: { xs: "24px", sm: "45px" } },
     userName: { fontWeight: "normal", fontSize: { xs: "18px", sm: "32px" }, margin: "0", overflow: "hide" },
     editProfileBtn: {
@@ -12,7 +12,7 @@ const styles = () => ({
         padding: "8px 24px",
         borderRadius: "24px",
         bgcolor: "button.tertiary",
-        marginRight: { xs: "16px", md: "0" },
+        marginRight: { xs: "12px", md: "0" },
         color: "white",
         boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
         "&:hover": {

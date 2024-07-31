@@ -23,7 +23,7 @@ function ProfileBar(props) {
         return (
             <Grid item xs={size}>
                 <Box sx={classes.gridItemBox}>
-                    {value === 0 ? <Typography>{value}</Typography> : <Typography>{value || "Loading..."}</Typography>}
+                    {value === 0 ? <Typography sx={classes.gridItemValue}>{value}</Typography> : <Typography sx={classes.gridItemValue}>{value || "Loading..."}</Typography>}
                     <Typography sx={classes.gridItemTitle}>{value === 1 ? singularTitle : pluralTitle}</Typography>
                 </Box>
             </Grid>
@@ -43,11 +43,11 @@ function ProfileBar(props) {
                 </Tooltip>
             </Box>
             <Box sx={classes.gridItemBox}>
-                <Typography>{formatDate(user.dateJoined)}</Typography>
+                <Typography sx={{ fontSize: "16px" }}>{formatDate(user.dateJoined)}</Typography>
                 <Typography sx={classes.gridItemTitle}>Explorer since</Typography>
             </Box>
             <Grid container>
-                {gridItemContainer(5, user.postsCount, "Record", "Records")}
+                {gridItemContainer(5, user.postsCount, "Post", "Posts")}
                 {gridItemContainer(2, " ", "")}
                 {gridItemContainer(5, user.credits, "Celestial Credit", "Celestial Credits")}
                 {gridItemContainer(12, user.subspacesJoined, "Subspace joined", "Subspaces joined")}
