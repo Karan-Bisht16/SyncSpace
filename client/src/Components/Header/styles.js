@@ -1,18 +1,17 @@
 // Styling for Header.jsx
 const styles = () => ({
     appBar: {
-        height: "75px",
+        height: { xs: "55px", sm: "75px" },
         display: "flex",
         flexDirection: "row",
-        gap: "15px",
         justifyContent: "space-between",
         alignItems: "center",
-        padding: "16px 16px 16px 8px",
+        padding: { xs: "0 8px 0 0", sm: "16px 16px 16px 0px" },
         bgcolor: "background.primary",
         zIndex: { xs: "1199", md: "1201" },
     },
     flexContainer: { display: "flex", alignItems: "center" },
-    sideBar: { display: { sm: "flex", md: "none" }, paddingRight: "12px" },
+    sideBar: { display: { sm: "flex", md: "none" }, paddingRight: { xs: "0", sm: "12px" } },
     logo: { width: "45px", height: "45px", borderRadius: "50%" },
     titleComponent: {
         display: "flex",

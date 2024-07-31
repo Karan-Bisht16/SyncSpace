@@ -55,7 +55,7 @@ function ProfileBar(props) {
             <br />
             <Divider />
             <Box sx={classes.bioContainer}>{user.bio}</Box>
-            <Typography sx={{ fontSize: "12px", paddingTop: "4px" }}>Bio</Typography>
+            <Typography sx={{ fontSize: "12px", padding: "4px 0 8px 0" }}>Bio</Typography>
         </Grid >
     )
 }

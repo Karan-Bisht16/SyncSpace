@@ -194,7 +194,7 @@ function Subspace(props) {
                                             {canModifySubspace &&
                                                 <>
                                                     <Box>
-                                                        <IconButton onClick={handleMenuOpen}><MoreVert /></IconButton>
+                                                        <IconButton sx={{ padding: "0" }} onClick={handleMenuOpen}><MoreVert /></IconButton>
                                                         <Menu
                                                             id="basic-menu"
                                                             anchorEl={anchorEl}

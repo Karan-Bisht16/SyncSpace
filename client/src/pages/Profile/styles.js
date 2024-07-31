@@ -1,7 +1,7 @@
 // Styling for Profile.jsx 
 const styles = () => ({
     leftContainer: { height: { xs: "0", md: "80vh" }, minWidth: { xs: "0", md: "275px" } },
-    mainContainer: { width: { xs: "100%", md: "65%", lg: "75%" }, margin: "0 auto", padding: { xs: "32px 8px", md: "32px 16px" } },
+    mainContainer: { width: { xs: "100%", md: "65%", lg: "75%" }, margin: "0 auto", padding: { xs: "4px", md: "32px 16px" } },
     flexContainer: { display: "flex" },
     heading: { display: "flex", justifyContent: "space-between", alignItems: "center" },
     userContainer: { display: "flex", gap: "15px", alignItems: "center", margin: { xs: "16px 16px", md: "16px 0" } },
@@ -31,7 +31,7 @@ const styles = () => ({
         boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
     },
     profileDeletedContainer: { display: "flex", justifyContent: "center", marginTop: "15vh" },
-    primaryLoadingScreenStyling: { height: "80vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" },
+    primaryLoadingScreenStyling: { height: "80vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" },
     titleFont: { fontSize: { xs: "24px", md: "36px" } },
     progressBar: { width: { xs: "80%", md: "500px" }, color: "#0090c1", marginTop: "7.5px" },
     titleField: { marginBottom: "4px" },

@@ -1,7 +1,7 @@
 // Styling for Comment.jsx
 const styles = () => ({
     avatarContainer: { display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" },
-    avatar: { height: { xs: "25px", md: "40px" }, width: { xs: "25px", md: "40px" }, marginTop: "8px" },
+    avatar: { height: { xs: "24px", md: "40px" }, width: { xs: "24px", md: "40px" }, marginTop: "8px" },
     userDetailsContainer: { display: "flex", gap: "8px", alignItems: "center" },
     replyContainer: { display: "flex", gap: "16px", alignItems: "center", margin: "0 8px" },
     replyCancelBtn: {

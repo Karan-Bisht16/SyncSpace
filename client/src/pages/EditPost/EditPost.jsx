@@ -79,7 +79,7 @@ function EditPost(props) {
                             <>
                                 <TextField
                                     readOnly disabled id="standard-basic" label={previousSubspace} variant="standard"
-                                    sx={{ width: 300 }}
+                                    sx={{ width: "300px", padding: "4px 0 8px 0" }}
                                 />
                                 <PostForm
                                     user={user} predefinedTabIndex={predefinedTabIndex} type="Edit"

@@ -257,11 +257,12 @@ function SubspaceForm(props) {
             <Grid container>
                 <Grid item xs={12} lg={8.75}>
                     <Box>
-                        {(activeStep === 0 || activeStep === 1) &&
-                            <Typography variant="h4" sx={{ marginBottom: { xs: "241px", lg: "24px" } }}>{type} Subspace</Typography>
-                        }
-                        {(activeStep === 2) &&
-                            <Typography variant="h4" sx={{ marginBottom: { xs: "24px", sm: "241px", lg: "24px" } }}>{type} Subspace</Typography>
+                        {(activeStep === 0) &&
+                            <Typography variant="h4" sx={{ marginBottom: { xs: "180px", lg: "24px" } }}>{type} Subspace</Typography>
+                        } {(activeStep === 1) &&
+                            <Typography variant="h4" sx={{ marginBottom: { xs: "190px", lg: "24px" } }}>{type} Subspace</Typography>
+                        } {(activeStep === 2) &&
+                            <Typography variant="h4" sx={{ marginBottom: { xs: "12px", sm: "281px", lg: "24px" } }}>{type} Subspace</Typography>
                         }
                         <form noValidate onSubmit={handleSubmit}>
                             {(activeStep === 0) &&

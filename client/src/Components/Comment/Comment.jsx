@@ -105,15 +105,15 @@ function Comment(props) {
     return (
         <>
             <Box sx={{ marginLeft: { xs: `${updatedIntendation * 32}px`, md: `${updatedIntendation * 48}px` } }}>
-                <Box sx={{ display: "flex", gap: "12px", alignItems: "top", marginTop: parentId === null ? "16px" : "8px" }}>
+                <Box sx={{ display: "flex", gap: "12px", alignItems: "top", marginTop: parentId === null ? "8px" : "4px" }}>
                     <Box sx={classes.avatarContainer}>
                         <Avatar src={avatar} sx={classes.avatar}>{userName.charAt(0)}</Avatar>
                         {(repliesCount > 0) &&
                             <>
                                 {hideReplies ?
-                                    <AddCircleOutline sx={classes.icon} onClick={toggleHideReplies} />
+                                    <AddCircleOutline sx={{ ...classes.icon, fontSize: { xs: "12px", sm: "24px" } }} onClick={toggleHideReplies} />
                                     :
-                                    <RemoveCircleOutline sx={classes.icon} onClick={toggleHideReplies} />
+                                    <RemoveCircleOutline sx={{ ...classes.icon, fontSize: { xs: "12px", sm: "24px" } }} onClick={toggleHideReplies} />
                                 }
                             </>
                         }
@@ -121,18 +121,18 @@ function Comment(props) {
                     <Box>
                         <Box sx={classes.userDetailsContainer}>
                             {userDetails.isDeleted ?
-                                <span style={{ fontSize: "16px" }}><span style={{ fontSize: "12px" }}>e/</span>[Deleted]</span>
+                                <span style={{ fontSize: "14px" }}><span style={{ fontSize: "12px" }}>e/</span>[Deleted]</span>
                                 :
-                                <span style={{ cursor: "pointer", fontWeight: "bold" }} onClick={() => navigate(`/e/${userName}`)}>
+                                <span style={{ fontSize: "14px", cursor: "pointer", fontWeight: "bold" }} onClick={() => navigate(`/e/${userName}`)}>
                                     <span style={{ fontSize: "13px" }}>e/</span>{userName}
                                 </span>
                             }
-                            <Typography sx={{ fontSize: "14px" }}>{formatTime(createdAt)} ago </Typography>
+                            <Typography sx={{ fontSize: "12px" }}>{formatTime(createdAt)} ago </Typography>
                             {user && userId === authorId &&
-                                <Typography sx={{ fontSize: "14px", color: "#0090c1" }}> author</Typography>
+                                <Typography sx={{ fontSize: "12px", color: "#0090c1" }}> author</Typography>
                             }
                         </Box>
-                        <Typography sx={{ wordBreak: "break-word", whiteSpace: "pre-line" }}>{comment}</Typography>
+                        <Typography sx={{ fontSize: "14px", wordBreak: "break-word", whiteSpace: "pre-line" }}>{comment}</Typography>
                         <Box sx={classes.replyContainer}>
                             {openReply ?
                                 <Box sx={{ width: "100%" }}>

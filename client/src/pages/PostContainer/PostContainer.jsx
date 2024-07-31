@@ -29,7 +29,7 @@ function PostContainer(props) {
     lineSpinner.register("l-loader");
 
     const [redirect, setRedirect] = useState(true);
-    const [primaryLoading, setPrimaryLoading] = useState(true);
+    const [primaryLoading, setPrimaryLoading] = useState((location?.state === null) ? true : false);
     const [secondaryLoading, setSecondaryLoading] = useState(true);
     const [noPostFound, setNoPostFound] = useState(false);
     const [comments, setComments] = useState([]);

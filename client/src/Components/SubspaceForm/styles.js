@@ -32,8 +32,8 @@ const styles = () => ({
             position: "absolute",
         },
     },
-    selectedChipContainer: { bgcolor: "background.secondary", borderRadius: "16px", padding: "4px 16px", maxHeight: "15vh", overflow: "scroll" },
-    selectedChipContainerArray: { padding: "12px 0", display: "flex", flexWrap: "wrap", gap: "5px" },
+    selectedChipContainer: { bgcolor: "background.secondary", borderRadius: "16px", padding: "4px 8px", maxHeight: "15vh", overflow: "scroll" },
+    selectedChipContainerArray: { padding: "2px 0", display: "flex", flexWrap: "wrap", gap: "5px" },
     chipContainer: { display: "flex", justifyContent: "start", flexWrap: "wrap", gap: "5px", maxHeight: "25vh", overflow: "scroll" },
     chipDivider: { height: "2px", width: "100%", flexBasis: "100%", margin: "4px 0" }
 });

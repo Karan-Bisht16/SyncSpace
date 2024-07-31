@@ -72,6 +72,9 @@ function Posts(props) {
             >
                 {queryData.pages.map((page, index) => (
                     <div key={index}>
+                        {page?.message &&
+                            <Box sx={classes.postMessageContainer}>{page?.message}</Box>
+                        }
                         {page?.results?.map((item, index) => (
                             <Post key={index} post={item} />
                         ))}

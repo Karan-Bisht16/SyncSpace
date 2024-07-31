@@ -153,7 +153,7 @@ function Post(props) {
                         <IconButton sx={classes.closeBtn} onClick={handlePostClose}><CloseRounded /></IconButton>
                     }
                 </Box>
-                <Typography sx={classes.link} onClick={handlePostClick} variant="h6">{title}</Typography>
+                <Typography sx={{ ...classes.link, fontSize: { xs: "16px", sm: "18px" } }} onClick={handlePostClick}>{title}</Typography>
             </Box>
             {body ?
                 <>
