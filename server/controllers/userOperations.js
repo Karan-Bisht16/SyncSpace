@@ -12,7 +12,8 @@ const fetchUserSession = async (req, res) => {
             const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
             const user = await User.findOne({ email: email });
             if (user) {
-                res.status(200).json(createUserSession(user));
+                req.session.user = createUserSession(user);
+                res.status(200).json(req.session.user);
             } else {
                 res.status(409).json({ message: "No user for given token" });
             }

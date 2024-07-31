@@ -43,8 +43,8 @@ function Posts(props) {
     function noMoreData() {
         return (
             <Box sx={classes.noContentContainer}>
-                <Typography variant="h4">Wow! You have reached the end of it all.</Typography>
-                <Typography variant="h5">Go, touch some grass.</Typography>
+                <Typography sx={{ fontSize: { xs: "18px", sm: "32px" } }}>Wow! You have reached the end of it all.</Typography>
+                <Typography sx={{ fontSize: { xs: "16px", sm: "32px" } }}>Go, touch some grass.</Typography>
             </Box>
         );
     }

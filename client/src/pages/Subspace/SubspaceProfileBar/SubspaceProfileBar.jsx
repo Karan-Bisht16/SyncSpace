@@ -1,18 +1,20 @@
 import React, { useState, useContext } from "react";
 import { Box, Chip, Divider, Grid, IconButton, Tooltip, Typography } from "@mui/material";
 import { DoneAll, Link } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 // Importing my components
 import { formatDate } from "../../../utils/functions";
 // Importing contexts
 import { SnackBarContext } from "../../../store";
 
 function SubspaceProfileBar(props) {
-    const { user, classes, subspaceData } = props;
+    const { classes, subspaceData } = props;
     const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
+    const navigate = useNavigate();
 
     const [linkCopied, setLinkCopied] = useState(false);
     function handleLinkCopied() {
-        navigator.clipboard.writeText(process.env.REACT_APP_DOMAIN + "/e/" + user.userName)
+        navigator.clipboard.writeText(process.env.REACT_APP_DOMAIN + "/ss/" + subspaceData.subspaceName)
         setLinkCopied(true);
         setSnackbarState(true);
         setSnackbarValue({ message: "Link copied to clipboard", status: "info" });
@@ -49,7 +51,9 @@ function SubspaceProfileBar(props) {
                 {subspaceData?.creatorDetails?.isDeleted ?
                     <Typography sx={classes.gridItemValue}><span style={{ fontSize: "13px" }}>e/</span>[Deleted]</Typography>
                     :
-                    <Typography sx={classes.gridItemValue}><span style={{ fontSize: "13px" }}>e/</span>{subspaceData?.creatorDetails?.userName}</Typography>
+                    <Typography sx={classes.gridItemValue} onClick={() => navigate(`/e/${subspaceData?.creatorDetails?.userName}`)}>
+                        <span style={{ fontSize: "13px" }}>e/</span>{subspaceData?.creatorDetails?.userName}
+                    </Typography>
                 }
                 <Typography sx={classes.gridItemTitle}>Creator</Typography>
             </Box>

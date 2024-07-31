@@ -17,7 +17,7 @@ const useFetchUser = (setSnackbarValue, setSnackbarState) => {
     }, [useSelectorUser]);
 
     useEffect(() => {
-        async function fetchUser() {
+        async function fetchUserInfoFromDataBase() {
             if (!user) {
                 try {
                     const { status, result } = await dispatch(fetchUserSession());
@@ -40,7 +40,7 @@ const useFetchUser = (setSnackbarValue, setSnackbarState) => {
                 }
             }
         }
-        fetchUser();
+        fetchUserInfoFromDataBase();
     }, [dispatch, user, setSnackbarValue, setSnackbarState]);
 
     return { user, loading };

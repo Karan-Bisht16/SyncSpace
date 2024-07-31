@@ -95,6 +95,47 @@ function Subspace(props) {
     function handleTabChange(event, newTabIndex) {
         setTabIndex(newTabIndex);
     };
+    function subspacePostsContainer() {
+        return (
+            <>
+                {secondaryLoading ?
+                    <Box sx={classes.secondaryLoadingScreenStyling}>
+                        <l-loader size="75" speed="1.75" color="#0090c1" />
+                    </Box>
+                    :
+                    <>
+                        {subspacePostsCount === 0 ?
+                            <Box sx={classes.noContentContainer}>
+                                <>
+                                    {joined ?
+                                        <NotFound
+                                            mainText="No post in this subspace"
+                                            link={{ linkText: "Create one", to: "/create-post", state: { subspaceName, subspaceId: subspaceData?._id } }}
+                                        />
+                                        :
+                                        <Box sx={{ textAlign: "center" }}>
+                                            <NotFound
+                                                mainText="No post in this subspace"
+                                                link={false}
+                                            />
+                                            <Typography sx={classes.link} onClick={handleCreate}>Create one</Typography>
+                                        </Box>
+                                    }
+                                </>
+                            </Box>
+                            :
+                            <Box sx={classes.subspacePostContainer}>
+                                <Posts
+                                    key={reRenderSubspacePosts}
+                                    searchQuery={{ subspaceId: reRenderSubspacePosts }}
+                                />
+                            </Box>
+                        }
+                    </>
+                }
+            </>
+        )
+    }
     function handleCreate() {
         if (!user) {
             navigate("/authentication");
@@ -265,44 +306,15 @@ function Subspace(props) {
                                             </Tabs>
                                         </Box>
                                         {tabIndex === 0 ?
-                                            <SubspaceProfileBar user={user} classes={classes} subspaceData={subspaceData} />
+                                            <>
+                                                <SubspaceProfileBar user={user} classes={classes} subspaceData={subspaceData} />
+                                                <Box hidden>
+                                                    {subspacePostsContainer()}
+                                                </Box>
+                                            </>
                                             :
                                             <>
-                                                {secondaryLoading ?
-                                                    <Box sx={classes.secondaryLoadingScreenStyling}>
-                                                        <l-loader size="75" speed="1.75" color="#0090c1" />
-                                                    </Box>
-                                                    :
-                                                    <>
-                                                        {subspacePostsCount === 0 ?
-                                                            <Box sx={classes.noContentContainer}>
-                                                                <>
-                                                                    {joined ?
-                                                                        <NotFound
-                                                                            mainText="No post in this subspace"
-                                                                            link={{ linkText: "Create one", to: "/create-post", state: { subspaceName, subspaceId: subspaceData?._id } }}
-                                                                        />
-                                                                        :
-                                                                        <Box sx={{ textAlign: "center" }}>
-                                                                            <NotFound
-                                                                                mainText="No post in this subspace"
-                                                                                link={false}
-                                                                            />
-                                                                            <Typography sx={classes.link} onClick={handleCreate}>Create one</Typography>
-                                                                        </Box>
-                                                                    }
-                                                                </>
-                                                            </Box>
-                                                            :
-                                                            <Box sx={classes.subspacePostContainer}>
-                                                                <Posts
-                                                                    key={reRenderSubspacePosts}
-                                                                    searchQuery={{ subspaceId: reRenderSubspacePosts }}
-                                                                />
-                                                            </Box>
-                                                        }
-                                                    </>
-                                                }
+                                                {subspacePostsContainer()}
                                             </>
                                         }
                                     </>
