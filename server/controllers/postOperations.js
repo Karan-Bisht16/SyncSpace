@@ -5,7 +5,7 @@ import User from "../models/user.js";
 import Like from "../models/like.js";
 import Join from "../models/join.js";
 import Subspace from "../models/subspace.js";
-import { pagination, sortBasedOnPopularity, postDetailsExtraction, authorAndSubspaceDetails, postDataStructure, baseQuery } from "../utils/functions.js";
+import { pagination, postDetailsExtraction, authorAndSubspaceDetails, postDataStructure, baseQuery } from "../utils/functions.js";
 
 const LIMIT = process.env.POSTS_LIMIT || 2;
 
@@ -138,7 +138,7 @@ const fetchPosts = async (req, res) => {
         } else {
             res.status(200).json({ count: count, previous: currentPage - 1, next: currentPage + 1, results: posts });
         }
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
 const createPost = async (req, res) => {
@@ -183,12 +183,11 @@ const likePost = async (req, res) => {
 
 const updatePost = async (req, res) => {
     try {
-        const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
-        const user = await User.findOne({ email: email });
+        const { _id } = jwt.decode(req.headers.authorization.split(" ")[1]);
         const { postId, updatedData } = req.body;
         const tempUpdatedData = { ...updatedData, edited: true };
         const post = await Post.findById(postId);
-        if (post.authorId.equals(user._id)) {
+        if (post.authorId.equals(_id)) {
             await Post.findByIdAndUpdate(postId, tempUpdatedData);
             res.sendStatus(200);
         } else {

@@ -6,20 +6,17 @@ const auth = (req, res, next) => {
         if (!token) {
             token = req.query.token;
         }
-        const isCustomToken = token.length < 500;
         let decodedData;
         try {
-            if (token && isCustomToken) {
+            if (token) {
                 decodedData = jwt.verify(token, process.env.JWT_TOKEN_KEY);
-            } else if (token && !isCustomToken) {
-                decodedData = jwt.decode(token);
+                next();
             }
-            next();
         } catch (error) {
-            res.status(409).json({ message: "Invalid token credentials." })
+            res.status(409).json({ message: "Invalid token credentials." });
         }
     } catch (error) {
-        res.status(404).json({ message: "No token found." })
+        res.sendStatus(404);
     }
 }
 

@@ -1,11 +1,10 @@
-function createUserSession(user) {
+function condenseUserInfo(user) {
     const userSessionObj = {
         _id: user._id,
         name: user.name,
         userName: user.userName,
         email: user.email,
         avatar: user.avatar ? user.avatar : "",
-        subspacesJoined: user.subspacesJoined,
     };
     return userSessionObj;
 }
@@ -71,4 +70,4 @@ const baseQuery = (startIndex, LIMIT) => {
     ]
 };
 
-export { createUserSession, pagination, sortBasedOnPopularity, postDetailsExtraction, authorAndSubspaceDetails, postDataStructure, baseQuery };
+export { condenseUserInfo, pagination, sortBasedOnPopularity, postDetailsExtraction, authorAndSubspaceDetails, postDataStructure, baseQuery };

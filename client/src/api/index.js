@@ -17,7 +17,6 @@ export const getGoogleUser = (token) => API.get("/user/getGoogleUser", { params:
 export const createGoogleUser = (token) => API.get("/user/createGoogleUser", { params: token });
 export const signUp = (authData) => API.post("/user/signUp", authData);
 export const signIn = (authData) => API.post("/user/signIn", authData);
-export const logout = () => API.delete("/user/logout");
 export const updateProfile = (formData) => API.patch("/user/updateProfile", formData);
 export const changePassword = (formData) => API.patch("/user/changePassword", formData);
 export const deleteProfile = () => API.delete("/user/deleteProfile");

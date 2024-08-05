@@ -3,7 +3,6 @@ import cors from "cors";
 import express from "express";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-import session from "express-session";
 import methodOverride from "method-override";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -17,7 +16,7 @@ app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 app.use(methodOverride("_method"));
 app.use(express.static(__dirname + "/public"));
 
-import mongoose from "mongoose";
+// import mongoose from "mongoose";
 import connection from "./database.js";
 connection();
 
@@ -27,25 +26,6 @@ const corsOptions = {
     optionsSuccessStatus: 200,
 }
 app.use(cors(corsOptions));
-
-import MongoStore from "connect-mongo";
-const mongoStore = MongoStore.create({
-    mongoUrl: process.env.MONGODB_URI,
-    collectionName: "sessions",
-    mongooseConnection: mongoose.connection,
-    ttl: 365 * 24 * 60 * 60 * 1000,
-    autoRemove: "native",
-});
-
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: mongoStore,
-    cookie: {
-        maxAge: 365 * 24 * 60 * 60 * 1000,
-    }
-}));
 
 import userRoutes from "./routes/userRoutes.js";
 app.use("/user", userRoutes);

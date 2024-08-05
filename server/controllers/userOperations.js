@@ -2,21 +2,20 @@ const saltRounds = 10;
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
-import { createUserSession } from "../utils/functions.js";
+import { condenseUserInfo } from "../utils/functions.js";
 
+// This method is obsolete. Only useful to convert old token type to new ones
 const fetchUserSession = async (req, res) => {
     try {
-        if (req.session.user) {
-            res.status(200).json(req.session.user);
+        console.log("Database called");
+        const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
+        const user = await User.findOne({ email: email });
+        if (user) {
+            const userTokenInfo = condenseUserInfo(user);
+            const token = jwt.sign(userTokenInfo, process.env.JWT_TOKEN_KEY, { expiresIn: 365 * 24 * 60 * 60 * 1000 });
+            res.status(200).json({ user: userTokenInfo, token });
         } else {
-            const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
-            const user = await User.findOne({ email: email });
-            if (user) {
-                req.session.user = createUserSession(user);
-                res.status(200).json(req.session.user);
-            } else {
-                res.status(409).json({ message: "No user for given token" });
-            }
+            res.status(409).json({ message: "No user for given token" });
         }
     } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }
@@ -24,10 +23,9 @@ const fetchUserSession = async (req, res) => {
 const fetchUserInfo = async (req, res) => {
     try {
         const { userName } = req.query;
-        const user = await User.findOne({ userName: userName });
+        const user = await User.findOne({ userName: userName }).select("-password");
         if (user) {
-            const { password, ...updatedUser } = user._doc;
-            res.status(200).json(updatedUser);
+            res.status(200).json(user);
         } else {
             res.status(404).json({ message: "User not found" });
         }
@@ -46,7 +44,9 @@ const getGoogleUser = async (req, res) => {
                 if (checkIfLoginOrSignUp.avatar !== picture) {
                     await User.findByIdAndUpdate(checkIfLoginOrSignUp._id, { avatar: picture });
                 }
-                res.status(200).json({ user: createUserSession(checkIfLoginOrSignUp), token: req.query.token });
+                const userTokenInfo = condenseUserInfo(checkIfLoginOrSignUp);
+                const customToken = jwt.sign(userTokenInfo, process.env.JWT_TOKEN_KEY, { expiresIn: 365 * 24 * 60 * 60 * 1000 });
+                res.status(200).json({ user: userTokenInfo, token: customToken });
             } else {
                 res.status(409).json({ message: "Unique username required" });
             }
@@ -69,7 +69,9 @@ const createGoogleUser = async (req, res) => {
                 googleId: sub,
                 avatar: picture,
             });
-            res.status(200).json({ user: createUserSession(newUser), token: token });
+            const userTokenInfo = condenseUserInfo(newUser);
+            const customToken = jwt.sign(userTokenInfo, process.env.JWT_TOKEN_KEY, { expiresIn: 365 * 24 * 60 * 60 * 1000 });
+            res.status(200).json({ user: userTokenInfo, token: customToken });
         }
     } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }
@@ -92,8 +94,9 @@ const signUp = async (req, res) => {
                     email: userEmail,
                     password: hashedPassword,
                 });
-                const token = jwt.sign({ _id: newUser._id, email: newUser.email }, process.env.JWT_TOKEN_KEY, { expiresIn: 365 * 24 * 60 * 60 * 1000 });
-                res.status(200).json({ user: createUserSession(newUser), token });
+                const userTokenInfo = condenseUserInfo(newUser);
+                const token = jwt.sign(userTokenInfo, process.env.JWT_TOKEN_KEY, { expiresIn: 365 * 24 * 60 * 60 * 1000 });
+                res.status(200).json({ user: userTokenInfo, token });
             }
         }
     } catch (error) { res.status(503).json({ message: "Network error. Try agin" }) }
@@ -107,20 +110,13 @@ const signIn = async (req, res) => {
             res.status(404).json({ message: "No such user found" });
         } else {
             if (await bcrypt.compare(userPassword, existingUser.password)) {
-                const token = jwt.sign({ _id: existingUser._id, email: existingUser.email }, process.env.JWT_TOKEN_KEY, { expiresIn: 365 * 24 * 60 * 60 * 1000 });
-                res.status(200).json({ user: createUserSession(existingUser), token });
+                const userTokenInfo = condenseUserInfo(existingUser);
+                const token = jwt.sign(userTokenInfo, process.env.JWT_TOKEN_KEY, { expiresIn: 365 * 24 * 60 * 60 * 1000 });
+                res.status(200).json({ user: userTokenInfo, token });
             } else {
                 res.status(400).json({ message: "Invalid credentials" });
             }
         }
-    } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
-}
-
-const logout = async (req, res) => {
-    try {
-        req.session.destroy();
-        res.clearCookie("connect.sid");
-        res.status(200).json({ message: "Logout successfull!" });
     } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }
 
@@ -131,10 +127,10 @@ const updateProfile = async (req, res) => {
         const isUserNameUnique = await User.findOne({ name: name });
         if (!isUserNameUnique) {
             const updatedUser = await User.findOneAndUpdate({ email: email }, { name: name, userName: name.replace(/ /g, "-"), bio: bio }, { new: true });
-            res.status(200).json(createUserSession(updatedUser));
+            res.status(200).json(condenseUserInfo(updatedUser));
         } else if (isUserNameUnique.email === email) {
             const updatedUser = await User.findByIdAndUpdate(isUserNameUnique._id, { bio: bio }, { new: true });
-            res.status(200).json(createUserSession(updatedUser));
+            res.status(200).json(condenseUserInfo(updatedUser));
         } else {
             res.status(400).json({ message: "Username not available" });
         }
@@ -172,4 +168,4 @@ const deleteProfile = async (req, res) => {
     } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }
 
-export { fetchUserSession, fetchUserInfo, getGoogleUser, createGoogleUser, signUp, signIn, logout, updateProfile, changePassword, deleteProfile };
+export { fetchUserSession, fetchUserInfo, getGoogleUser, createGoogleUser, signUp, signIn, updateProfile, changePassword, deleteProfile };

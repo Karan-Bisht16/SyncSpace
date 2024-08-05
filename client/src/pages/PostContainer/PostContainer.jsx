@@ -182,7 +182,7 @@ function PostContainer(props) {
                                 </Box>
                                 :
                                 <>
-                                    <Post post={postData} individual={true} redirect={redirect} />
+                                    <Post post={postData} isPostLikedByUser={location?.state?.isPostLikedByUser} individual={true} redirect={redirect} />
                                     {secondaryLoading ?
                                         <Box sx={classes.noCommentsContainer}>
                                             <l-loader size="75" speed="1.75" color="#0090c1" />

@@ -139,11 +139,10 @@ const joinSubspace = async (req, res) => {
 
 const updateSubspace = async (req, res) => {
     try {
-        const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
+        const { _id } = jwt.decode(req.headers.authorization.split(" ")[1]);
         const { subspaceId, subspaceData } = req.body;
-        const user = await User.findOne({ email: email });
         const subspace = await Subspace.findById(subspaceId);
-        if (subspace.creator.equals(user._id)) {
+        if (subspace.creator.equals(_id)) {
             const updatedSubspaceData = { ...subspaceData, subspaceName: subspaceData.name.replace(/ /g, "-") };
             const isSubspaceNameUnique = await Subspace.findOne({ name: updatedSubspaceData.name });
             if (isSubspaceNameUnique && JSON.stringify(isSubspaceNameUnique) !== JSON.stringify(subspace)) {

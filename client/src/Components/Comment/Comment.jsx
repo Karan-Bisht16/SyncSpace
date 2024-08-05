@@ -118,7 +118,7 @@ function Comment(props) {
                             </>
                         }
                     </Box>
-                    <Box>
+                    <Box sx={{ width: "100%" }}>
                         <Box sx={classes.userDetailsContainer}>
                             {userDetails.isDeleted ?
                                 <span style={{ fontSize: "14px" }}><span style={{ fontSize: "12px" }}>e/</span>[Deleted]</span>
@@ -138,7 +138,7 @@ function Comment(props) {
                                 <Box sx={{ width: "100%" }}>
                                     <InputField
                                         name="reply" value={reply} label="Your reply"
-                                        handleChange={handleReplyChange} autoFocus={true} multiline={true} rows={3}
+                                        handleChange={handleReplyChange} autoFocus={true} multiline={true} rows="auto"
                                         sx={{ bgcolor: "background.secondary" }}
                                     />
                                     <Box sx={{ display: "flex", gap: "8px", justifyContent: "end", margin: "8px auto" }}>
