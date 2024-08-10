@@ -121,7 +121,7 @@ function PostContainer(props) {
             setAddComment(false);
         }
     }
-    async function handleDialog() {
+    async function handlePostDialog() {
         if (dialogValue.submitBtnText.toUpperCase() === "DISCARD") {
             closeDialog();
             setAddComment(false);
@@ -242,7 +242,7 @@ function PostContainer(props) {
                     }
                 </div>
             </Box>
-            <ConfirmationDialog dialog={dialog} closeDialog={closeDialog} handleDialog={handleDialog} linearProgressBar={linearProgressBar} dialogValue={dialogValue} />
+            <ConfirmationDialog dialog={dialog} closeDialog={closeDialog} handleDialog={handlePostDialog} linearProgressBar={linearProgressBar} dialogValue={dialogValue} />
         </Grid>
     );
 }

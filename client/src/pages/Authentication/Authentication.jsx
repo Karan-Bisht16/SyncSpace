@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { Avatar, Box, Button, Container, Grid, Paper, Typography, TextField, LinearProgress } from "@mui/material";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
-import { LockOutlined, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { GoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -162,7 +162,12 @@ function Authentication() {
                 <Container sx={classes.subContainer}>
                     <Paper elevation={3}>
                         <Box sx={classes.title}>
-                            <Avatar><LockOutlined /></Avatar>
+                            <Avatar sx={{ width: "50px", height: "50px" }}>
+                                <lord-icon
+                                    src="https://cdn.lordicon.com/stxfyhky.json" trigger="loop" stroke="bold" state="loop-cycle"
+                                    colors="primary:#ffffff,secondary:#ffffff" style={{ width: "75px", height: "75px" }}
+                                />
+                            </Avatar>
                             <Typography variant="h5">{isSignUp ? "Sign Up" : "Sign In"}</Typography>
                         </Box>
                         <form noValidate onSubmit={handleSubmit}>

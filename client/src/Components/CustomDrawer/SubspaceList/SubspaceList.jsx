@@ -1,8 +1,9 @@
 import React from "react";
 import { Avatar, Box, ListItem, ListItemButton, ListItemText, ListItemIcon } from "@mui/material"
-import { useDispatch } from "react-redux";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "react-infinite-scroller";
+import { useDispatch } from "react-redux";
+// Importing actions
 import { fetchSubspaces } from "../../../actions/subspace";
 
 function SubspaceList(props) {

@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Avatar, Box, Button, Grid, IconButton, LinearProgress, ListItemIcon, Menu, MenuItem, Tab, Tabs, Typography } from "@mui/material";
 import { DeleteTwoTone, EditNoteRounded, MoreVert } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { Player } from "@lordicon/react";
 import { lineSpinner } from "ldrs";
 // Importing my components
 import ConfirmationDialog from "../../Components/ConfirmationDialog/ConfirmationDialog";
@@ -27,8 +26,6 @@ function Subspace(props) {
     const classes = styles();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const ICON = require("../../assets/animation-deleted.json");
-    const playerRef = useRef(null);
     lineSpinner.register("l-loader");
 
     useEffect(() => {
@@ -214,8 +211,10 @@ function Subspace(props) {
                         {subspaceDeleted ?
                             <Box>
                                 <Box sx={classes.subspaceDeletedContainer}>
-                                    <Player ref={playerRef} icon={ICON} size={250} />
-                                    {playerRef.current?.playFromBeginning()}
+                                    <lord-icon
+                                        src="https://cdn.lordicon.com/drxwpfop.json" trigger="loop" delay="1000"
+                                        colors="primary:#0090c1,secondary:#0090c1" style={{ width: "250px", height: "250px" }}
+                                    />
                                 </Box>
                                 <NotFound
                                     mainText={`s/${subspaceName} was deleted`}

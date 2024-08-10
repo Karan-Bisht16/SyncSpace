@@ -4,11 +4,10 @@ import { MoreHoriz, AddCommentRounded, DeleteTwoTone, EditNoteRounded, RemoveCir
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 // Importing my components
-import ConfirmationDialog from "../ConfirmationDialog/ConfirmationDialog";
 import { formatTime } from "../../utils/functions";
 import InputField from "../InputField/InputField";
 // Importing contexts
-import { ConfirmationDialogContext, SnackBarContext } from "../../store";
+import { SnackBarContext } from "../../store";
 // Importing actions
 import { deleteComment, createReply, fetchReplies } from "../../actions/comment";
 // Importing styling
@@ -19,7 +18,6 @@ function Comment(props) {
     const { _id, postId, userId, parentId, comment, repliesCount, userDetails, createdAt } = commentData;
     const { userName, avatar } = userDetails;
     const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
-    const { dialog, dialogValue, openDialog, closeDialog, linearProgressBar } = useContext(ConfirmationDialogContext);
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -51,23 +49,6 @@ function Comment(props) {
     function handleReplyChange(event) {
         const { value } = event.target;
         setReply(value);
-    }
-    function handleCancelReply() {
-        if (reply.trim() !== "") {
-            openDialog({
-                title: "Discard comment",
-                message: "Discard comment?",
-                cancelBtnText: "Cancel", submitBtnText: "Discard"
-            });
-        }
-        else {
-            setOpenReply(false);
-        }
-    }
-    function handleDialog() {
-        closeDialog();
-        setOpenReply(false);
-        setReply("");
     }
     const [replies, setReplies] = useState([]);
     const [hideReplies, setHideReplies] = useState(false);
@@ -142,7 +123,7 @@ function Comment(props) {
                                         sx={{ bgcolor: "background.secondary" }}
                                     />
                                     <Box sx={{ display: "flex", gap: "8px", justifyContent: "end", margin: "8px auto" }}>
-                                        <Button variant="outlined" sx={classes.replyCancelBtn} onClick={handleCancelReply}>Cancel</Button>
+                                        <Button variant="outlined" sx={classes.replyCancelBtn} onClick={()=>setOpenReply(false)}>Cancel</Button>
                                         <Button variant="contained" sx={classes.replyAddBtn} onClick={handleAddReply}>Add</Button>
                                     </Box>
                                 </Box>
@@ -211,7 +192,6 @@ function Comment(props) {
                     </Box>
                 }
             </Box>
-            <ConfirmationDialog dialog={dialog} closeDialog={closeDialog} handleDialog={handleDialog} linearProgressBar={linearProgressBar} dialogValue={dialogValue} />
         </>
     );
 };

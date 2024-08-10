@@ -3,6 +3,7 @@ import cors from "cors";
 import express from "express";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
+import cookieParser from "cookie-parser";
 import methodOverride from "method-override";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -15,6 +16,7 @@ app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
 app.use(methodOverride("_method"));
 app.use(express.static(__dirname + "/public"));
+app.use(cookieParser());
 
 // import mongoose from "mongoose";
 import connection from "./database.js";

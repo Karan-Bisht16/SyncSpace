@@ -3,7 +3,6 @@ import { Avatar, Box, Button, Divider, Grid, LinearProgress, Tab, Tabs, Typograp
 import { CloseRounded, ModeEdit } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { Player } from "@lordicon/react";
 // Importing my components
 import RealTimeProfileViwer from "./RealTimeProfileViewer/RealTimeProfileViewer";
 import InputField from "../../Components/InputField/InputField";
@@ -24,8 +23,6 @@ function Profile(props) {
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const ICON = require("../../assets/animation-deleted.json");
-    const playerRef = useRef(null);
 
     useEffect(() => {
         document.title = "SyncSpace: e/" + userName;
@@ -155,8 +152,10 @@ function Profile(props) {
                         {userProfileDeleted ?
                             <Box>
                                 <Box sx={classes.profileDeletedContainer}>
-                                    <Player ref={playerRef} icon={ICON} size={250} />
-                                    {playerRef.current?.playFromBeginning()}
+                                    <lord-icon
+                                        src="https://cdn.lordicon.com/drxwpfop.json" trigger="loop" delay="1000"
+                                        colors="primary:#0090c1,secondary:#0090c1" style={{ width: "250px", height: "250px" }}
+                                    />
                                 </Box>
                                 <NotFound
                                     mainText="This profile has been deleted"

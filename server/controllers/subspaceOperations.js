@@ -9,6 +9,8 @@ const LIMIT = process.env.SUBSPACES_LIMIT || 4;
 const fetchSubspaceInfo = async (req, res) => {
     try {
         const { subspaceName } = req.query;
+        const isSubspaceDeleted = await Subspace.findOne({ subspaceName });
+        if (isSubspaceDeleted?.isDeleted) { return res.status(200).json(isSubspaceDeleted) }
         const subspace = await Subspace.aggregate([
             { $match: { subspaceName: subspaceName } },
             {
@@ -43,7 +45,7 @@ const fetchSubspaceInfo = async (req, res) => {
         } else {
             res.status(200).json(subspace[0]);
         }
-    } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
+    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
 }
 
 const fetchSubspaces = async (req, res) => {
