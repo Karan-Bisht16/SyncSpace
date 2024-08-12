@@ -26,7 +26,7 @@ const auth = async (req, res, next) => {
             req.refreshedAccessToken = true;
         }
         next();
-    } catch (error) { res.sendStatus(503) }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again" }) }
 }
 
 export default auth;
