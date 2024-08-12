@@ -32,7 +32,7 @@ export const createSubspace = (subspaceData) => async (dispatch) => {
     } catch (error) { return handleError(error) }
 };
 
-export const uploadSubspaceAvatar = (avatar) => async() => {
+export const uploadSubspaceAvatar = (avatar) => async () => {
     const { data } = await api.uploadSubspaceAvatar(avatar);
     return { status: 200, result: data };
 }
