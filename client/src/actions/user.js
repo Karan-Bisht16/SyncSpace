@@ -1,5 +1,5 @@
 import * as api from "../api";
-import { FETCH_USER_SESSION, SET_USER, AUTH, LOGOUT, UPDATE_PROFILE } from "../constants/actionTypes";
+import { FETCH_CONDENSE_USER_INFO, AUTH, LOGOUT, UPDATE_PROFILE } from "../constants/actionTypes";
 
 function handleError(error) {
     if (error.code === "ERR_NETWORK") {
@@ -9,19 +9,11 @@ function handleError(error) {
     }
 }
 
-// This method is obsolete. Only useful to convert old token type to new ones
-export const fetchUserSession = () => async (dispatch) => {
+export const fetchCondenseUserInfo = () => async (dispatch) => {
     try {
-        const { data } = await api.fetchUserSession();
-        dispatch({ type: FETCH_USER_SESSION, payload: data });
+        const { data } = await api.fetchCondenseUserInfo();
+        dispatch({ type: FETCH_CONDENSE_USER_INFO, payload: data });
         return { status: 200, result: data };
-    } catch (error) { return handleError(error) }
-}
-
-export const setUserSession = (userData) => async (dispatch) => {
-    try {
-        dispatch({ type: SET_USER, payload: userData });
-        return { status: 200, result: "done" };
     } catch (error) { return handleError(error) }
 }
 
@@ -32,42 +24,43 @@ export const fetchUserInfo = (userName) => async () => {
     } catch (error) { return handleError(error) }
 }
 
-export const getGoogleUser = (token) => async (dispatch) => {
+export const registerViaGoogle = (token) => async (dispatch) => {
     try {
-        const { data } = await api.getGoogleUser(token);
+        const { data } = await api.registerViaGoogle(token);
         dispatch({ type: AUTH, payload: data });
         return { status: 200, result: data.user };
     } catch (error) { return handleError(error) }
 }
 
-export const createGoogleUser = (token) => async (dispatch) => {
+export const loginViaGoogle = (token) => async (dispatch) => {
     try {
-        const { data } = await api.createGoogleUser(token);
+        const { data } = await api.loginViaGoogle(token);
         dispatch({ type: AUTH, payload: data });
         return { status: 200, result: data.user };
     } catch (error) { return handleError(error) }
 }
 
-export const signUp = (authData) => async (dispatch) => {
+export const register = (authData) => async (dispatch) => {
     try {
-        const { data } = await api.signUp(authData);
+        const { data } = await api.register(authData);
         dispatch({ type: AUTH, payload: data });
-        return { status: 200, result: data.user };
+        return { status: 200, result: data };
     } catch (error) { return handleError(error) }
 }
 
-export const signIn = (authData) => async (dispatch) => {
+export const login = (authData) => async (dispatch) => {
     try {
-        const { data } = await api.signIn(authData);
+        const { data } = await api.login(authData);
         dispatch({ type: AUTH, payload: data });
-        return { status: 200, result: data.user };
+        return { status: 200, result: data };
     } catch (error) { return handleError(error) }
 }
 
 export const logoutUser = () => async (dispatch) => {
     try {
+        const { data } = await api.logout();
         dispatch({ type: LOGOUT });
-        return { status: 200, result: "Successfully logged out" };
+        return { status: 200, result: data.message };
     } catch (error) { return handleError(error) }
 }
 

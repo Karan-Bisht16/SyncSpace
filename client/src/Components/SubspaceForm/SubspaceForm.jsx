@@ -1,6 +1,6 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
-import { Button, Box, Chip, Divider, Grid, Stepper, Step, StepLabel, Typography } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useState, useContext, useRef, useEffect } from "react";
+import { Button, Box, Chip, Dialog, DialogContent, DialogContentText, DialogTitle, Divider, Grid, LinearProgress, Stepper, Step, StepLabel, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import imageCompression from "browser-image-compression";
 // Importing my components
@@ -12,13 +12,12 @@ import FileUpload from "../FileUpload/FileUpload";
 // Importing contexts
 import { ReRenderContext, ConfirmationDialogContext, SnackBarContext } from "../../store";
 // Importing actions
-import { createSubspace, fetchSubspaceInfo, updateSubspace } from "../../actions/subspace";
+import { createSubspace, updateSubspace, uploadSubspaceAvatar } from "../../actions/subspace";
 // Importing styling
 import styles from "./styles"
 
 function SubspaceForm(props) {
-    const { user, type, subspaceFormData } = props;
-    const { subspaceName } = useParams();
+    const { subspaceData, setSubspaceData, avatar, setAvatar, type, subspaceId } = props;
     const { setReRender } = useContext(ReRenderContext);
     const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
     const { dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar } = useContext(ConfirmationDialogContext);
@@ -29,13 +28,15 @@ function SubspaceForm(props) {
     const nameField = useRef(null);
     const descriptionField = useRef(null);
 
-    const [subspaceData, setSubspaceData] = useState({
-        name: "",
-        description: "",
-        creator: user._id,
-        avatar: "",
-        topics: [],
-    });
+    // JS for Modal
+    const [modal, setModal] = useState(false);
+    const [modalTitle, setModalTitle] = useState("Updating Subspace")
+    function openModal() {
+        setModal(true);
+    }
+    function closeModal() {
+        setModal(false);
+    }
     // JS for Stepper
     const steps = ["Add name", "Add styling", "Add topics"]
     const [activeStep, setActiveStep] = useState(0);
@@ -51,9 +52,14 @@ function SubspaceForm(props) {
         setActiveStep((prevActiveStep) => prevActiveStep - 1);
     };
     // JS for Chip
-    const [topicsArray, setTopicsArray] = useState([]);
+    const [topicsArray, setTopicsArray] = useState(subspaceData.topics);
+    useEffect(() => {
+        if (type.toUpperCase() === "UPDATE" && avatar && activeStep === 1) {
+            document.querySelector("#fileChosen").textContent = "1 file selected";
+        }
+    }, [type, avatar, activeStep]);
     function handleTopicDeletion(topicToDelete) {
-        setTopicsArray(prevTopicsArray => prevTopicsArray.filter(topic => topic.key !== topicToDelete.key))
+        setTopicsArray(prevTopicsArray => prevTopicsArray.filter(topic => topic.key !== topicToDelete.key));
     };
     function handleTopicSelection(topicToSelect) {
         setTopicsArray(prevTopicsArray => {
@@ -72,85 +78,53 @@ function SubspaceForm(props) {
             return (<Chip key={data.key} label={data.label} onClick={() => handleTopicSelection(data)} />);
         }
     }
-    const [updateSubspaceId, setUpdateSubspaceId] = useState(null);
-    useEffect(() => {
-        async function getSubspaceInfo() {
-            const { status, result } = await dispatch(fetchSubspaceInfo({ subspaceName }));
-            if (status === 200) {
-                setSubspaceData({
-                    name: result.name,
-                    description: result.description,
-                    creator: user._id,
-                    avatar: result.avatar,
-                    topics: result.topics,
-                });
-                setUpdateSubspaceId(result._id);
-                setTopicsArray(result.topics);
-            } else {
-                setSnackbarValue({ message: result.message, status: "error" });
-                setSnackbarState(true);
-            }
-        }
-        if (type.toUpperCase() === "UPDATE") {
-            if (subspaceFormData) {
-                setSubspaceData({
-                    name: subspaceFormData.name,
-                    description: subspaceFormData.description,
-                    creator: user._id,
-                    avatar: subspaceFormData.avatar,
-                    topics: subspaceFormData.topics,
-                });
-                setUpdateSubspaceId(subspaceFormData._id);
-                setTopicsArray(subspaceFormData.topics);
-            } else {
-                getSubspaceInfo();
-            }
-        }
-    }, [type, user._id, subspaceFormData, subspaceName, dispatch, setSnackbarValue, setSnackbarState]);
     // File Upload
     const fileUploadOptions = {
         maxSizeMB: 0.05,
         maxWidthOrHeight: 360,
         useWebWorker: true,
     }
-    function setFile(fileBase64String) {
+    function setFile(file) {
         document.querySelector("#fileChosen").textContent = "1 file selected";
-        setSubspaceData(prevSubspaceData => {
-            return { ...prevSubspaceData, "avatar": fileBase64String };
-        });
+        setAvatar(file);
     }
     async function compressImage(imageFile) {
         const compressedBlob = await imageCompression(imageFile, fileUploadOptions);
         const compressedBase64String = await imageCompression.getDataUrlFromFile(compressedBlob);
-        setFile(compressedBase64String);
+        const fileObj = {
+            base64: compressedBase64String,
+            file: compressedBlob,
+            name: compressedBlob.name,
+            size: compressedBlob.size,
+            type: compressedBlob.type,
+        };
+        setFile(fileObj);
     }
     function handleFileUpload(file) {
         let fileSize = Number(file.size.slice(0, file.size.length - 2));
         let fileType = file.type.includes("image");
-        if (fileSize > process.env.REACT_APP_SUBSPACE_AVATAR_SIZE) {
+        if (!fileType) {
+            setSnackbarValue({ message: "Select a valid image", status: "error" });
+            setSnackbarState(true);
+            resetSelectedFiles();
+        } else if (fileSize > process.env.REACT_APP_SUBSPACE_AVATAR_SIZE) {
             setSnackbarValue({
                 message: `File size must be less than ${process.env.REACT_APP_SUBSPACE_AVATAR_SIZE / 1000}MB!`,
                 status: "error"
             });
             setSnackbarState(true);
             resetSelectedFiles();
-        } else if (!fileType) {
-            setSnackbarValue({ message: "Select a valid image", status: "error" });
-            setSnackbarState(true);
-            resetSelectedFiles();
         } else if (fileSize > 50) {
             compressImage(file.file);
         } else {
-            setFile(file.base64);
+            setFile(file);
         }
     }
     function resetSelectedFiles() {
         const file = document.querySelector("input[type=file]");
         file.value = "";
         document.querySelector("#fileChosen").textContent = "No file selected";
-        setSubspaceData(prevSubspaceData => {
-            return { ...prevSubspaceData, "avatar": "" };
-        });
+        setAvatar(null);
     }
     function handleChange(event) {
         const { name, value } = event.target;
@@ -162,14 +136,15 @@ function SubspaceForm(props) {
     function handleClear() {
         setActiveStep(0);
         setTopicsArray([]);
-        setSubspaceData({
-            name: "",
-            description: "",
-            creator: user._id,
-            members: [user._id],
-            moderators: [user._id],
-            topics: [],
+        setSubspaceData((prevSubspaceData) => {
+            return {
+                ...prevSubspaceData,
+                "name": "",
+                "description": "",
+                "topics": [],
+            }
         });
+        setAvatar(null);
     }
     // Submit Form
     function handleFirstSubmit() {
@@ -181,9 +156,6 @@ function SubspaceForm(props) {
             descriptionField.current.focus();
             return false;
         }
-        setSubspaceData(prevSubspaceData => {
-            return { ...prevSubspaceData, topics: topicsArray }
-        })
         return true;
     }
     function handleSecondSubmit() {
@@ -207,6 +179,7 @@ function SubspaceForm(props) {
             setActiveStep(2);
             return false;
         }
+        subspaceData.topics = topicsArray;
         if (type.toUpperCase() === "CREATE") {
             openDialog({
                 title: "Create Subspace",
@@ -224,10 +197,26 @@ function SubspaceForm(props) {
         }
     }
     async function handleUpdateSubspace() {
-        const { status, result } = await dispatch(updateSubspace({ subspaceId: updateSubspaceId, subspaceData }));
+        openModal();
+        setLinearProgressBar(true);
+        const { status, result } = await dispatch(updateSubspace({ subspaceId, subspaceData }));
         if (status === 200) {
-            setReRender(prevReRender => !prevReRender);
-            navigate("/", { state: { status: "success", message: "Subspace updated successfully!", time: new Date().getTime() } });
+            if (avatar === null || avatar?.file) {
+                setModalTitle("Updating Media");
+                const { status, result } = await dispatch(uploadSubspaceAvatar({ avatar: avatar?.file, subspaceId, type }));
+                if (status === 200) {
+                    setReRender(prevReRender => !prevReRender);
+                    navigate("/", { state: { status: "success", message: "Subspace updated successfully!", time: new Date().getTime() } });
+                } else {
+                    setSnackbarValue({ message: result.message, status: "error" });
+                    setSnackbarState(true);
+                }
+                closeModal();
+                setLinearProgressBar(false);
+            } else {
+                setReRender(prevReRender => !prevReRender);
+                navigate("/", { state: { status: "success", message: "Subspace updated successfully!", time: new Date().getTime() } });
+            }
         } else {
             setSnackbarValue({ message: result.message, status: "error" });
             setSnackbarState(true);
@@ -239,8 +228,33 @@ function SubspaceForm(props) {
             const { status, result } = await dispatch(createSubspace(subspaceData));
             closeDialog();
             if (status === 200) {
-                setReRender(prevReRender => !prevReRender);
-                navigate("/", { state: { status: "success", message: `ss/${subspaceData.name.replace(/ /g, "-")} is now live!`, time: new Date().getTime() } });
+                const subspaceId = result._id;
+                if (avatar && avatar.file) {
+                    openDialog({
+                        title: "Uploading Media",
+                        message:
+                            <span>
+                                Are you sure you want to create this new subspace?
+                                As the creator, you will automatically become the moderator of this subspace.
+                                <br /><br />
+                                Proceed?
+                            </span>,
+                        cancelBtnText: "Cancel", submitBtnText: "Create"
+                    });
+                    setLinearProgressBar(true);
+                    const { status, result } = await dispatch(uploadSubspaceAvatar({ avatar: avatar.file, subspaceId, type }));
+                    closeDialog();
+                    if (status === 200) {
+                        setReRender(prevReRender => !prevReRender);
+                        navigate("/", { state: { status: "success", message: `ss/${subspaceData.name.replace(/ /g, "-")} is now live!`, time: new Date().getTime() } });
+                    } else {
+                        setSnackbarValue({ message: result.message, status: "error" });
+                        setSnackbarState(true);
+                    }
+                } else {
+                    setReRender(prevReRender => !prevReRender);
+                    navigate("/", { state: { status: "success", message: `ss/${subspaceData.name.replace(/ /g, "-")} is now live!`, time: new Date().getTime() } });
+                }
             } else {
                 setSnackbarValue({ message: result.message, status: "error" });
                 setSnackbarState(true);
@@ -262,7 +276,7 @@ function SubspaceForm(props) {
                         } {(activeStep === 1) &&
                             <Typography variant="h4" sx={{ marginBottom: { xs: "190px", lg: "24px" } }}>{type} Subspace</Typography>
                         } {(activeStep === 2) &&
-                            <Typography variant="h4" sx={{ marginBottom: { xs: "12px", sm: "281px", lg: "24px" } }}>{type} Subspace</Typography>
+                            <Typography variant="h4" sx={{ marginBottom: { xs: "12px", sm: "200px", lg: "24px" } }}>{type} Subspace</Typography>
                         }
                         <form noValidate onSubmit={handleSubmit}>
                             {(activeStep === 0) &&
@@ -274,13 +288,16 @@ function SubspaceForm(props) {
                                     <InputField
                                         name="description" label="Description" value={subspaceData.description} type="text"
                                         handleChange={handleChange} reference={descriptionField} multiline={true} rows={4}
-                                        sx={{ height: "131px" }}
+                                        sx={{ height: { xs: "188.5px", sm: "165px", lg: "155px" } }}
                                     />
                                     <hr />
                                 </>
                             } {(activeStep === 1) &&
                                 <>
-                                    <FileUpload handleFileUpload={handleFileUpload} resetSelectedFiles={resetSelectedFiles} />
+                                    <FileUpload
+                                        handleFileUpload={handleFileUpload} resetSelectedFiles={resetSelectedFiles}
+                                        message="Image compression may take a moment. Please wait."
+                                    />
                                     <hr />
                                 </>
                             } {(activeStep === 2) &&
@@ -332,9 +349,8 @@ function SubspaceForm(props) {
                     </Box>
                 </Grid>
                 <Grid item lg={0.25}></Grid>
-                <RealTimeSubspaceViewer subspaceData={subspaceData} activeStep={activeStep} />
+                <RealTimeSubspaceViewer classes={classes} subspaceData={subspaceData} avatar={avatar} activeStep={activeStep} />
             </Grid>
-
             <Box sx={classes.stepperContainer}>
                 <Stepper activeStep={activeStep} alternativeLabel>
                     {steps.map((label, index) => {
@@ -346,6 +362,20 @@ function SubspaceForm(props) {
                     })}
                 </Stepper>
             </Box>
+            <Dialog
+                open={modal}
+                onClose={closeModal}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <DialogTitle id="alert-dialog-title" sx={{ padding: "8px 24px" }}>{modalTitle}</DialogTitle>
+                <LinearProgress sx={{ opacity: linearProgressBar ? "1" : "0" }} />
+                <DialogContent sx={{ padding: "8px 24px" }}>
+                    <DialogContentText id="alert-dialog-description" sx={{ textAlign: "justify" }}>
+                        This may take a few moments. Please wait.
+                    </DialogContentText>
+                </DialogContent>
+            </Dialog>
             <ConfirmationDialog dialog={dialog} closeDialog={closeDialog} handleDialog={handleDialog} linearProgressBar={linearProgressBar} dialogValue={dialogValue} />
         </div>
     );

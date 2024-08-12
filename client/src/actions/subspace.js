@@ -9,13 +9,6 @@ function handleError(error) {
     }
 }
 
-export const fetchSubspaceInfo = (subspaceName) => async () => {
-    try {
-        const { data } = await api.fetchSubspaceInfo(subspaceName);
-        return { status: 200, result: data };
-    } catch (error) { return handleError(error) }
-};
-
 export const fetchSubspaces = (searchParams) => async (dispatch) => {
     try {
         const { data } = await api.fetchSubspaces(searchParams);
@@ -24,6 +17,13 @@ export const fetchSubspaces = (searchParams) => async (dispatch) => {
     } catch (error) { return handleError(error) }
 }
 
+export const fetchSubspaceInfo = (subspaceName) => async () => {
+    try {
+        const { data } = await api.fetchSubspaceInfo(subspaceName);
+        return { status: 200, result: data };
+    } catch (error) { return handleError(error) }
+};
+
 export const createSubspace = (subspaceData) => async (dispatch) => {
     try {
         const { data } = await api.createSubspace(subspaceData);
@@ -31,6 +31,11 @@ export const createSubspace = (subspaceData) => async (dispatch) => {
         return { status: 200, result: data };
     } catch (error) { return handleError(error) }
 };
+
+export const uploadSubspaceAvatar = (avatar) => async() => {
+    const { data } = await api.uploadSubspaceAvatar(avatar);
+    return { status: 200, result: data };
+}
 
 export const isSubspaceJoined = (subspaceAndUserId) => async () => {
     try {

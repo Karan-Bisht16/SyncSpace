@@ -53,7 +53,7 @@ function EditPost(props) {
                 setSnackbarState(true);
             }
         }
-        if (location.state && location.state.post) {
+        if (location?.state && location.state.post) {
             const postData = location.state.post;
             if (postData.authorId === user._id) { setValidation(true) }
             setPreviousSubspace(postData.subspaceDetails.subspaceName);
@@ -71,7 +71,7 @@ function EditPost(props) {
     return (
         <Grid container sx={classes.flexContainer}>
             <Grid item xs={0} md={2} sx={classes.leftContainer}></Grid>
-            <Box id="postFormForm" sx={classes.mainContainer}>
+            <Box sx={classes.mainContainer}>
                 <Typography variant="h4">Edit Post</Typography>
                 {allPostFormDataSet ?
                     <>
@@ -82,9 +82,8 @@ function EditPost(props) {
                                     sx={{ width: "300px", padding: "4px 0 8px 0" }}
                                 />
                                 <PostForm
-                                    user={user} predefinedTabIndex={predefinedTabIndex} type="Edit"
-                                    postData={postFormData} setPostData={setPostFormData}
-                                    hasPredefinedSubspace={true} postId={id}
+                                    user={user} postData={postFormData} setPostData={setPostFormData}
+                                    predefinedTabIndex={predefinedTabIndex} type="Edit" hasPredefinedSubspace={true} postId={id}
                                 />
                             </>
                             :

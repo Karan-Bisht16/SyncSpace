@@ -1,5 +1,4 @@
-export const FETCH_USER_SESSION = "FETCH_USER_SESSION";
-export const SET_USER = "SET_USER";
+export const FETCH_CONDENSE_USER_INFO = "FETCH_CONDENSE_USER_INFO";
 export const AUTH = "AUTH";
 export const LOGOUT = "LOGOUT";
 export const UPDATE_PROFILE = "UPDATE_PROFILE";

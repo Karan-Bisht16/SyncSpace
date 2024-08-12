@@ -8,19 +8,19 @@ function handleError(error) {
     }
 }
 
-export const fetchPostInfo = (postId) => async () => {
-    try {
-        const { data } = await api.fetchPostInfo(postId);
-        return { status: 200, result: data };
-    } catch (error) { return handleError(error) }
-}
-
 export const fetchPosts = (searchParams) => async () => {
     try {
         const { data } = await api.fetchPosts(searchParams);
         return data;
     } catch (error) { return handleError(error) }
 };
+
+export const fetchPostInfo = (postId) => async () => {
+    try {
+        const { data } = await api.fetchPostInfo(postId);
+        return { status: 200, result: data };
+    } catch (error) { return handleError(error) }
+}
 
 export const createPost = (postData) => async () => {
     try {

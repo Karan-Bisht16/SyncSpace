@@ -24,9 +24,6 @@ function Settings(props) {
         document.title = "SyncSpace: Settings";
     });
 
-    const token = localStorage.getItem("token");
-    if (!token) { navigate("/authentication"); }
-
     const currentPasswordField = useRef(null);
     const newPasswordField = useRef(null);
     const confirmPasswordField = useRef(null);
@@ -136,7 +133,7 @@ function Settings(props) {
             <Grid item xs={0} md={2} sx={classes.leftContainer}></Grid>
             <Box sx={classes.mainContainer}>
                 <Typography variant="h4">Settings</Typography>
-                {(token && token.length < 500) &&
+                {!user.viaGoogle &&
                     <>
                         <Typography variant="h5" sx={classes.titleField}>Change Password</Typography>
                         <Divider />

@@ -59,7 +59,12 @@ function Profile(props) {
                     setUserProfileDeleted(true);
                 } else {
                     setUpdatedUser(result);
-                    setUserPostsCount(result.postsCount)
+                    setUserPostsCount(result.postsCount);
+                    setFormData({
+                        name: result.name,
+                        bio: result.bio,
+                        email: result.email,
+                    });
                 }
                 setPrimaryLoading(false);
                 setSecondaryLoading(false);
@@ -96,8 +101,8 @@ function Profile(props) {
     }
     const [formData, setFormData] = useState({
         name: user.name,
-        bio: "",
-        email: "",
+        bio: user.bio,
+        email: user.email,
     });
     function handleChange(event) {
         const { name, value } = event.target;
@@ -116,6 +121,8 @@ function Profile(props) {
         event.preventDefault();
         if (formData.name.trim() === "") {
             nameField.current.focus();
+            setSnackbarValue({ message: "Invalid Username", status: "error" });
+            setSnackbarState(true);
             return false;
         }
         try {
@@ -235,7 +242,7 @@ function Profile(props) {
                                                         </Box>
                                                     </Grid>
                                                     <Grid item md={0.25}></Grid>
-                                                    <RealTimeProfileViwer user={updatedUser} formData={formData} />
+                                                    <RealTimeProfileViwer user={updatedUser} classes={classes} formData={formData} />
                                                 </Grid>
                                                 <Box sx={Object.assign({ display: "none" }, classes.postContainer)} />
                                             </>
@@ -244,7 +251,7 @@ function Profile(props) {
                                                 <Grid container sx={classes.subContainer}>
                                                     <Grid item xs={12} lg={8.75} sx={{ display: { xs: "none", lg: "block" } }}>
                                                         <UserPostsBlock
-                                                            user={updatedUser} userPostsCount={userPostsCount}
+                                                            user={updatedUser} classes={classes} userPostsCount={userPostsCount}
                                                             secondaryLoading={secondaryLoading} tabIndex={tabIndex} handleTabChange={handleTabChange}
                                                         />
                                                     </Grid>
@@ -253,7 +260,7 @@ function Profile(props) {
                                                 </Grid>
                                                 <Box sx={{ display: { xs: "block", lg: "none" } }}>
                                                     <UserPostsBlock
-                                                        user={updatedUser} userPostsCount={userPostsCount}
+                                                        user={updatedUser} classes={classes} userPostsCount={userPostsCount}
                                                         secondaryLoading={secondaryLoading} tabIndex={tabIndex} handleTabChange={handleTabChange}
                                                     />
                                                 </Box>

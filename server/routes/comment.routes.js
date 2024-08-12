@@ -1,7 +1,7 @@
 import express from "express";
-import auth from "../middleware/auth.js";
-import { fetchComments, createComment, deleteComment } from "../controllers/commentOperations.js";
-import { fetchReplies, createReply } from "../controllers/commentOperations.js";
+import auth from "../middleware/auth.middleware.js";
+import { fetchComments, createComment, deleteComment } from "../controllers/comment.controller.js";
+import { fetchReplies, createReply } from "../controllers/comment.controller.js";
 
 const router = express.Router();
 

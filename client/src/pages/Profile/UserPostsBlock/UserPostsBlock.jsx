@@ -3,12 +3,9 @@ import { Box, Tab, Tabs } from "@mui/material";
 // Importing my components
 import NotFound from "../../../Components/NotFound/NotFound";
 import Posts from "../../../Components/Posts/Posts";
-// Importing styling
-import styles from "./styles";
 
 function UserPostsBlock(props) {
-    const { user, userPostsCount, secondaryLoading, tabIndex, handleTabChange } = props;
-    const classes = styles();
+    const { user, classes, userPostsCount, secondaryLoading, tabIndex, handleTabChange } = props;
 
     return (
         <>

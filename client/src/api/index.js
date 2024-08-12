@@ -3,20 +3,14 @@ import axios from "axios";
 axios.defaults.withCredentials = true;
 const API = axios.create({ baseURL: process.env.REACT_APP_BACKEND_URL });
 
-API.interceptors.request.use((req) => {
-    if (localStorage.getItem("token")) {
-        req.headers.authorization = `Bearer ${localStorage.getItem("token")}`;
-    }
-    return req;
-});
-
 // User
-export const fetchUserSession = () => API.get("/user/session");
+export const fetchCondenseUserInfo = () => API.get("/user/session");
 export const fetchUserInfo = (userName) => API.get("/user", { params: userName });
-export const getGoogleUser = (token) => API.get("/user/getGoogleUser", { params: token });
-export const createGoogleUser = (token) => API.get("/user/createGoogleUser", { params: token });
-export const signUp = (authData) => API.post("/user/signUp", authData);
-export const signIn = (authData) => API.post("/user/signIn", authData);
+export const registerViaGoogle = (token) => API.post("/user/registerViaGoogle", token);
+export const loginViaGoogle = (token) => API.post("/user/loginViaGoogle", token);
+export const register = (authData) => API.post("/user/register", authData);
+export const login = (authData) => API.post("/user/login", authData);
+export const logout = () => API.patch("/user/logout");
 export const updateProfile = (formData) => API.patch("/user/updateProfile", formData);
 export const changePassword = (formData) => API.patch("/user/changePassword", formData);
 export const deleteProfile = () => API.delete("/user/deleteProfile");
@@ -25,6 +19,11 @@ export const deleteProfile = () => API.delete("/user/deleteProfile");
 export const fetchSubspaces = (searchParams) => API.post("/subspace", searchParams);
 export const fetchSubspaceInfo = (subspaceName) => API.get("/subspace/info", { params: subspaceName });
 export const createSubspace = (subspaceData) => API.post("/subspace/create", subspaceData);
+export const uploadSubspaceAvatar = (avatar) => API.post("/subspace/uploadAvatar", avatar, {
+    headers: {
+        "Content-Type": "multipart/form-data",
+    }
+});
 export const isSubspaceJoined = (subspaceAndUserId) => API.get("/subspace/isJoined", { params: subspaceAndUserId });
 export const joinSubspace = (actionData) => API.patch("/subspace/join", actionData);
 export const updateSubspace = (subspaceData) => API.put("/subspace/update", subspaceData);

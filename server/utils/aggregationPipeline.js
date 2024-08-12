@@ -1,14 +1,3 @@
-function condenseUserInfo(user) {
-    const userSessionObj = {
-        _id: user._id,
-        name: user.name,
-        userName: user.userName,
-        email: user.email,
-        avatar: user.avatar ? user.avatar : "",
-    };
-    return userSessionObj;
-}
-
 const pagination = (startIndex, LIMIT) => {
     return [
         { $skip: Number(startIndex) },
@@ -54,7 +43,7 @@ const postDataStructure = {
         likesCount: 1,
         commentsCount: 1,
         edited: 1,
-        "subspaceDetails.avatar": 1,
+        "subspaceDetails.avatarURL": 1,
         "subspaceDetails.subspaceName": 1,
         "subspaceDetails.isDeleted": 1,
         "authorDetails.userName": 1,
@@ -70,4 +59,4 @@ const baseQuery = (startIndex, LIMIT) => {
     ]
 };
 
-export { condenseUserInfo, pagination, sortBasedOnPopularity, postDetailsExtraction, authorAndSubspaceDetails, postDataStructure, baseQuery };
+export { pagination, sortBasedOnPopularity, postDetailsExtraction, authorAndSubspaceDetails, postDataStructure, baseQuery };

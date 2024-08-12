@@ -107,7 +107,7 @@ function Post(props) {
                 <Box sx={classes.subContainer}>
                     <Box sx={classes.postHeader}>
                         <Box sx={classes.avatarContainer}>
-                            <Avatar sx={classes.avatar} alt="Subspace avatar" src={subspaceDetails?.avatar}>
+                            <Avatar sx={classes.avatar} alt="Subspace avatar" src={subspaceDetails?.avatarURL}>
                                 {subspaceDetails?.subspaceName?.charAt(0)}
                             </Avatar>
                         </Box>

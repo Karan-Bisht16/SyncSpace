@@ -66,7 +66,7 @@ function SubspaceList(props) {
                                 <ListItemButton sx={{ pl: 4 }}>
                                     <ListItemIcon>
                                         <Box sx={{ bgcolor: "background.primary", padding: "2px", borderRadius: "50%" }}>
-                                            <Avatar sx={{ height: "35px", width: "35px" }} src={subspace.avatar} alt="Subspace avatar">{subspace.name.charAt(0)}</Avatar>
+                                            <Avatar sx={{ height: "35px", width: "35px" }} src={subspace.avatarURL} alt="Subspace avatar">{subspace.name.charAt(0)}</Avatar>
                                         </Box>
                                     </ListItemIcon>
                                     <ListItemText primary={subspace.name} />

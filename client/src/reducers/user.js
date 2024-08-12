@@ -1,17 +1,12 @@
-import { FETCH_USER_SESSION, SET_USER, AUTH, LOGOUT, UPDATE_PROFILE } from "../constants/actionTypes";
+import { FETCH_CONDENSE_USER_INFO, AUTH, LOGOUT, UPDATE_PROFILE } from "../constants/actionTypes";
 
 export default (user = null, action) => {
     switch (action.type) {
-        case FETCH_USER_SESSION:
-            localStorage.setItem("token", action.payload.token);
-            return action.payload.user;
-        case SET_USER:
+        case FETCH_CONDENSE_USER_INFO:
             return action.payload;
         case AUTH:
-            localStorage.setItem("token", action.payload.token);
-            return action.payload.user;
+            return action.payload;
         case LOGOUT:
-            localStorage.removeItem("token");
             return null;
         case UPDATE_PROFILE:
             return action.payload;

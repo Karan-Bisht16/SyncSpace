@@ -83,8 +83,8 @@ function CreatePost(props) {
                     }
                 </div>
                 <PostForm
-                    user={user} predefinedTabIndex="1" type="Post" postData={postData} setPostData={setPostData}
-                    hasPredefinedSubspace={hasPredefinedSubspace} subspacesArray={subspacesArray}
+                    user={user} postData={postData} setPostData={setPostData}
+                    predefinedTabIndex="1" type="Post" hasPredefinedSubspace={hasPredefinedSubspace} subspacesArray={subspacesArray}
                 />
             </Box>
         </Grid>

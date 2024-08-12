@@ -5,29 +5,9 @@ import User from "../models/user.js";
 import Like from "../models/like.js";
 import Join from "../models/join.js";
 import Subspace from "../models/subspace.js";
-import { pagination, postDetailsExtraction, authorAndSubspaceDetails, postDataStructure, baseQuery } from "../utils/functions.js";
+import { pagination, postDetailsExtraction, authorAndSubspaceDetails, postDataStructure, baseQuery } from "../utils/aggregationPipeline.js";
 
 const LIMIT = process.env.POSTS_LIMIT || 2;
-
-const fetchPostInfo = async (req, res) => {
-    try {
-        const { id } = req.query;
-        try {
-            const post = await Post.aggregate([
-                { $match: { _id: new ObjectId(id) } },
-                ...authorAndSubspaceDetails,
-                postDataStructure,
-            ]);
-            if (post.length === 0) {
-                res.status(404).json({ message: "No post found" });
-            } else {
-                res.status(200).json(post[0]);
-            }
-        } catch (BSONError) {
-            res.status(404).json({ message: "No post found" });
-        }
-    } catch (error) { res.status(503).json({ message: "Network error. Try ogain." }) }
-}
 
 const fetchPosts = async (req, res) => {
     try {
@@ -37,12 +17,12 @@ const fetchPosts = async (req, res) => {
         let total = 0;
         let message;
         if (customParams === "HOME_PAGE") {
-            if (req.headers.authorization) {
-                const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
-                const user = await User.findOne({ email: email });
+            if (req.cookies?.accessToken) {
+                const { _id } = jwt.decode(req.cookies?.accessToken);
+                const user = await User.findById(_id);
                 if (user && user.subspacesJoined > 0) {
                     posts = await Join.aggregate([
-                        { $match: { userId: new ObjectId(user._id) } },
+                        { $match: { userId: new ObjectId(_id) } },
                         {
                             $lookup: {
                                 from: "posts",
@@ -55,7 +35,7 @@ const fetchPosts = async (req, res) => {
                         ...baseQuery(startIndex, LIMIT),
                     ]);
                     const [{ totalCount }] = await Join.aggregate([
-                        { $match: { userId: new ObjectId(user._id) } },
+                        { $match: { userId: new ObjectId(_id) } },
                         {
                             $lookup: {
                                 from: "posts",
@@ -141,13 +121,33 @@ const fetchPosts = async (req, res) => {
     } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
+const fetchPostInfo = async (req, res) => {
+    try {
+        const { id } = req.query;
+        try {
+            const post = await Post.aggregate([
+                { $match: { _id: new ObjectId(id) } },
+                ...authorAndSubspaceDetails,
+                postDataStructure,
+            ]);
+            if (post.length === 0) {
+                res.status(404).json({ message: "No post found" });
+            } else {
+                res.status(200).json(post[0]);
+            }
+        } catch (BSONError) {
+            res.status(404).json({ message: "No post found" });
+        }
+    } catch (error) { res.status(503).json({ message: "Network error. Try ogain." }) }
+}
+
 const createPost = async (req, res) => {
     try {
-        const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
+        const { _id } = req.user;
         const post = req.body;
         const newPost = new Post(post);
         await newPost.save();
-        await User.findOneAndUpdate({ email: email }, { $inc: { postsCount: 1 } });
+        await User.findByIdAndUpdate(_id, { $inc: { postsCount: 1 } });
         await Subspace.findByIdAndUpdate(post.subspaceId, { $inc: { postsCount: 1 } });
         res.status(200).json(newPost);
     } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
@@ -157,11 +157,8 @@ const isPostLiked = async (req, res) => {
     try {
         const { postId, userId } = req.query;
         const isLiked = await Like.findOne({ postId: postId, userId: userId });
-        if (isLiked) {
-            res.status(200).json(true);
-        } else {
-            res.status(200).json(false);
-        }
+        if (isLiked) return res.status(200).json(true);
+        res.status(200).json(false);
     } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
@@ -183,25 +180,23 @@ const likePost = async (req, res) => {
 
 const updatePost = async (req, res) => {
     try {
-        const { _id } = jwt.decode(req.headers.authorization.split(" ")[1]);
+        const { _id } = req.user;
         const { postId, updatedData } = req.body;
         const tempUpdatedData = { ...updatedData, edited: true };
         const post = await Post.findById(postId);
-        if (post.authorId.equals(_id)) {
-            await Post.findByIdAndUpdate(postId, tempUpdatedData);
-            res.sendStatus(200);
-        } else {
-            res.status(409).json({ message: "Unauthorised access" });
-        }
+        if (!post.authorId.equals(_id)) return res.status(409).json({ message: "Unauthorised access" });
+
+        await Post.findByIdAndUpdate(postId, tempUpdatedData);
+        res.sendStatus(200);
     } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
 const deletePost = async (req, res) => {
     try {
-        const { email } = jwt.decode(req.headers.authorization.split(" ")[1]);
+        const { _id } = req.user;
         const { postId } = req.query;
         const post = await Post.findByIdAndDelete(postId);
-        await User.findOneAndUpdate({ email: email }, { $inc: { postsCount: -1 } });
+        await User.findByIdAndUpdate(_id, { $inc: { postsCount: -1 } });
         await Subspace.findByIdAndUpdate(post.subspaceId, { $inc: { postsCount: -1 } });
         res.sendStatus(200);
     } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }

@@ -1,11 +1,8 @@
 import React from "react";
 import { Avatar, Box, Grid, Typography } from "@mui/material";
-// Importing styling
-import styles from "./styles"
 
 function RealTimeSubspaceViewer(props) {
-    const { subspaceData, activeStep } = props;
-    const classes = styles();
+    const { classes, subspaceData, avatar, activeStep } = props;
 
     let componentStyle = { display: "block" };
     if (activeStep === 2) {
@@ -16,7 +13,7 @@ function RealTimeSubspaceViewer(props) {
         <Grid item xs={12} lg={3} sx={Object.assign({}, classes.profileContainer, componentStyle)}>
             <Box sx={classes.mainContainer}>
                 <Box sx={classes.avatarContainer}>
-                    <Avatar src={subspaceData.avatar} alt="Subspace Avatar" >{subspaceData.name.charAt(0)}</Avatar>
+                    <Avatar src={avatar?.base64 || avatar} alt="Subspace Avatar" >{subspaceData.name.charAt(0)}</Avatar>
                 </Box>
                 <Box sx={classes.gridItemBox}>
                     <Typography variant="h6" sx={classes.flexContainer}>

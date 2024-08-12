@@ -1,6 +1,6 @@
 import express from "express";
-import auth from "../middleware/auth.js";
-import { fetchPostInfo, fetchPosts, createPost, isPostLiked, likePost, updatePost, deletePost } from "../controllers/postOperations.js";
+import auth from "../middleware/auth.middleware.js";
+import { fetchPosts, fetchPostInfo, createPost, isPostLiked, likePost, updatePost, deletePost } from "../controllers/post.controller.js";
 
 const router = express.Router();
 

@@ -10,7 +10,7 @@ import { SnackBarContext } from "../../store/index";
 // Importing my components
 import InputField from "../../Components/InputField/InputField";
 // Importing actions
-import { getGoogleUser, createGoogleUser, signUp, signIn } from "../../actions/user";
+import { loginViaGoogle, registerViaGoogle, register, login } from "../../actions/user";
 // Importing styling
 import styles from "./styles";
 
@@ -75,7 +75,7 @@ function Authentication() {
     async function googleSuccessFunction(response) {
         if (response.credential) {
             setGoogleToken(response.credential);
-            const { status, result } = await dispatch(getGoogleUser({ token: response.credential }));
+            const { status, result } = await dispatch(loginViaGoogle({ token: response.credential }));
             if (status === 200) {
                 navigate("/", { state: { status: "success", message: "Sign in successful!", time: new Date().getTime() } })
             } else if (status === 409) {
@@ -90,10 +90,9 @@ function Authentication() {
     async function handleUserDialog(event) {
         event.preventDefault();
         setLinearProgressBar(true);
-        const token = googleToken;
-        const { status, result } = await dispatch(createGoogleUser({ token: token, name: authData.userName }));
+        const { status, result } = await dispatch(registerViaGoogle({ token: googleToken, userName: authData.userName }));
         if (status === 200) {
-            navigate("/", { state: { status: "success", message: "Sign in successful!", time: new Date().getTime() } })
+            navigate("/", { state: { status: "success", message: "Sign up successful!", time: new Date().getTime() } })
         } else if (status === 400) {
             setUniqueUserNameError(true);
             setLinearProgressBar(false);
@@ -135,7 +134,7 @@ function Authentication() {
             }
         }
         if (isSignUp) {
-            const { status, result } = await dispatch(signUp(authData));
+            const { status, result } = await dispatch(register(authData));
             if (status === 200) {
                 navigate("/", { state: { status: "success", message: "Sign up successful!", time: new Date().getTime() } })
             } else {
@@ -144,7 +143,7 @@ function Authentication() {
                 return false;
             }
         } else {
-            const { status, result } = await dispatch(signIn(authData));
+            const { status, result } = await dispatch(login(authData));
             if (status === 200) {
                 navigate("/", { state: { status: "success", message: "Sign in successful!", time: new Date().getTime() } })
             } else {

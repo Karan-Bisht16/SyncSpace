@@ -61,6 +61,7 @@ function App() {
                         <Route path="/Trending" element={<Trending user={user} />} />
                         <Route path="/post/:id" element={<PostContainer user={user} />} />
                         <Route path="/ss/:subspaceName" element={<Subspace user={user} />} />
+                        {/* <Route path="/ss/:subspaceName/post/:id" element={<PostContainer user={user} />} /> */}
                         <Route path="/e/:userName" element={<Profile user={user} />} />
                         <Route
                             path="/create-post"

@@ -14,7 +14,7 @@ import { createPost, updatePost } from "../../actions/post";
 import styles from "./styles";
 
 function PostForm(props) {
-    const { postData, predefinedTabIndex, type, hasPredefinedSubspace, postId, subspacesArray, setPostData } = props;
+    const { postData, setPostData, predefinedTabIndex, type, hasPredefinedSubspace, subspacesArray, postId } = props;
     const { mode } = useContext(ColorModeContext);
     const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
     const { dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar } = useContext(ConfirmationDialogContext)
@@ -38,7 +38,7 @@ function PostForm(props) {
             return { ...prevPostData, "body": content };
         });
     }
-    // File Upload
+    // Update file upload in case of Edit Post
     useEffect(() => {
         if (type.toUpperCase() === "EDIT" && predefinedTabIndex === "2") {
             const filesArrayLength = postData.selectedFile.length;

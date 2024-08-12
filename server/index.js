@@ -15,10 +15,9 @@ app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
 app.use(methodOverride("_method"));
-app.use(express.static(__dirname + "/public"));
+app.use(express.static(__dirname + "/uploads"));
 app.use(cookieParser());
 
-// import mongoose from "mongoose";
 import connection from "./database.js";
 connection();
 
@@ -29,13 +28,13 @@ const corsOptions = {
 }
 app.use(cors(corsOptions));
 
-import userRoutes from "./routes/userRoutes.js";
+import userRoutes from "./routes/user.routes.js";
 app.use("/user", userRoutes);
-import subspaceRoutes from "./routes/subspaceRoutes.js";
+import subspaceRoutes from "./routes/subspace.routes.js";
 app.use("/subspace", subspaceRoutes);
-import postRoutes from "./routes/postRoutes.js";
+import postRoutes from "./routes/post.routes.js";
 app.use("/post", postRoutes);
-import commentRoutes from "./routes/commentRoutes.js";
+import commentRoutes from "./routes/comment.routes.js";
 app.use("/comment", commentRoutes);
 
 app.listen(PORT, () => {

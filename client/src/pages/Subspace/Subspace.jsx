@@ -233,7 +233,7 @@ function Subspace(props) {
                                         <Box sx={classes.mainDialog}>
                                             <Box sx={classes.mainText}>
                                                 <Box sx={classes.avatarContainer}>
-                                                    <Avatar sx={classes.subspaceAvatar} src={subspaceData.avatar} alt="Subspace avatar">{subspaceName.charAt(0)}</Avatar>
+                                                    <Avatar sx={classes.subspaceAvatar} src={subspaceData.avatarURL} alt="Subspace avatar">{subspaceName.charAt(0)}</Avatar>
                                                 </Box>
                                                 <Box>
                                                     <Typography sx={classes.subspaceTitle}>{subspaceData.name}</Typography>

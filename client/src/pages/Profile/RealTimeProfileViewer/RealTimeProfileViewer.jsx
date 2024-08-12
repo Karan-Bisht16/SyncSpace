@@ -2,12 +2,9 @@ import React from "react";
 import { Box, Divider, Grid, Typography } from "@mui/material";
 // Importing my components
 import { formatDate } from "../../../utils/functions";
-// Importing styling
-import styles from "./styles";
 
 function RealTimeProfileViwer(props) {
-    const { formData, user } = props;
-    const classes = styles();
+    const { user, classes, formData } = props;
 
     function gridItemContainer(size, value, singularTitle, pluralTitle) {
         return (
