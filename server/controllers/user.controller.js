@@ -3,7 +3,8 @@ import User from "../models/user.js";
 
 const cookiesOptions = {
     httpOnly: true,
-    secure: true
+    secure: true,
+    sameSite: "None"
 };
 
 const condenseUserInfo = (user) => {
