@@ -19,10 +19,6 @@ console.log(env);
 
 app.use(methodOverride("_method"));
 app.use(express.static(__dirname + "/uploads"));
-
-if (env === "PRODUCTION") {
-}
-
 app.use(cookieParser());
 
 import connection from "./database.js";

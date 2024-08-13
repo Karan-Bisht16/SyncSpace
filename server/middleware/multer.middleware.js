@@ -10,14 +10,13 @@ const getExtension = (file) => {
     return ext;
 }
 
-const storage = multer.memoryStorage();
-// const storage = multer.diskStorage({
-//     destination: function (req, file, callback) {
-//         callback(null, "./uploads/temp")
-//     },
-//     filename: function (req, file, callback) {
-//         callback(null, file.fieldname + "-" + uuidv4() + getExtension(file))
-//     }
-// })
+const storage = multer.diskStorage({
+    destination: function (req, file, callback) {
+        callback(null, "./uploads/temp")
+    },
+    filename: function (req, file, callback) {
+        callback(null, file.fieldname + "-" + uuidv4() + getExtension(file))
+    }
+});
 
 export const upload = multer({ storage });

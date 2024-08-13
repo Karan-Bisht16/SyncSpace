@@ -1,6 +1,5 @@
-import fs from "fs";
 import "dotenv/config";
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -9,52 +8,18 @@ cloudinary.config({
 });
 
 const uploadFile = async (fileBuffer) => {
+    if (!fileBuffer) return null;
+
     const result = await new Promise((resolve) => {
         cloudinary.uploader.upload_stream((error, result) => {
             if (error) {
-                return res.status(500).send({ error: 'Failed to upload image' });
+                console.log("FileUploadError: ", error);
+                return res.status(500).send({ error: "Failed to upload image" });
             }
             return resolve(result);
         }).end(fileBuffer);
     });
     return result;
-}
-// const uploadFile = async (filePath) => {
-//     let retries = 0;
-//     let finalStatusValue;
-//     let fileURL;
-//     let filePublicId;
-//     while (retries < 5) {
-//         try {
-//             const { status, ...rest } = await uploadOnCloudinary(filePath);
-//             finalStatusValue = status;
-//             if (status === 0) {
-//                 break;
-//             } else if (status === 1) {
-//                 fs.unlinkSync(filePath);
-//                 fileURL = rest.fileURL;
-//                 filePublicId = rest.filePublicId;
-//                 break;
-//             }
-//         } catch (error) {
-//             console.log(error);
-//             break;
-//         }
-//         retries++;
-//     }
-//     return { retries, finalStatusValue, fileURL, filePublicId };
-// }
-const uploadOnCloudinary = async (localFilePath) => {
-    if (!localFilePath) return { status: 0 };       // 0 -> no file path
-    try {
-        const response = await cloudinary.uploader.upload(localFilePath, {
-            resource_type: "auto"
-        });
-        return { status: 1, fileURL: response.url, filePublicId: response.public_id };      // 1 -> success
-    } catch (error) {
-        console.log(error);
-        return { status: 2 };       // 2 -> failure
-    }
 }
 const deleteFromCloudinary = async (publicId) => {
     if (!publicId) return null;
@@ -77,4 +42,4 @@ const deleteManyFromCloudinary = async (publicIds) => {
     }
 }
 
-export { uploadFile, uploadOnCloudinary, deleteFromCloudinary, deleteManyFromCloudinary };
+export { uploadFile, deleteFromCloudinary, deleteManyFromCloudinary };

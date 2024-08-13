@@ -1,9 +1,10 @@
+import multer from "multer";
 import express from "express";
 import auth from "../middleware/auth.middleware.js";
-import { upload } from "../middleware/multer.middleware.js";
 import { fetchSubspaces, fetchSubspaceInfo, createSubspace, uploadSubspaceAvatar, isSubspaceJoined, joinSubspace, updateSubspace, deleteSubspace } from "../controllers/subspace.controller.js";
 
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.post("/", auth, fetchSubspaces);
 router.get("/info", fetchSubspaceInfo);

@@ -2,8 +2,7 @@ import { ObjectId } from "mongodb";
 import User from "../models/user.js";
 import Join from "../models/join.js";
 import Subspace from "../models/subspace.js";
-import { v2 as cloudinary } from "cloudinary";
-import { uploadFile, deleteFromCloudinary, deleteManyFromCloudinary } from "../utils/cloudinary.js";
+import { uploadFile, deleteFromCloudinary } from "../utils/cloudinary.js";
 
 const LIMIT = process.env.SUBSPACES_LIMIT || 4;
 
@@ -111,7 +110,7 @@ const uploadSubspaceAvatar = async (req, res) => {
         let avatarPublicId;
         if (type.toUpperCase() === "UPDATE") {
             const subspace = await Subspace.findById(subspaceId);
-            if (!req.file) {
+            if (!req.file?.buffer) {
                 if (!subspace.avatarPublicId) return res.sendStatus(200);
 
                 await Subspace.findByIdAndUpdate(subspaceId, { $unset: { avatarURL: "", avatarPublicId: "" } });
@@ -123,40 +122,29 @@ const uploadSubspaceAvatar = async (req, res) => {
                 const avatarDeleted = await deleteFromCloudinary(subspace.avatarPublicId);
                 if (!avatarDeleted) console.error(`FileDeletionError: ${subspace.avatarPublicId}`);
             }
-            const { finalStatusValue, fileURL, filePublicId } = await uploadFile(req.file.path);
-            if (finalStatusValue === 1) {
-                avatarURL = fileURL;
-                avatarPublicId = filePublicId;
-            } else {
-                console.error(`FileUploadError: finalStatusValue = ${finalStatusValue}`);
+            if (req.file?.buffer) {
+                const result = await uploadFile(req.file.buffer);
+                if (result.url && result.public_id) {
+                    avatarURL = result.url;
+                    avatarPublicId = result.public_id;
+
+                    await Subspace.findByIdAndUpdate(subspaceId, { avatarURL: avatarURL, avatarPublicId: avatarPublicId });
+                }
             }
-            await Subspace.findByIdAndUpdate(subspaceId, { avatarURL: avatarURL, avatarPublicId: avatarPublicId });
             return res.sendStatus(200);
         } else if (type.toUpperCase() === "CREATE") {
-            // console.log(req.file.buffer);
-            const result = await uploadFile(req.file.buffer);
-            // await cloudinary.uploader.upload_stream((error, result) => {
-            //     avatarURL = result.url;
-            //     avatarPublicId = result.public_id;
-            // }).end(req.file.buffer);
-            console.log(result);
-            avatarURL = result.url;
-            avatarPublicId = result.public_id;
-            console.log(avatarURL);
-            console.log(avatarPublicId);
-            // if (req.file) {
-            //     const { finalStatusValue, fileURL, filePublicId } = await uploadFile(req.file.path);
-            //     if (finalStatusValue === 1) {
-            //         avatarURL = fileURL;
-            //         avatarPublicId = filePublicId;
-            //     } else {
-            //         console.error(`FileUploadError: finalStatusValue = ${finalStatusValue}`);
-            //     }
-            // }
-            await Subspace.findByIdAndUpdate(subspaceId, { avatarURL: avatarURL, avatarPublicId: avatarPublicId });
+            if (req.file.buffer) {
+                const result = await uploadFile(req.file.buffer);
+                if (result.url && result.public_id) {
+                    avatarURL = result.url;
+                    avatarPublicId = result.public_id;
+
+                    await Subspace.findByIdAndUpdate(subspaceId, { avatarURL: avatarURL, avatarPublicId: avatarPublicId });
+                }
+            }
             return res.sendStatus(200);
         }
-        res.sendStatus(401)
+        res.sendStatus(401);
     } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
 }
 
