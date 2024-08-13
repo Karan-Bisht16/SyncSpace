@@ -12,7 +12,7 @@ const getExtension = (file) => {
 
 const storage = multer.diskStorage({
     destination: function (req, file, callback) {
-        callback(null, "./uploads/temp")
+        callback(null, "../uploads/temp")
     },
     filename: function (req, file, callback) {
         callback(null, file.fieldname + "-" + uuidv4() + getExtension(file))
