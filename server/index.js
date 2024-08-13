@@ -16,13 +16,15 @@ app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
 app.use(methodOverride("_method"));
 app.use(express.static(__dirname + "/uploads"));
+console.log(__dirname);
+console.log(__dirname + "/uploads");
 app.use(cookieParser());
 
 import connection from "./database.js";
 connection();
 
 const corsOptions = {
-    origin: true, 
+    origin: true,
     credentials: true,
     optionsSuccessStatus: 200,
 }
