@@ -14,7 +14,7 @@ function ProfileBar(props) {
 
     const [linkCopied, setLinkCopied] = useState(false);
     function handleLinkCopied() {
-        navigator.clipboard.writeText(process.env.REACT_APP_DOMAIN + "/e/" + user.userName)
+        navigator.clipboard.writeText(window.location.href);
         setLinkCopied(true);
         setSnackbarState(true);
         setSnackbarValue({ message: "Link copied to clipboard", status: "info" });

@@ -14,10 +14,19 @@ const PORT = process.env.PORT || 8080;
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
+const env = process.env.NODE_ENV;
+console.log(env);
+
 app.use(methodOverride("_method"));
 app.use(express.static(__dirname + "/uploads"));
-console.log(__dirname);
-console.log(__dirname + "/uploads");
+
+console.log("deployment");
+if (env === "PRODUCTION") {
+    console.log("production");
+    console.log(__dirname);
+    console.log(__dirname + "/uploads");
+}
+
 app.use(cookieParser());
 
 import connection from "./database.js";
