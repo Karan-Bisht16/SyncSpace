@@ -8,31 +8,42 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-const uploadFile = async (filePath) => {
-    let retries = 0;
-    let finalStatusValue;
-    let fileURL;
-    let filePublicId;
-    while (retries < 5) {
-        try {
-            const { status, ...rest } = await uploadOnCloudinary(filePath);
-            finalStatusValue = status;
-            if (status === 0) {
-                break;
-            } else if (status === 1) {
-                fs.unlinkSync(filePath);
-                fileURL = rest.fileURL;
-                filePublicId = rest.filePublicId;
-                break;
+const uploadFile = async (fileBuffer) => {
+    const result = await new Promise((resolve) => {
+        cloudinary.uploader.upload_stream((error, result) => {
+            if (error) {
+                return res.status(500).send({ error: 'Failed to upload image' });
             }
-        } catch (error) {
-            console.log(error);
-            break;
-        }
-        retries++;
-    }
-    return { retries, finalStatusValue, fileURL, filePublicId };
+            return resolve(result);
+        }).end(fileBuffer);
+    });
+    return result;
 }
+// const uploadFile = async (filePath) => {
+//     let retries = 0;
+//     let finalStatusValue;
+//     let fileURL;
+//     let filePublicId;
+//     while (retries < 5) {
+//         try {
+//             const { status, ...rest } = await uploadOnCloudinary(filePath);
+//             finalStatusValue = status;
+//             if (status === 0) {
+//                 break;
+//             } else if (status === 1) {
+//                 fs.unlinkSync(filePath);
+//                 fileURL = rest.fileURL;
+//                 filePublicId = rest.filePublicId;
+//                 break;
+//             }
+//         } catch (error) {
+//             console.log(error);
+//             break;
+//         }
+//         retries++;
+//     }
+//     return { retries, finalStatusValue, fileURL, filePublicId };
+// }
 const uploadOnCloudinary = async (localFilePath) => {
     if (!localFilePath) return { status: 0 };       // 0 -> no file path
     try {

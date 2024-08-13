@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import User from "../models/user.js";
 import Join from "../models/join.js";
 import Subspace from "../models/subspace.js";
+import { v2 as cloudinary } from "cloudinary";
 import { uploadFile, deleteFromCloudinary, deleteManyFromCloudinary } from "../utils/cloudinary.js";
 
 const LIMIT = process.env.SUBSPACES_LIMIT || 4;
@@ -132,20 +133,31 @@ const uploadSubspaceAvatar = async (req, res) => {
             await Subspace.findByIdAndUpdate(subspaceId, { avatarURL: avatarURL, avatarPublicId: avatarPublicId });
             return res.sendStatus(200);
         } else if (type.toUpperCase() === "CREATE") {
-            if (req.file) {
-                const { finalStatusValue, fileURL, filePublicId } = await uploadFile(req.file.path);
-                if (finalStatusValue === 1) {
-                    avatarURL = fileURL;
-                    avatarPublicId = filePublicId;
-                } else {
-                    console.error(`FileUploadError: finalStatusValue = ${finalStatusValue}`);
-                }
-            }
+            // console.log(req.file.buffer);
+            const result = await uploadFile(req.file.buffer);
+            // await cloudinary.uploader.upload_stream((error, result) => {
+            //     avatarURL = result.url;
+            //     avatarPublicId = result.public_id;
+            // }).end(req.file.buffer);
+            console.log(result);
+            avatarURL = result.url;
+            avatarPublicId = result.public_id;
+            console.log(avatarURL);
+            console.log(avatarPublicId);
+            // if (req.file) {
+            //     const { finalStatusValue, fileURL, filePublicId } = await uploadFile(req.file.path);
+            //     if (finalStatusValue === 1) {
+            //         avatarURL = fileURL;
+            //         avatarPublicId = filePublicId;
+            //     } else {
+            //         console.error(`FileUploadError: finalStatusValue = ${finalStatusValue}`);
+            //     }
+            // }
             await Subspace.findByIdAndUpdate(subspaceId, { avatarURL: avatarURL, avatarPublicId: avatarPublicId });
             return res.sendStatus(200);
         }
         res.sendStatus(401)
-    } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
+    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
 }
 
 const isSubspaceJoined = async (req, res) => {
