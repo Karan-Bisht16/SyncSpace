@@ -7,7 +7,7 @@ import FileBase from "react-file-base64";
 import styles from "./styles"
 
 function FileUpload(props) {
-    const { isMultiple, handleFileUpload, resetSelectedFiles, message } = props;
+    const { isMultiple, handleFileUpload, resetSelectedFiles, title, message } = props;
     const classes = styles();
     function selectFilesFunction(event) {
         const file = document.querySelector("input[type=file]");
@@ -21,7 +21,7 @@ function FileUpload(props) {
             </Box>
             <Box sx={classes.fileUploadButton} onClick={selectFilesFunction}>
                 <Upload sx={{ fontSize: "50px", padding: "8px 0" }}></Upload>
-                Select a file to upload
+                {title || "Select a file to upload"}
                 <span id="fileChosen" style={{ fontSize: "14px", fontWeight: "lighter" }}>
                     No file selected
                 </span>

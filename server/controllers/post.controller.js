@@ -5,6 +5,7 @@ import User from "../models/user.js";
 import Like from "../models/like.js";
 import Join from "../models/join.js";
 import Subspace from "../models/subspace.js";
+import { uploadFile } from "../utils/cloudinary.js";
 import { pagination, postDetailsExtraction, authorAndSubspaceDetails, postDataStructure, baseQuery } from "../utils/aggregationPipeline.js";
 
 const LIMIT = process.env.POSTS_LIMIT || 2;
@@ -153,6 +154,33 @@ const createPost = async (req, res) => {
     } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
+const uploadPostMedia = async (req, res) => {
+    try {
+        const filesArray = req.files;
+        const { postId } = req.body;
+        // console.log(filesArray);
+        let i = 0;
+        let mediaArray = [];
+        while (i < filesArray.length) {
+            const fileBuffer = filesArray[i];
+            const result = await uploadFile(fileBuffer?.buffer);
+            // console.log(result);
+            const mediaObj = {
+                mediaURL: result.url,
+                mediaPublicId: result.public_id,
+                mediaType: result.is_audio ? "audio" : result.resource_type,
+                // mediaSpecificType: result.resource_type+"/"+result.format,
+            };
+            mediaArray.push(mediaObj);
+            i++;
+        }
+        // console.log(mediaArray);
+        await Post.findByIdAndUpdate(postId, { selectedFile: mediaArray });
+        // res.status(409).json({ message: "Testing" });
+        res.sendStatus(200);
+    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+}
+
 const isPostLiked = async (req, res) => {
     try {
         const { postId, userId } = req.query;
@@ -202,4 +230,4 @@ const deletePost = async (req, res) => {
     } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
-export { fetchPosts, fetchPostInfo, createPost, isPostLiked, likePost, updatePost, deletePost };
+export { fetchPosts, fetchPostInfo, createPost, uploadPostMedia, isPostLiked, likePost, updatePost, deletePost };

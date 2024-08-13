@@ -145,7 +145,7 @@ const uploadSubspaceAvatar = async (req, res) => {
             return res.sendStatus(200);
         }
         res.sendStatus(401);
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+    } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
 const isSubspaceJoined = async (req, res) => {

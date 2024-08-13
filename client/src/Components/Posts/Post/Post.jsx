@@ -144,32 +144,33 @@ function Post(props) {
                         <Box sx={classes.fileContainer}>
                             <Carousel slide={false} interval={null} activeIndex={index} onSelect={handleSelect} style={classes.imageContainer}>
                                 {selectedFile.map((file, index) =>
-                                    file.type.includes("image") ?
+                                    file.mediaType.includes("image") ?
                                         <Carousel.Item key={index} style={classes.carouselImageItem}>
-                                            <img src={file.file} alt={title} style={classes.multipleImageBox} />
+                                            <img src={file.mediaURL} alt={title} style={classes.multipleImageBox} />
                                         </Carousel.Item>
                                         :
                                         <Carousel.Item key={index} style={classes.carouselMiscItem}>
-                                            <Box sx={{ textAlign: "center" }}>Multiple files of {file.type} are not implemented.</Box>
+                                            <Box sx={{ textAlign: "center" }}>Multiple files of {file.mediaType} are not implemented.</Box>
                                         </Carousel.Item>
                                 )}
                             </Carousel>
                         </Box>
                         :
                         <Box>
-                            {selectedFile[0].type.includes("image") &&
+                            {selectedFile[0].mediaType.includes("image") &&
                                 <Box sx={classes.imageContainer}>
-                                    <img style={classes.imageBox} src={selectedFile[0].file} alt="post related" />
+                                    <img style={classes.imageBox} src={selectedFile[0].mediaURL} alt="post related" />
                                 </Box>
-                            } {selectedFile[0].type.includes("video") &&
+                            } {selectedFile[0].mediaType.includes("video") &&
                                 <Box sx={classes.imageContainer}>
                                     <video controls style={classes.videoBox}>
-                                        <source type={selectedFile[0].type} src={selectedFile[0].file} />
+                                        {/* mediaType might cause problem */}
+                                        <source type={selectedFile[0].mediaType} src={selectedFile[0].mediaURL} />
                                     </video>
                                 </Box>
-                            }{selectedFile[0].type.includes("audio") &&
+                            }{selectedFile[0].mediaType.includes("audio") &&
                                 <Box sx={classes.audioContainer}>
-                                    <AudioPlayer autoPlay={false} src={selectedFile[0].file} style={classes.audioBox} />
+                                    <AudioPlayer autoPlay={false} src={selectedFile[0].mediaURL} style={classes.audioBox} />
                                 </Box>
                             }
                         </Box>

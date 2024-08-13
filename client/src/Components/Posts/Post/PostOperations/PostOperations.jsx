@@ -14,7 +14,11 @@ function PostOperations(props) {
 
     const [linkCopied, setLinkCopied] = useState(false);
     function handleLinkCopied() {
-        navigator.clipboard.writeText(window.location.href)
+        if (individual) {
+            navigator.clipboard.writeText(window.location.href)
+        } else {
+            navigator.clipboard.writeText(process.env.REACT_APP_DOMAIN + "/post/" + _id);
+        }
         setLinkCopied(true);
         setSnackbarValue({ message: "Link copied to clipboard", status: "info" });
         setSnackbarState(true);

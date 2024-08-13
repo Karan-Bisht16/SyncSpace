@@ -33,6 +33,11 @@ export const deleteSubspace = (subspaceId) => API.delete("/subspace/delete", { p
 export const fetchPosts = (searchParams) => API.post("/post/", searchParams);
 export const fetchPostInfo = (postId) => API.get("/post/info", { params: postId });
 export const createPost = (newPost) => API.post("/post/create", newPost);
+export const uploadPostMedia = (media) => API.post("/post/uploadMedia", media, {
+    headers: {
+        "Content-Type": "multipart/form-data",
+    }
+});
 export const isPostLiked = (postAndUserId) => API.get("/post/isLiked", { params: postAndUserId });
 export const likePost = (actionData) => API.patch("/post/like", actionData);
 export const updatePost = (postData) => API.put("/post/update", postData);

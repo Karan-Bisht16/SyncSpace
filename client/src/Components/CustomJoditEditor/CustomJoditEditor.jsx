@@ -12,15 +12,16 @@ const CustomJoditEditor = React.forwardRef((props, ref) => {
         maxHeight: 500,
         style: { font: "16px Noto Sans" },
         enableDragAndDropFileToEditor: true,
-        buttons: ["source", "|", "bold", "italic", "underline", "strikethrough", "|", "ul", "ol", "|", "font", "fontsize", "|", "left", "center", "right", "justify", "|", "brush", "paragraph", "|", "image", "table", "link", "undo", "redo", "|", "hr", "eraser", "fullsize"],
-        buttonsMD: ["bold", "italic", "underline", "|", "left", "center", "right", "justify", "|", "ul", "ol", "|", "font", "fontsize", "|", "brush", "paragraph", "|", "image", "link", "hr", "fullsize"],
-        buttonsSM: ["bold", "italic", "underline", "|", "left", "center", "right", "justify", "|", "ul", "ol", "|", "font", "fontsize", "|", "brush", "paragraph", "|", "image", "link", "hr", "fullsize"],
-        buttonsXS: ["bold", "italic", "underline", "left", "center", "right", "link", "fontsize", "brush", "paragraph", "image", "fullsize", "dots"],
-        uploader: { insertImageAsBase64URI: true },
+        buttons: ["bold", "italic", "underline", "strikethrough", "|", "ul", "ol", "|", "font", "fontsize", "|", "left", "center", "right", "justify", "|", "brush", "paragraph", "|", "table", "link", "undo", "redo", "|", "hr", "eraser", "fullsize"],
+        buttonsMD: ["bold", "italic", "underline", "|", "left", "center", "right", "justify", "|", "ul", "ol", "|", "font", "fontsize", "|", "brush", "paragraph", "|", "link", "hr", "fullsize"],
+        buttonsSM: ["bold", "italic", "underline", "|", "left", "center", "right", "justify", "|", "ul", "ol", "|", "font", "fontsize", "|", "brush", "paragraph", "|", "link", "hr", "fullsize"],
+        buttonsXS: ["bold", "italic", "underline", "left", "center", "right", "link", "fontsize", "brush", "paragraph", "fullsize", "dots"],
+        uploader: { insertImageAsBase64URI: false },
         showXPathInStatusbar: false,
         toolbarAdaptive: true,
         toolbarSticky: true,
         theme: selectedTheme === "dark" ? "dark" : "default",
+        enter: "br",
     };
 
     return (

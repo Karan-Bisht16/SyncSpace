@@ -11,10 +11,10 @@ const uploadFile = async (fileBuffer) => {
     if (!fileBuffer) return null;
 
     const result = await new Promise((resolve) => {
-        cloudinary.uploader.upload_stream((error, result) => {
+        cloudinary.uploader.upload_stream({ resource_type: "auto" }, (error, result) => {
             if (error) {
-                console.log("FileUploadError: ", error);
-                return res.status(500).send({ error: "Failed to upload image" });
+                console.error("FileUploadError: ", error);
+                return null;
             }
             return resolve(result);
         }).end(fileBuffer);
@@ -27,7 +27,7 @@ const deleteFromCloudinary = async (publicId) => {
         const response = await cloudinary.uploader.destroy(publicId);
         return response;
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return null;
     }
 }
@@ -37,7 +37,7 @@ const deleteManyFromCloudinary = async (publicIds) => {
         const response = await cloudinary.api.delete_resources(publicIds);
         return response;
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return null;
     }
 }

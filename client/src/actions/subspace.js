@@ -22,7 +22,7 @@ export const fetchSubspaceInfo = (subspaceName) => async () => {
         const { data } = await api.fetchSubspaceInfo(subspaceName);
         return { status: 200, result: data };
     } catch (error) { return handleError(error) }
-};
+}
 
 export const createSubspace = (subspaceData) => async (dispatch) => {
     try {
@@ -30,7 +30,7 @@ export const createSubspace = (subspaceData) => async (dispatch) => {
         dispatch({ type: CREATE_SUBSPACE, payload: data });
         return { status: 200, result: data };
     } catch (error) { return handleError(error) }
-};
+}
 
 export const uploadSubspaceAvatar = (avatar) => async () => {
     const { data } = await api.uploadSubspaceAvatar(avatar);
@@ -50,7 +50,7 @@ export const joinSubspace = (actionData) => async (dispatch) => {
         dispatch({ type: JOIN_SUBSPACE, payload: data });
         return { status: 200, result: data };
     } catch (error) { return handleError(error); }
-};
+}
 
 export const updateSubspace = (subspaceData) => async () => {
     try {

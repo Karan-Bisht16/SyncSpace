@@ -21,8 +21,8 @@ function CreatePost(props) {
         authorId: user._id,
         title: "",
         body: "",
-        selectedFile: [],
     });
+    const [selectedFile, setSelectedFile] = useState([]);
     // JS for already set subspace
     const [hasPredefinedSubspace, setHasPredefinedSubspace] = useState(false);
     const [previousSubspace, setPreviousSubspace] = useState(false);
@@ -83,7 +83,7 @@ function CreatePost(props) {
                     }
                 </div>
                 <PostForm
-                    user={user} postData={postData} setPostData={setPostData}
+                    postData={postData} setPostData={setPostData} selectedFile={selectedFile} setSelectedFile={setSelectedFile}
                     predefinedTabIndex="1" type="Post" hasPredefinedSubspace={hasPredefinedSubspace} subspacesArray={subspacesArray}
                 />
             </Box>

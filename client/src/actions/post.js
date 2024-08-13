@@ -13,7 +13,7 @@ export const fetchPosts = (searchParams) => async () => {
         const { data } = await api.fetchPosts(searchParams);
         return data;
     } catch (error) { return handleError(error) }
-};
+}
 
 export const fetchPostInfo = (postId) => async () => {
     try {
@@ -27,7 +27,14 @@ export const createPost = (postData) => async () => {
         const { data } = await api.createPost(postData);
         return { status: 200, result: data };
     } catch (error) { return handleError(error) }
-};
+}
+
+export const uploadPostMedia = (media) => async () => {
+    try {
+        const { data } = await api.uploadPostMedia(media);
+        return { status: 200, result: data };
+    } catch (error) { return handleError(error) }
+}
 
 export const isPostLiked = (postAndUserId) => async () => {
     try {
@@ -48,11 +55,11 @@ export const updatePost = (postData) => async () => {
         const { data } = await api.updatePost(postData);
         return { status: 200, result: data };
     } catch (error) { return handleError(error) }
-};
+}
 
 export const deletePost = (postId) => async () => {
     try {
         const { data } = await api.deletePost(postId);
         return { status: 200, result: data };
     } catch (error) { return handleError(error) }
-};
+}
