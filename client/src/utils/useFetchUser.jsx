@@ -25,10 +25,11 @@ const useFetchUser = (setSnackbarValue, setSnackbarState) => {
                 } else {
                     if (status === 503) {
                         setSnackbarValue({ message: "Server is down. Try again later.", status: "error" });
+                        setSnackbarState(true);
                     } else if (status === 409) {
                         setSnackbarValue({ message: result.message, status: "error" });
+                        setSnackbarState(true);
                     }
-                    setSnackbarState(true);
                     setUser(false);
                 }
                 setLoading(false);
