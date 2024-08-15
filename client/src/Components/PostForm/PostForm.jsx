@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import { Box, Button, Tab, Tabs, TextField } from "@mui/material";
+import { Box, Button, Dialog, DialogContent, DialogContentText, DialogTitle, LinearProgress, Tab, Tabs, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 // Importing my components
-import ConfirmationDialog from "../ConfirmationDialog/ConfirmationDialog";
 import CustomJoditEditor from "../CustomJoditEditor/CustomJoditEditor";
 import FileUpload from "../FileUpload/FileUpload";
 // Importing contexts
-import { ColorModeContext, ConfirmationDialogContext, SnackBarContext } from "../../store";
+import { ColorModeContext } from "../../contexts/Color.context";
+import { SnackBarContext } from "../../contexts/SnackBar.context";
+import { ConfirmationDialogContext } from "../../contexts/ConfirmationDialog.context";
 // Importing actions
-import { createPost, updatePost, uploadPostMedia } from "../../actions/post";
+import { updatePost, uploadPostMedia } from "../../actions/post";
 // Importing styling
 import styles from "./styles";
 
@@ -17,7 +18,7 @@ function PostForm(props) {
     const { postData, setPostData, selectedFile, setSelectedFile, predefinedTabIndex, type, hasPredefinedSubspace, subspacesArray, postId } = props;
     const { mode } = useContext(ColorModeContext);
     const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
-    const { dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar } = useContext(ConfirmationDialogContext)
+    const { openDialog, linearProgressBar, setLinearProgressBar } = useContext(ConfirmationDialogContext);
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -25,6 +26,15 @@ function PostForm(props) {
     const titleTextField = useRef(null);
     const bodyField = useRef(null);
 
+    // JS for Modal
+    const [modal, setModal] = useState(false);
+    const [modalTitle, setModalTitle] = useState("Updating Post")
+    function openModal() {
+        setModal(true);
+    }
+    function closeModal() {
+        setModal(false);
+    }
     // Title Field
     function handleTitleChange(event) {
         const { value } = event.target;
@@ -38,7 +48,7 @@ function PostForm(props) {
             return { ...prevPostData, "body": content };
         });
     }
-    // Update file upload in case of Edit Post
+    // Update File Field in case of edit post
     useEffect(() => {
         if (type.toUpperCase() === "EDIT" && predefinedTabIndex === "2") {
             const filesArrayLength = selectedFile.length;
@@ -46,6 +56,7 @@ function PostForm(props) {
             document.querySelector("#fileChosen").textContent = string;
         }
     });
+    // File Field
     function handleFileUpload(event) {
         let filesArray = [];
         let flagForSize = false;
@@ -57,7 +68,6 @@ function PostForm(props) {
                 let fileSize = Number(file.size.slice(0, file.size.length - 2));
                 cummulativeFileSize += fileSize;
                 if (fileSize <= process.env.REACT_APP_POST_FILE_SIZE && cummulativeFileSize <= process.env.REACT_APP_POST_FILE_SIZE) {
-                    // filesArray.push({ file: file.base64, type: file.type });
                     filesArray.push(file);
                 } else {
                     flagForSize = true;
@@ -105,23 +115,6 @@ function PostForm(props) {
         });
         resetSelectedFiles();
     }
-    async function handleEdit() {
-        let updatedData;
-        if (tabIndex === "1") {
-            const { selectedFile, ...rest } = postData;
-            updatedData = rest;
-        } else if (tabIndex === "2") {
-            const { body, ...rest } = postData;
-            updatedData = rest;
-        }
-        const { status, result } = await dispatch(updatePost({ postId: postId, updatedData }));
-        if (status === 200) {
-            navigate("/post/" + postId);
-        } else {
-            setSnackbarValue({ message: result.message, status: "error" });
-            setSnackbarState(true);
-        }
-    }
     function openDialogContent(titleText) {
         openDialog({
             title: titleText,
@@ -133,7 +126,8 @@ function PostForm(props) {
                     <br /><br />
                     Proceed?
                 </span>,
-            cancelBtnText: "Cancel", submitBtnText: "Post"
+            cancelBtnText: "Cancel", submitBtnText: "Post", dialogId: 1,
+            rest: { navigate, postData, selectedFile, type, tabIndex, openDialogContent }
         });
     }
     // Submit Form
@@ -143,7 +137,7 @@ function PostForm(props) {
             titleTextField.current.focus();
             return false;
         }
-        if (tabIndex === "1" && (postData.body.trim() === "" || postData.body.trim() === "<p><br></p>")) {
+        if (tabIndex === "1" && (!postData.body || postData.body.trim() === "" || postData.body.trim() === "<p><br></p>")) {
             document.querySelector("div.jodit-wysiwyg").focus();
             return false;
         }
@@ -162,45 +156,40 @@ function PostForm(props) {
             }
             return false;
         }
-        // console.log(postData);
-        // console.log(selectedFile);
-        openDialogContent("Confirm Post");
+        if (type.toUpperCase() === "POST") {
+            openDialogContent("Confirm Post");
+        } else if (type.toUpperCase() === "EDIT") {
+            handleEditPost();
+        }
     }
-    async function handleDialog() {
+    async function handleEditPost() {
+        openModal();
         setLinearProgressBar(true);
-        try {
-            let updatedData;
-            if (tabIndex === "1") {
-                updatedData = postData;
-            } else if (tabIndex === "2") {
-                const { body, ...rest } = postData;
-                updatedData = rest;
-            }
-            const { status, result } = await dispatch(createPost(updatedData));
-            closeDialog();
-            if (status === 200) {
-                const postId = result._id;
-                // console.log(selectedFile);
-                if (selectedFile.length > 0) {
-                    openDialogContent("Uploading Media");
-                    setLinearProgressBar(true);
-                    const { status, result } = await dispatch(uploadPostMedia({ selectedFile, postId }));
-                    if (status === 200) {
-                        navigate("/", { state: { status: "success", message: "Post added!", time: new Date().getTime() } });
-                    } else {
-                        setSnackbarValue({ message: result.message, status: "error" });
-                        setSnackbarState(true);
-                    }
-                    closeDialog();
+        let updatedData;
+        if (tabIndex === "1") {
+            updatedData = postData;
+        } else if (tabIndex === "2") {
+            const { body, ...rest } = postData;
+            updatedData = rest;
+        }
+        const { status, result } = await dispatch(updatePost({ postId: postId, updatedData }));
+        if (status === 200) {
+            if (selectedFile?.length === 0 || selectedFile[0]?.name) {
+                setModalTitle("Updating Media");
+                const { status, result } = await dispatch(uploadPostMedia({ selectedFile, postId, type }));
+                if (status === 200) {
+                    navigate(`/post/${postId}`);
+                } else {
+                    setSnackbarValue({ message: result.message, status: "error" });
+                    setSnackbarState(true);
                 }
-                navigate("/", { state: { status: "success", message: "Post added!", time: new Date().getTime() } });
             } else {
-                setSnackbarValue({ message: result.message, status: "error" });
-                setSnackbarState(true);
+                navigate(`/post/${postId}`);
             }
-        } catch (error) {
-            closeDialog();
-            setSnackbarValue({ message: error.message, status: "error" });
+            closeModal();
+            setLinearProgressBar(false);
+        } else {
+            setSnackbarValue({ message: result.message, status: "error" });
             setSnackbarState(true);
         }
     }
@@ -251,14 +240,23 @@ function PostForm(props) {
                 }
                 <Box sx={{ float: "right" }}>
                     <Button variant="outlined" size="large" onClick={handleClear} sx={classes.clearBtn}>Clear</Button>
-                    {type.toUpperCase() === "EDIT" ?
-                        <Button variant="contained" color="primary" size="large" onClick={handleEdit} sx={classes.postBtn}>Edit</Button>
-                        :
-                        <Button variant="contained" color="primary" size="large" type="submit" sx={classes.postBtn}>Post</Button>
-                    }
+                    <Button variant="contained" color="primary" size="large" type="submit" sx={classes.postBtn}>{type}</Button>
                 </Box>
             </form>
-            <ConfirmationDialog dialog={dialog} closeDialog={closeDialog} handleDialog={handleDialog} linearProgressBar={linearProgressBar} dialogValue={dialogValue} />
+            <Dialog
+                open={modal}
+                onClose={closeModal}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <DialogTitle id="alert-dialog-title" sx={{ padding: "8px 24px" }}>{modalTitle}</DialogTitle>
+                <LinearProgress sx={{ opacity: linearProgressBar ? "1" : "0" }} />
+                <DialogContent sx={{ padding: "8px 24px" }}>
+                    <DialogContentText id="alert-dialog-description" sx={{ textAlign: "justify" }}>
+                        This may take a few moments. Please wait.
+                    </DialogContentText>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

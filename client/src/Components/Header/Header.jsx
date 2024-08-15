@@ -7,7 +7,8 @@ import { useDispatch } from "react-redux";
 import CustomDrawer from "../CustomDrawer/CustomDrawer";
 import ToolBar from "../ToolBar/ToolBar";
 // Importing contexts
-import { ColorModeContext, SnackBarContext } from "../../store";
+import { ColorModeContext } from "../../contexts/Color.context";
+import { SnackBarContext } from "../../contexts/SnackBar.context";
 // Importing actions
 import { logoutUser } from "../../actions/user";
 // Importing styling

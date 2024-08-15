@@ -49,7 +49,7 @@ function SubspaceList(props) {
     return (
         <div className="mx-auto my-10">
             {data &&
-                data.results.map((item, index) => (
+                data?.results?.map((item, index) => (
                     <Box></Box>
                 ))}
 

@@ -1,14 +1,14 @@
 import jwt from "jsonwebtoken";
 import { ObjectId } from "mongodb";
-import Post from "../models/post.js";
-import User from "../models/user.js";
-import Like from "../models/like.js";
-import Join from "../models/join.js";
-import Subspace from "../models/subspace.js";
-import { uploadFile } from "../utils/cloudinary.js";
+import User from "../models/user.model.js";
+import Post from "../models/post.model.js";
+import Like from "../models/like.model.js";
+import Join from "../models/join.model.js";
+import Subspace from "../models/subspace.model.js";
+import { uploadFile, deleteFromCloudinary } from "../utils/cloudinary.js";
 import { pagination, postDetailsExtraction, authorAndSubspaceDetails, postDataStructure, baseQuery } from "../utils/aggregationPipeline.js";
 
-const LIMIT = process.env.POSTS_LIMIT || 2;
+const LIMIT = process.env.POSTS_LIMIT || 4;
 
 const fetchPosts = async (req, res) => {
     try {
@@ -150,35 +150,68 @@ const createPost = async (req, res) => {
         await newPost.save();
         await User.findByIdAndUpdate(_id, { $inc: { postsCount: 1 } });
         await Subspace.findByIdAndUpdate(post.subspaceId, { $inc: { postsCount: 1 } });
-        res.status(200).json(newPost);
+        const updatedPostForm = await Post.aggregate([
+            { $match: { _id: newPost._id } },
+            ...authorAndSubspaceDetails,
+            postDataStructure,
+        ]);
+        res.status(200).json(updatedPostForm[0]);
     } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
 const uploadPostMedia = async (req, res) => {
     try {
-        const filesArray = req.files;
-        const { postId } = req.body;
-        // console.log(filesArray);
-        let i = 0;
-        let mediaArray = [];
-        while (i < filesArray.length) {
-            const fileBuffer = filesArray[i];
-            const result = await uploadFile(fileBuffer?.buffer);
-            // console.log(result);
-            const mediaObj = {
-                mediaURL: result.url,
-                mediaPublicId: result.public_id,
-                mediaType: result.is_audio ? "audio" : result.resource_type,
-                // mediaSpecificType: result.resource_type+"/"+result.format,
-            };
-            mediaArray.push(mediaObj);
-            i++;
+        const { postId, type } = req.body;
+        if (type.toUpperCase() === "EDIT") {
+            const post = await Post.findById(postId);
+            const mediaArray = post.selectedFile;
+            if (mediaArray && mediaArray.length > 0) {
+                for (let i = 0; i < mediaArray.length; i++) {
+                    const { mediaPublicId, mediaType } = mediaArray[i];
+                    const type = mediaType.substring(0, mediaType.indexOf("/"));
+                    const resourceType = (type === "audio") ? "video" : type;
+                    await deleteFromCloudinary(mediaPublicId, resourceType);
+                }
+            }
+            let newMediaArray = [];
+            const filesArray = req.files;
+            if (filesArray && filesArray.length > 0) {
+                for (let i = 0; i < filesArray.length; i++) {
+                    const fileBuffer = filesArray[i];
+                    const result = await uploadFile(fileBuffer?.buffer);
+                    const mediaObj = {
+                        mediaURL: result.url,
+                        mediaPublicId: result.public_id,
+                        mediaType: (result.is_audio ? "audio" : result.resource_type) + "/" + result.format,
+                    };
+                    newMediaArray.push(mediaObj);
+                }
+                await Post.findByIdAndUpdate(postId, {
+                    $set: { selectedFile: newMediaArray },
+                    $unset: { body: "" }
+                });
+            } else {
+                await Post.findByIdAndUpdate(postId, { selectedFile: newMediaArray });
+            }
+            return res.sendStatus(200);
+        } else if (type.toUpperCase() === "POST") {
+            const filesArray = req.files;
+            let mediaArray = [];
+            for (let i = 0; i < filesArray.length; i++) {
+                const fileBuffer = filesArray[i];
+                const result = await uploadFile(fileBuffer?.buffer);
+                const mediaObj = {
+                    mediaURL: result.url,
+                    mediaPublicId: result.public_id,
+                    mediaType: (result.is_audio ? "audio" : result.resource_type) + "/" + result.format,
+                };
+                mediaArray.push(mediaObj);
+            }
+            await Post.findByIdAndUpdate(postId, { selectedFile: mediaArray });
+            return res.sendStatus(200);
         }
-        // console.log(mediaArray);
-        await Post.findByIdAndUpdate(postId, { selectedFile: mediaArray });
-        // res.status(409).json({ message: "Testing" });
-        res.sendStatus(200);
-    } catch (error) { console.log(error); res.status(503).json({ message: "Network error. Try again." }) }
+        res.sendStatus(401);
+    } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
 const isPostLiked = async (req, res) => {
@@ -215,7 +248,7 @@ const updatePost = async (req, res) => {
         if (!post.authorId.equals(_id)) return res.status(409).json({ message: "Unauthorised access" });
 
         await Post.findByIdAndUpdate(postId, tempUpdatedData);
-        res.sendStatus(200);
+        res.status(200).json({ message: "Testing" });
     } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }
 
@@ -226,6 +259,15 @@ const deletePost = async (req, res) => {
         const post = await Post.findByIdAndDelete(postId);
         await User.findByIdAndUpdate(_id, { $inc: { postsCount: -1 } });
         await Subspace.findByIdAndUpdate(post.subspaceId, { $inc: { postsCount: -1 } });
+        const filesArray = post.selectedFile;
+        if (filesArray && filesArray.length > 0) {
+            for (let i = 0; i < filesArray.length; i++) {
+                const { mediaPublicId, mediaType } = filesArray[i];
+                const type = mediaType.substring(0, mediaType.indexOf("/"));
+                const resourceType = (type === "audio") ? "video" : type;
+                await deleteFromCloudinary(mediaPublicId, resourceType);
+            }
+        }
         res.sendStatus(200);
     } catch (error) { res.status(503).json({ message: "Network error. Try again." }) }
 }

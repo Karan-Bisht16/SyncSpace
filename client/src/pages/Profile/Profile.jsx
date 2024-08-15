@@ -10,7 +10,7 @@ import ProfileBar from "../../Components/ProfileBar/ProfileBar";
 import UserPostsBlock from "./UserPostsBlock/UserPostsBlock";
 import NotFound from "../../Components/NotFound/NotFound";
 // Importing contexts
-import { SnackBarContext } from "../../store";
+import { SnackBarContext } from "../../contexts/SnackBar.context";
 // Importing actions
 import { fetchUserInfo, updateProfile } from "../../actions/user";
 // Importing styling

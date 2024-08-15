@@ -1,9 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, LinearProgress } from "@mui/material";
 
 function ConfirmationDialog(props) {
-    const { dialog, closeDialog, handleDialog, linearProgressBar, dialogValue } = props;
+    const { dialog, dialogValue, closeDialog, handleDialog, linearProgressBar } = props;
     const { title, message, cancelBtnText, submitBtnText, type } = dialogValue;
+
+    const [isDisabled, setIsDisabled] = useState(false);
+
+    const dialogFunction = async () => {
+        setIsDisabled(true);
+        await handleDialog();
+        setIsDisabled(false);
+    }
 
     return (
         <Dialog
@@ -18,8 +26,10 @@ function ConfirmationDialog(props) {
                 <DialogContentText id="alert-dialog-description" sx={{ textAlign: "justify" }}>{message}</DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={closeDialog}>{cancelBtnText}</Button>
-                <Button id="focusPostBtn" variant="contained" color={type} onClick={handleDialog}>{submitBtnText}</Button>
+                <Button disabled={isDisabled} onClick={closeDialog}>{cancelBtnText}</Button>
+                <Button id="focusPostBtn" disabled={isDisabled} variant="contained" color={type} onClick={dialogFunction}>
+                    {submitBtnText}
+                </Button>
             </DialogActions>
         </Dialog>
     );

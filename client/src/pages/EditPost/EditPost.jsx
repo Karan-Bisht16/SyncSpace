@@ -7,7 +7,7 @@ import { lineSpinner } from "ldrs";
 import PostForm from "../../Components/PostForm/PostForm";
 import NotFound from "../../Components/NotFound/NotFound";
 // Importing contexts
-import { SnackBarContext } from "../../store";
+import { SnackBarContext } from "../../contexts/SnackBar.context";
 // Importing actions
 import { fetchPostInfo } from "../../actions/post";
 // Importing styling
@@ -31,6 +31,7 @@ function EditPost(props) {
         body: "",
         selectedFile: [],
     });
+    const [selectedFile, setSelectedFile] = useState([]);
     const [validation, setValidation] = useState(false);
     const [predefinedTabIndex, setPredefinedTabIndex] = useState("1");
     const [previousSubspace, setPreviousSubspace] = useState(false);
@@ -45,8 +46,8 @@ function EditPost(props) {
                 setPostFormData({
                     title: result.title,
                     body: result.body,
-                    selectedFile: result.selectedFile,
                 });
+                setSelectedFile(result.selectedFile);
                 setAllPostFormDataSet(true);
             } else {
                 setSnackbarValue({ message: result.message, status: "error" });
@@ -61,13 +62,14 @@ function EditPost(props) {
             setPostFormData({
                 title: postData.title,
                 body: postData.body,
-                selectedFile: postData.selectedFile,
             });
+            setSelectedFile(postData.selectedFile);
             setAllPostFormDataSet(true);
         } else {
             getPostInfo();
         }
     }, [location.state, id, user._id, dispatch, setSnackbarValue, setSnackbarState]);
+
     return (
         <Grid container sx={classes.flexContainer}>
             <Grid item xs={0} md={2} sx={classes.leftContainer}></Grid>
@@ -82,7 +84,7 @@ function EditPost(props) {
                                     sx={{ width: "300px", padding: "4px 0 8px 0" }}
                                 />
                                 <PostForm
-                                    user={user} postData={postFormData} setPostData={setPostFormData}
+                                    postData={postFormData} setPostData={setPostFormData} selectedFile={selectedFile} setSelectedFile={setSelectedFile}
                                     predefinedTabIndex={predefinedTabIndex} type="Edit" hasPredefinedSubspace={true} postId={id}
                                 />
                             </>

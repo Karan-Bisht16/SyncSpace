@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
-import User from "../models/user.js";
-import Join from "../models/join.js";
-import Subspace from "../models/subspace.js";
+import User from "../models/user.model.js";
+import Join from "../models/join.model.js";
+import Subspace from "../models/subspace.model.js";
 import { uploadFile, deleteFromCloudinary } from "../utils/cloudinary.js";
 
 const LIMIT = process.env.SUBSPACES_LIMIT || 4;

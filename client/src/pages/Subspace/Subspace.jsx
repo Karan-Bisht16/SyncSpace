@@ -5,15 +5,16 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { lineSpinner } from "ldrs";
 // Importing my components
-import ConfirmationDialog from "../../Components/ConfirmationDialog/ConfirmationDialog";
 import SubspaceProfileBar from "./SubspaceProfileBar/SubspaceProfileBar";
 import { formatMembersCount } from "../../utils/functions";
 import NotFound from "../../Components/NotFound/NotFound";
 import Posts from "../../Components/Posts/Posts";
 // Importing contexts
-import { ReRenderContext, ConfirmationDialogContext, SnackBarContext } from "../../store";
+import { ReRenderContext } from "../../contexts/ReRender.context";
+import { SnackBarContext } from "../../contexts/SnackBar.context";
+import { ConfirmationDialogContext } from "../../contexts/ConfirmationDialog.context";
 // Importing actions
-import { fetchSubspaceInfo, joinSubspace, deleteSubspace, isSubspaceJoined } from "../../actions/subspace";
+import { fetchSubspaceInfo, joinSubspace, isSubspaceJoined } from "../../actions/subspace";
 // Importing styling
 import styles from "./styles";
 
@@ -22,7 +23,7 @@ function Subspace(props) {
     const { subspaceName } = useParams();
     const { setReRender } = useContext(ReRenderContext);
     const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
-    const { dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar } = useContext(ConfirmationDialogContext);
+    const { openDialog } = useContext(ConfirmationDialogContext);
     const classes = styles();
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -141,7 +142,8 @@ function Subspace(props) {
         } else {
             openDialog({
                 title: "Join Subspace", message: `Join ss/${subspaceName} to create posts.`,
-                cancelBtnText: "Cancel", submitBtnText: "Join"
+                cancelBtnText: "Cancel", submitBtnText: "Join", dialogId: 4,
+                rest: { navigate, subspaceData, subspaceName, handleJoin }
             });
         }
     }
@@ -175,26 +177,9 @@ function Subspace(props) {
                     <br /><br />
                     Are you sure you want to proceed?
                 </span>,
-            cancelBtnText: "Cancel", submitBtnText: "Delete", type: "error"
+            cancelBtnText: "Cancel", submitBtnText: "Delete", type: "error", dialogId: 5,
+            rest: { navigate, subspaceData }
         });
-    }
-    async function handleDialog() {
-        setLinearProgressBar(true);
-        if (dialogValue.submitBtnText.toUpperCase() === "JOIN") {
-            await handleJoin();
-            closeDialog();
-            navigate("/create-post", { state: { subspaceName, subspaceId: subspaceData?._id } });
-        } else if (dialogValue.submitBtnText.toUpperCase() === "DELETE") {
-            const { status, result } = await dispatch(deleteSubspace({ subspaceId: subspaceData?._id }));
-            closeDialog();
-            if (status === 200) {
-                setReRender(prevReRender => !prevReRender);
-                navigate("/", { state: { message: "Subspace deleted successfully", status: "success", time: new Date().getTime() } });
-            } else {
-                setSnackbarValue({ message: result.message, status: "error" });
-                setSnackbarValue(true);
-            }
-        }
     }
 
     return (
@@ -323,7 +308,6 @@ function Subspace(props) {
                     </>
                 }
             </Box>
-            <ConfirmationDialog dialog={dialog} closeDialog={closeDialog} handleDialog={handleDialog} linearProgressBar={linearProgressBar} dialogValue={dialogValue} />
         </Grid>
     );
 }

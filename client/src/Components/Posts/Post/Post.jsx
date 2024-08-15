@@ -11,7 +11,7 @@ import parse from "html-react-parser";
 import { formatDate, formatTime } from "../../../utils/functions";
 import BodyFooter from "./BodyFooter/BodyFooter";
 // Importing contexts
-import { SnackBarContext } from "../../../store/index";
+import { SnackBarContext } from "../../../contexts/SnackBar.context";
 // Importing actions
 import { isPostLiked, likePost } from "../../../actions/post";
 // Importing styling
@@ -76,6 +76,40 @@ function Post(props) {
             parse(body, options)
         );
     }
+    function bodyMedia(file, index) {
+        if (file.mediaType.includes("image")) {
+            return (
+                <Carousel.Item key={index} style={classes.carouselImageItem}>
+                    <img src={file.mediaURL} alt={title} style={classes.multipleImageBox} />
+                </Carousel.Item>
+            )
+        } else if (file.mediaType.includes("audio")) {
+            return (
+                <Carousel.Item key={index} style={classes.carouselAudioItem}>
+                    <Box sx={classes.audioContainer}>
+                        <AudioPlayer autoPlay={false} src={file.mediaURL} style={classes.multipleAudioBox} />
+                    </Box>
+                </Carousel.Item>
+            )
+        } else if (file.mediaType.includes("video")) {
+            return (
+                <Carousel.Item key={index} style={classes.carouselAudioItem}>
+                    <Box sx={classes.imageContainer}>
+                        <video controls style={classes.videoBox}>
+                            <source type={file.mediaType} src={file.mediaURL} />
+                        </video>
+                    </Box>
+                </Carousel.Item>
+            )
+        }
+        else {
+            return (
+                <Carousel.Item key={index} style={classes.carouselMiscItem}>
+                    <Box sx={{ textAlign: "center" }}>Multiple files of {file.mediaType} are not implemented.</Box>
+                </Carousel.Item>
+            )
+        }
+    }
     const [postLikesCount, setPostLikesCount] = useState(likesCount);
     async function handleLike() {
         if (user) {
@@ -101,6 +135,7 @@ function Post(props) {
             navigate("/authentication");
         }
     }
+
     return (
         <Grid item sx={classes.mainContainer}>
             <Box>
@@ -144,14 +179,7 @@ function Post(props) {
                         <Box sx={classes.fileContainer}>
                             <Carousel slide={false} interval={null} activeIndex={index} onSelect={handleSelect} style={classes.imageContainer}>
                                 {selectedFile.map((file, index) =>
-                                    file.mediaType.includes("image") ?
-                                        <Carousel.Item key={index} style={classes.carouselImageItem}>
-                                            <img src={file.mediaURL} alt={title} style={classes.multipleImageBox} />
-                                        </Carousel.Item>
-                                        :
-                                        <Carousel.Item key={index} style={classes.carouselMiscItem}>
-                                            <Box sx={{ textAlign: "center" }}>Multiple files of {file.mediaType} are not implemented.</Box>
-                                        </Carousel.Item>
+                                    bodyMedia(file, index)
                                 )}
                             </Carousel>
                         </Box>
@@ -164,11 +192,10 @@ function Post(props) {
                             } {selectedFile[0].mediaType.includes("video") &&
                                 <Box sx={classes.imageContainer}>
                                     <video controls style={classes.videoBox}>
-                                        {/* mediaType might cause problem */}
                                         <source type={selectedFile[0].mediaType} src={selectedFile[0].mediaURL} />
                                     </video>
                                 </Box>
-                            }{selectedFile[0].mediaType.includes("audio") &&
+                            } {selectedFile[0].mediaType.includes("audio") &&
                                 <Box sx={classes.audioContainer}>
                                     <AudioPlayer autoPlay={false} src={selectedFile[0].mediaURL} style={classes.audioBox} />
                                 </Box>

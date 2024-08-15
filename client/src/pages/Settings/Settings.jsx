@@ -1,23 +1,19 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { Box, Button, Divider, Grid, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 // Importing my components
-import ConfirmationDialog from "../../Components/ConfirmationDialog/ConfirmationDialog";
 import InputField from "../../Components/InputField/InputField";
 // Importing actions
-import { ConfirmationDialogContext, SnackBarContext } from "../../store/index";
-// Importing actions
-import { changePassword, deleteProfile } from "../../actions/user";
+import { SnackBarContext } from "../../contexts/SnackBar.context";
+import { ConfirmationDialogContext } from "../../contexts/ConfirmationDialog.context";
 // Importing styling
 import styles from "./styles";
 
 function Settings(props) {
     const { user } = props;
     const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
-    const { dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar } = useContext(ConfirmationDialogContext);
+    const { openDialog } = useContext(ConfirmationDialogContext);
     const classes = styles();
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -81,38 +77,9 @@ function Settings(props) {
                     <br /><br />
                     Proceed?
                 </span>,
-            cancelBtnText: "Cancel", submitBtnText: "Change"
+            cancelBtnText: "Cancel", submitBtnText: "Change", dialogId: 8,
+            rest: { navigate, formData }
         });
-    }
-    function handleResult(status, result, type) {
-        closeDialog();
-        if (status === 200) {
-            if (type === "DELETE") {
-                navigate("/");
-                window.location.reload();
-            } else if (type === "CHANGE") {
-                navigate(-1);
-            }
-        } else {
-            setSnackbarValue({ message: result.message, status: "error" });
-            setSnackbarState(true);
-        }
-    }
-    async function handleDialog() {
-        setLinearProgressBar(true);
-        try {
-            if (dialogValue.submitBtnText.toUpperCase() === "CHANGE") {
-                const { status, result } = await dispatch(changePassword(formData));
-                handleResult(status, result, "CHANGE");
-            } else if (dialogValue.submitBtnText.toUpperCase() === "DELETE") {
-                const { status, result } = await dispatch(deleteProfile());
-                handleResult(status, result, "DELETE");
-            }
-        } catch (error) {
-            closeDialog();
-            setSnackbarValue({ message: error.message, status: "error" });
-            setSnackbarState(true);
-        }
     }
     function handleDelete() {
         openDialog({
@@ -124,7 +91,8 @@ function Settings(props) {
                     <br /><br />
                     Are you sure you want to proceed?
                 </span>,
-            cancelBtnText: "Cancel", submitBtnText: "Delete", type: "error"
+            cancelBtnText: "Cancel", submitBtnText: "Delete", type: "error", dialogId: 9,
+            rest: { navigate }
         });
     }
 
@@ -164,7 +132,6 @@ function Settings(props) {
                 </Typography>
                 <Button variant="contained" color="error" onClick={handleDelete}>Delete Account</Button>
             </Box>
-            <ConfirmationDialog dialog={dialog} closeDialog={closeDialog} handleDialog={handleDialog} linearProgressBar={linearProgressBar} dialogValue={dialogValue} />
         </Grid>
     );
 }

@@ -7,7 +7,8 @@ import { useDispatch } from "react-redux";
 import { formatTime } from "../../utils/functions";
 import InputField from "../InputField/InputField";
 // Importing contexts
-import { SnackBarContext } from "../../store";
+import { ConfirmationDialogContext } from "../../contexts/ConfirmationDialog.context";
+import { SnackBarContext } from "../../contexts/SnackBar.context";
 // Importing actions
 import { deleteComment, createReply, fetchReplies } from "../../actions/comment";
 // Importing styling
@@ -17,6 +18,7 @@ function Comment(props) {
     const { user, authorId, commentData, intendation } = props;
     const { _id, postId, userId, parentId, comment, repliesCount, userDetails, createdAt } = commentData;
     const { userName, avatar } = userDetails;
+    const { openDialog } = useContext(ConfirmationDialogContext);
     const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
     const classes = styles();
     const dispatch = useDispatch();
@@ -76,6 +78,24 @@ function Comment(props) {
             setSnackbarState(true);
         }
     }
+    function handleCancelReply() {
+        if (reply.trim() !== "") {
+            openDialog({
+                title: "Discard reply",
+                message:
+                    <span>
+                        Are you sure you want to discard your comment? This action cannot be undone.
+                        <br /><br />
+                        Proceed?
+                    </span>,
+                cancelBtnText: "Cancel", submitBtnText: "Discard", dialogId: 7,
+                rest: { setReply, setOpenReply }
+            });
+        }
+        else {
+            setOpenReply(false);
+        }
+    }
     function resetIntendation() {
         setUpdatedIntendation(0);
     }
@@ -123,7 +143,7 @@ function Comment(props) {
                                         sx={{ bgcolor: "background.secondary" }}
                                     />
                                     <Box sx={{ display: "flex", gap: "8px", justifyContent: "end", margin: "8px auto" }}>
-                                        <Button variant="outlined" sx={classes.replyCancelBtn} onClick={()=>setOpenReply(false)}>Cancel</Button>
+                                        <Button variant="outlined" sx={classes.replyCancelBtn} onClick={handleCancelReply}>Cancel</Button>
                                         <Button variant="contained" sx={classes.replyAddBtn} onClick={handleAddReply}>Add</Button>
                                     </Box>
                                 </Box>

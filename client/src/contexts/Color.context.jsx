@@ -1,10 +1,6 @@
 import { ThemeProvider, createTheme } from "@mui/material";
 import { createContext, useState, useEffect, useMemo } from "react";
 
-export const ColorModeContext = createContext({
-    toggleMode: () => { },
-    mode: "dark",
-});
 const getDesignTokens = (mode) => ({
     palette: {
         mode,
@@ -56,6 +52,10 @@ const getDesignTokens = (mode) => ({
         }
     },
 });
+export const ColorModeContext = createContext({
+    toggleMode: () => { },
+    mode: "dark",
+});
 export const ColorContextProvider = ({ children }) => {
     const [mode, setMode] = useState("dark");
     const [isInitialized, setIsInitialized] = useState(false);
@@ -82,58 +82,4 @@ export const ColorContextProvider = ({ children }) => {
             <ThemeProvider theme={theme}>{children}</ThemeProvider>
         </ColorModeContext.Provider>
     );
-}
-
-export const ReRenderContext = createContext();
-export const ReRenderProvider = ({ children }) => {
-    const [reRender, setReRender] = useState(false);
-
-    return (
-        <ReRenderContext.Provider value={{ reRender, setReRender }}>
-            {children}
-        </ReRenderContext.Provider>
-    );
-};
-
-export const ConfirmationDialogContext = createContext();
-export const ConfirmationDialogProvider = ({ children }) => {
-    const [dialog, setDialog] = useState(false);
-    const [dialogValue, setDialogValue] = useState({
-        title: "",
-        message: "",
-        cancelBtnText: "",
-        submitBtnText: "",
-    });
-    const [linearProgressBar, setLinearProgressBar] = useState(false);
-    async function openDialog(values) {
-        await setDialogValue(values);
-        await setDialog(true);
-        document.querySelector("#focusPostBtn").focus();
-    };
-    function closeDialog() {
-        setDialog(false);
-        setLinearProgressBar(false)
-    };
-
-    return (
-        <ConfirmationDialogContext.Provider value={{ dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar }}>
-            {children}
-        </ConfirmationDialogContext.Provider>
-    )
-}
-
-export const SnackBarContext = createContext();
-export const SnackBarProvider = ({ children }) => {
-    const [snackbarState, setSnackbarState] = useState(false);
-    const [snackbarValue, setSnackbarValue] = useState({ message: "", status: "" });
-    function handleSnackbarState(event, reason) {
-        if (reason === "clickaway") { return }
-        setSnackbarState(false);
-    }
-
-    return (
-        <SnackBarContext.Provider value={{ snackbarValue, snackbarState, setSnackbarValue, setSnackbarState, handleSnackbarState }}>
-            {children}
-        </SnackBarContext.Provider>
-    )
 }

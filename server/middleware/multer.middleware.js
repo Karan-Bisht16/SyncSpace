@@ -1,3 +1,4 @@
+// This middleware is no longer in use.
 import path from "path";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";

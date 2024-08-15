@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 // Importing my components
 import { formatDate } from "../../../utils/functions";
 // Importing contexts
-import { SnackBarContext } from "../../../store";
+import { SnackBarContext } from "../../../contexts/SnackBar.context";
 
 function SubspaceProfileBar(props) {
     const { classes, subspaceData } = props;

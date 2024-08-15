@@ -7,7 +7,7 @@ import { lineSpinner } from "ldrs";
 import SubspaceForm from "../../Components/SubspaceForm/SubspaceForm";
 import NotFound from "../../Components/NotFound/NotFound";
 // Importing contexts
-import { SnackBarContext } from "../../store";
+import { SnackBarContext } from "../../contexts/SnackBar.context";
 // Importing actions
 import { fetchSubspaceInfo } from "../../actions/subspace";
 // Importing styling

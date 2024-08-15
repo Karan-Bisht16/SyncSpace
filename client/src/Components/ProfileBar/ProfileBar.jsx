@@ -3,7 +3,7 @@ import { Box, Divider, Grid, IconButton, Tooltip, Typography } from "@mui/materi
 import { Link, DoneAll } from "@mui/icons-material";
 // Importing my components
 import { formatDate } from "../../utils/functions";
-import { SnackBarContext } from "../../store/index";
+import { SnackBarContext } from "../../contexts/SnackBar.context";
 // Importing styling
 import styles from "./styles";
 

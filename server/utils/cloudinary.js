@@ -9,7 +9,6 @@ cloudinary.config({
 
 const uploadFile = async (fileBuffer) => {
     if (!fileBuffer) return null;
-
     const result = await new Promise((resolve) => {
         cloudinary.uploader.upload_stream({ resource_type: "auto" }, (error, result) => {
             if (error) {
@@ -21,20 +20,11 @@ const uploadFile = async (fileBuffer) => {
     });
     return result;
 }
-const deleteFromCloudinary = async (publicId) => {
+
+const deleteFromCloudinary = async (publicId, type) => {
     if (!publicId) return null;
     try {
-        const response = await cloudinary.uploader.destroy(publicId);
-        return response;
-    } catch (error) {
-        console.error(error);
-        return null;
-    }
-}
-const deleteManyFromCloudinary = async (publicIds) => {
-    if (!publicIds) return null;
-    try {
-        const response = await cloudinary.api.delete_resources(publicIds);
+        const response = await cloudinary.uploader.destroy(publicId, { resource_type: type });
         return response;
     } catch (error) {
         console.error(error);
@@ -42,4 +32,4 @@ const deleteManyFromCloudinary = async (publicIds) => {
     }
 }
 
-export { uploadFile, deleteFromCloudinary, deleteManyFromCloudinary };
+export { uploadFile, deleteFromCloudinary };

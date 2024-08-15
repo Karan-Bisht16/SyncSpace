@@ -5,14 +5,15 @@ import { useDispatch } from "react-redux";
 import imageCompression from "browser-image-compression";
 // Importing my components
 import RealTimeSubspaceViewer from "./RealTimeSubspaceViewer/RealTimeSubspaceViewer";
-import ConfirmationDialog from "../ConfirmationDialog/ConfirmationDialog";
 import preDefinedTopics from "../../assets/preDefinedTopics";
 import InputField from "../InputField/InputField";
 import FileUpload from "../FileUpload/FileUpload";
 // Importing contexts
-import { ReRenderContext, ConfirmationDialogContext, SnackBarContext } from "../../store";
+import { ReRenderContext } from "../../contexts/ReRender.context";
+import { SnackBarContext } from "../../contexts/SnackBar.context";
+import { ConfirmationDialogContext } from "../../contexts/ConfirmationDialog.context";
 // Importing actions
-import { createSubspace, updateSubspace, uploadSubspaceAvatar } from "../../actions/subspace";
+import { updateSubspace, uploadSubspaceAvatar } from "../../actions/subspace";
 // Importing styling
 import styles from "./styles"
 
@@ -20,7 +21,7 @@ function SubspaceForm(props) {
     const { subspaceData, setSubspaceData, avatar, setAvatar, type, subspaceId } = props;
     const { setReRender } = useContext(ReRenderContext);
     const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
-    const { dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar } = useContext(ConfirmationDialogContext);
+    const { openDialog, linearProgressBar, setLinearProgressBar } = useContext(ConfirmationDialogContext);
     const classes = styles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -146,6 +147,20 @@ function SubspaceForm(props) {
         });
         setAvatar(null);
     }
+    function openDialogContent(titleText) {
+        openDialog({
+            title: titleText,
+            message:
+                <span>
+                    Are you sure you want to create this new subspace?
+                    As the creator, you will automatically become the moderator of this subspace.
+                    <br /><br />
+                    Proceed?
+                </span>,
+            cancelBtnText: "Cancel", submitBtnText: "Create", dialogId: 3,
+            rest: { navigate, subspaceData, avatar, type, openDialogContent }
+        });
+    }
     // Submit Form
     function handleFirstSubmit() {
         if (subspaceData.name.trim() === "") {
@@ -181,17 +196,7 @@ function SubspaceForm(props) {
         }
         subspaceData.topics = topicsArray;
         if (type.toUpperCase() === "CREATE") {
-            openDialog({
-                title: "Create Subspace",
-                message:
-                    <span>
-                        Are you sure you want to create this new subspace?
-                        As the creator, you will automatically become the moderator of this subspace.
-                        <br /><br />
-                        Proceed?
-                    </span>,
-                cancelBtnText: "Cancel", submitBtnText: "Create"
-            });
+            openDialogContent("Create Subspace");
         } else if (type.toUpperCase() === "UPDATE") {
             handleUpdateSubspace();
         }
@@ -211,57 +216,14 @@ function SubspaceForm(props) {
                     setSnackbarValue({ message: result.message, status: "error" });
                     setSnackbarState(true);
                 }
-                closeModal();
-                setLinearProgressBar(false);
             } else {
                 setReRender(prevReRender => !prevReRender);
                 navigate("/", { state: { status: "success", message: "Subspace updated successfully!", time: new Date().getTime() } });
             }
+            closeModal();
+            setLinearProgressBar(false);
         } else {
             setSnackbarValue({ message: result.message, status: "error" });
-            setSnackbarState(true);
-        }
-    }
-    async function handleDialog() {
-        setLinearProgressBar(true);
-        try {
-            const { status, result } = await dispatch(createSubspace(subspaceData));
-            closeDialog();
-            if (status === 200) {
-                const subspaceId = result._id;
-                if (avatar && avatar.file) {
-                    openDialog({
-                        title: "Uploading Media",
-                        message:
-                            <span>
-                                Are you sure you want to create this new subspace?
-                                As the creator, you will automatically become the moderator of this subspace.
-                                <br /><br />
-                                Proceed?
-                            </span>,
-                        cancelBtnText: "Cancel", submitBtnText: "Create"
-                    });
-                    setLinearProgressBar(true);
-                    const { status, result } = await dispatch(uploadSubspaceAvatar({ avatar: avatar.file, subspaceId, type }));
-                    closeDialog();
-                    if (status === 200) {
-                        setReRender(prevReRender => !prevReRender);
-                        navigate("/", { state: { status: "success", message: `ss/${subspaceData.name.replace(/ /g, "-")} is now live!`, time: new Date().getTime() } });
-                    } else {
-                        setSnackbarValue({ message: result.message, status: "error" });
-                        setSnackbarState(true);
-                    }
-                } else {
-                    setReRender(prevReRender => !prevReRender);
-                    navigate("/", { state: { status: "success", message: `ss/${subspaceData.name.replace(/ /g, "-")} is now live!`, time: new Date().getTime() } });
-                }
-            } else {
-                setSnackbarValue({ message: result.message, status: "error" });
-                setSnackbarState(true);
-            }
-        } catch (error) {
-            closeDialog();
-            setSnackbarValue({ message: error.message, status: "error" });
             setSnackbarState(true);
         }
     }
@@ -376,7 +338,6 @@ function SubspaceForm(props) {
                     </DialogContentText>
                 </DialogContent>
             </Dialog>
-            <ConfirmationDialog dialog={dialog} closeDialog={closeDialog} handleDialog={handleDialog} linearProgressBar={linearProgressBar} dialogValue={dialogValue} />
         </div>
     );
 }

@@ -6,7 +6,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 // Importing contexts
-import { SnackBarContext } from "../../store/index";
+import { SnackBarContext } from "../../contexts/SnackBar.context";
 // Importing my components
 import InputField from "../../Components/InputField/InputField";
 // Importing actions

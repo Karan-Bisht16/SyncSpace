@@ -29,7 +29,8 @@ function FileUpload(props) {
             {message &&
                 <Typography>{message}</Typography>
             }
-            <Button variant="outlined" size="large" onClick={resetSelectedFiles} sx={classes.resetSelectedFilesBtn}>Reset file</Button></>
+            <Button variant="outlined" size="large" onClick={resetSelectedFiles} sx={classes.resetSelectedFilesBtn}>Reset file</Button>
+        </>
     );
 }
 

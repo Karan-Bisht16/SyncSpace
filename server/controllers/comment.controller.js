@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb"
-import User from "../models/user.js";
-import Post from "../models/post.js";
-import Comment from "../models/comment.js";
+import User from "../models/user.model.js";
+import Post from "../models/post.model.js";
+import Comment from "../models/comment.model.js";
 
 const fetchComments = async (req, res) => {
     try {

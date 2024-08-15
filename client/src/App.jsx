@@ -10,6 +10,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { square } from "ldrs";
 // Importing my components
 import SnackBar from "./Components/SnackBar/SnackBar";
+import ConfirmationDialog from "./Components/ConfirmationDialog/ConfirmationDialog";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import GuestRoute from "./utils/GuestRoute";
 import Header from "./Components/Header/Header";
@@ -28,7 +29,8 @@ import Settings from "./pages/Settings/Settings";
 import Authentication from "./pages/Authentication/Authentication";
 import PageNotFound from "./pages/PageNotFound/PageNotFound";
 // Importing contexts
-import { SnackBarContext } from "./store";
+import { SnackBarContext } from "./contexts/SnackBar.context";
+import { ConfirmationDialogContext } from "./contexts/ConfirmationDialog.context";
 // Importing styling for toggle theme [for body]
 import "./styles.css";
 
@@ -37,12 +39,11 @@ function App() {
     const queryClient = new QueryClient();
 
     const { snackbarValue, snackbarState, setSnackbarValue, setSnackbarState, handleSnackbarState } = useContext(SnackBarContext);
+    const { dialog, dialogValue, closeDialog, linearProgressBar, handleDialog } = useContext(ConfirmationDialogContext)
+
     // Fetching user
     const { user, loading } = useFetchUser(setSnackbarValue, setSnackbarState);
-    const loadingScreenStyling = {
-        width: "100hw", height: "100vh", bgcolor: "background.default",
-        display: "flex", justifyContent: "center", alignItems: "center",
-    }
+    const loadingScreenStyling = { width: "100hw", height: "100vh", bgcolor: "background.default", display: "flex", justifyContent: "center", alignItems: "center" };
 
     if (loading) {
         return (
@@ -101,6 +102,7 @@ function App() {
                     vertical="top" horizontal="left"
                     sx={{ display: { xs: "flex", sm: "none" } }}
                 />
+                <ConfirmationDialog dialog={dialog} closeDialog={closeDialog} handleDialog={handleDialog} linearProgressBar={linearProgressBar} dialogValue={dialogValue} />
             </QueryClientProvider>
         </GoogleOAuthProvider>
     );

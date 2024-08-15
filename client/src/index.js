@@ -4,9 +4,13 @@ import App from "./App";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import { reducers } from "./reducers";
+// Importing contexts
+import { ColorContextProvider } from "./contexts/Color.context";
+import { ReRenderProvider } from "./contexts/ReRender.context";
+import { SnackBarProvider } from "./contexts/SnackBar.context";
+import { ConfirmationDialogProvider } from "./contexts/ConfirmationDialog.context";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react"
-import { ColorContextProvider, ReRenderProvider, ConfirmationDialogProvider, SnackBarProvider } from "./store";
 
 const store = configureStore({ reducer: reducers });
 
@@ -17,11 +21,11 @@ root.render(
             <ColorContextProvider>
                 <Provider store={store}>
                     <ReRenderProvider>
-                        <ConfirmationDialogProvider>
-                            <SnackBarProvider>
+                        <SnackBarProvider>
+                            <ConfirmationDialogProvider>
                                 <App />
-                            </SnackBarProvider>
-                        </ConfirmationDialogProvider>
+                            </ConfirmationDialogProvider>
+                        </SnackBarProvider>
                     </ReRenderProvider>
                 </Provider>
             </ColorContextProvider>

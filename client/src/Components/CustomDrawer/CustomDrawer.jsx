@@ -6,7 +6,7 @@ import { hatch } from "ldrs";
 // Importing my components
 import SubspaceList from "./SubspaceList/SubspaceList";
 // Importing contexts
-import { ReRenderContext } from "../../store";
+import { ReRenderContext } from "../../contexts/ReRender.context";
 // Importing styling
 import styles from "./styles";
 // Importing images

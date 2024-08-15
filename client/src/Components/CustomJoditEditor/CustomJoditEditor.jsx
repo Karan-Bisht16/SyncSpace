@@ -11,7 +11,7 @@ const CustomJoditEditor = React.forwardRef((props, ref) => {
         minHeight: 275,
         maxHeight: 500,
         style: { font: "16px Noto Sans" },
-        enableDragAndDropFileToEditor: true,
+        enableDragAndDropFileToEditor: false,
         buttons: ["bold", "italic", "underline", "strikethrough", "|", "ul", "ol", "|", "font", "fontsize", "|", "left", "center", "right", "justify", "|", "brush", "paragraph", "|", "table", "link", "undo", "redo", "|", "hr", "eraser", "fullsize"],
         buttonsMD: ["bold", "italic", "underline", "|", "left", "center", "right", "justify", "|", "ul", "ol", "|", "font", "fontsize", "|", "brush", "paragraph", "|", "link", "hr", "fullsize"],
         buttonsSM: ["bold", "italic", "underline", "|", "left", "center", "right", "justify", "|", "ul", "ol", "|", "font", "fontsize", "|", "brush", "paragraph", "|", "link", "hr", "fullsize"],

@@ -4,15 +4,15 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { lineSpinner } from "ldrs"
 // Importing my components
-import ConfirmationDialog from "../../Components/ConfirmationDialog/ConfirmationDialog";
 import InputField from "../../Components/InputField/InputField";
 import NotFound from "../../Components/NotFound/NotFound";
 import Comment from "../../Components/Comment/Comment";
 import Post from "../../Components/Posts/Post/Post";
 // Importing contexts
-import { ConfirmationDialogContext, SnackBarContext } from "../../store";
+import { SnackBarContext } from "../../contexts/SnackBar.context";
+import { ConfirmationDialogContext } from "../../contexts/ConfirmationDialog.context";
 // Importing actions
-import { fetchPostInfo, deletePost } from "../../actions/post";
+import { fetchPostInfo } from "../../actions/post";
 import { createComment, fetchComments } from "../../actions/comment";
 // Importing styling
 import styles from "./styles";
@@ -21,7 +21,7 @@ function PostContainer(props) {
     const { user } = props;
     const { id } = useParams();
     const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
-    const { dialog, dialogValue, openDialog, closeDialog, linearProgressBar, setLinearProgressBar } = useContext(ConfirmationDialogContext);
+    const { openDialog } = useContext(ConfirmationDialogContext);
     const classes = styles();
     const dispatch = useDispatch();
     const location = useLocation();
@@ -113,35 +113,18 @@ function PostContainer(props) {
         if (comment.trim() !== "") {
             openDialog({
                 title: "Discard comment",
-                message: "Discard comment?",
-                cancelBtnText: "Cancel", submitBtnText: "Discard"
+                message:
+                    <span>
+                        Are you sure you want to discard your comment? This action cannot be undone.
+                        <br /><br />
+                        Proceed?
+                    </span>,
+                cancelBtnText: "Cancel", submitBtnText: "Discard", dialogId: 6,
+                rest: { setComment, setAddComment }
             });
         }
         else {
             setAddComment(false);
-        }
-    }
-    async function handlePostDialog() {
-        if (dialogValue.submitBtnText.toUpperCase() === "DISCARD") {
-            closeDialog();
-            setAddComment(false);
-            setComment("");
-        } else if (dialogValue.submitBtnText.toUpperCase() === "DELETE") {
-            setLinearProgressBar(true);
-            try {
-                const { status, result } = await dispatch(deletePost({ postId: id }));
-                closeDialog();
-                if (status === 200) {
-                    navigate("/", { state: { message: "Post deleted.", status: "success", time: new Date().getTime() } });
-                } else {
-                    setSnackbarValue({ message: result.message, status: "error" });
-                    setSnackbarState(true);
-                }
-            } catch (error) {
-                closeDialog();
-                setSnackbarValue({ message: error.message, status: "error" });
-                setSnackbarState(true);
-            }
         }
     }
     async function handleAddComment() {
@@ -242,7 +225,6 @@ function PostContainer(props) {
                     }
                 </div>
             </Box>
-            <ConfirmationDialog dialog={dialog} closeDialog={closeDialog} handleDialog={handlePostDialog} linearProgressBar={linearProgressBar} dialogValue={dialogValue} />
         </Grid>
     );
 }

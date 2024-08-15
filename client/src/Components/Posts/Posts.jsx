@@ -70,7 +70,7 @@ function Posts(props) {
                 }}
                 hasMore={hasNextPage}
             >
-                {queryData.pages.map((page, index) => (
+                {queryData?.pages?.map((page, index) => (
                     <div key={index}>
                         {page?.message &&
                             <Box sx={classes.postMessageContainer}>{page?.message}</Box>
