@@ -174,7 +174,7 @@ function PostForm(props) {
         }
         const { status, result } = await dispatch(updatePost({ postId: postId, updatedData }));
         if (status === 200) {
-            if (selectedFile?.length === 0 || selectedFile[0]?.name) {
+            if (selectedFile?.length === 0 || selectedFile[0]?.name || (tabIndex === "1" && selectedFile[0]?.mediaURL)) {
                 setModalTitle("Updating Media");
                 const { status, result } = await dispatch(uploadPostMedia({ selectedFile, postId, type }));
                 if (status === 200) {
