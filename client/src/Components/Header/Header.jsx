@@ -78,6 +78,12 @@ function Header(props) {
             }
         }
     }, [mode, toggleBodyTheme, toggleMode, location.state, setSnackbarValue, setSnackbarState]);
+    useEffect(() => {
+        const url = window.location.href;
+        if (!url.includes("/ss/")) {
+            localStorage.setItem("subspacePageTabIndex", 0);
+        }
+    }, [window.location.href]);
 
     return (
         <>

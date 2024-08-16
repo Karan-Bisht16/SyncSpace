@@ -11,14 +11,16 @@ import UserPostsBlock from "./UserPostsBlock/UserPostsBlock";
 import NotFound from "../../Components/NotFound/NotFound";
 // Importing contexts
 import { SnackBarContext } from "../../contexts/SnackBar.context";
+import { UserDataContext } from "../../contexts/UserData.context";
 // Importing actions
-import { fetchUserInfo, updateProfile } from "../../actions/user";
+import { updateProfile } from "../../actions/user";
 // Importing styling
 import styles from "./styles";
 
 function Profile(props) {
     const { user } = props;
     const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
+    const { fetchAllUserInfo, updatedUser, setUpdatedUser, primaryLoading, secondaryLoading, noUserFound, userProfileDeleted, userPostsCount } = useContext(UserDataContext);
     const { userName } = useParams();
     const classes = styles();
     const dispatch = useDispatch();
@@ -26,68 +28,13 @@ function Profile(props) {
 
     useEffect(() => {
         document.title = "SyncSpace: e/" + userName;
-        setNoUserFound(false);
-        setUserProfileDeleted(false);
+        fetchAllUserInfo(userName, setFormData);
     }, [userName]);
 
     const nameField = useRef(null);
     const emailField = useRef(null);
     const bioField = useRef(null);
 
-    // Fetching user info
-    const [primaryLoading, setPrimaryLoading] = useState(true);
-    const [secondaryLoading, setSecondaryLoading] = useState(true);
-    const [noUserFound, setNoUserFound] = useState(false);
-    const [userProfileDeleted, setUserProfileDeleted] = useState(false);
-    const [updatedUser, setUpdatedUser] = useState({
-        name: "Loading...",
-        userName: "Loading...",
-        email: "Loading...",
-        bio: "Loading...",
-        dateJoined: "Loading...",
-        avatar: "",
-        credits: "Loading...",
-        subspacesJoined: "Loading...",
-        postsCount: "Loading...",
-    });
-    const [userPostsCount, setUserPostsCount] = useState(0);
-    useEffect(() => {
-        async function getUserInfo() {
-            const { status, result } = await dispatch(fetchUserInfo({ userName: userName }));
-            if (status === 200) {
-                if (result.isDeleted) {
-                    setUserProfileDeleted(true);
-                } else {
-                    setUpdatedUser(result);
-                    setUserPostsCount(result.postsCount);
-                    setFormData({
-                        name: result.name,
-                        bio: result.bio,
-                        email: result.email,
-                    });
-                }
-                setPrimaryLoading(false);
-                setSecondaryLoading(false);
-            } else if (status === 404) {
-                setPrimaryLoading(false);
-                setSecondaryLoading(false);
-                setNoUserFound(true);
-            } else {
-                setSnackbarValue({ message: result.message, status: "error" });
-                setSnackbarState(true);
-            }
-        }
-        async function getUser() {
-            if (user.userName === userName) {
-                setUpdatedUser(user);
-                setPrimaryLoading(false);
-                getUserInfo();
-            } else {
-                getUserInfo();
-            }
-        }
-        getUser();
-    }, [user, userName, dispatch, setSnackbarValue, setSnackbarState]);
     // Tab Change
     const [tabIndex, setTabIndex] = useState(0);
     function handleTabChange(event, newTabIndex) {

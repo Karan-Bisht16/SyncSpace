@@ -42,9 +42,9 @@ export const ConfirmationDialogProvider = ({ children }) => {
         switch (dialogValue.dialogId) {
             case 1:
                 console.log("Create Post");
-                setLinearProgressBar(true);
                 try {
                     const { navigate, postData, selectedFile, type, tabIndex, openDialogContent } = dialogValue.rest;
+                    setLinearProgressBar(true);
                     let updatedData;
                     if (tabIndex === "1") {
                         updatedData = postData;
@@ -79,9 +79,9 @@ export const ConfirmationDialogProvider = ({ children }) => {
                 break;
             case 2:
                 console.log("Delete Post");
-                setLinearProgressBar(true);
                 try {
                     const { navigate, _id } = dialogValue.rest;
+                    setLinearProgressBar(true);
                     const { status, result } = await dispatch(deletePost({ postId: _id }));
                     closeDialog();
                     if (status === 200) {
@@ -94,9 +94,9 @@ export const ConfirmationDialogProvider = ({ children }) => {
                 break;
             case 3:
                 console.log("Create Subspace");
-                setLinearProgressBar(true);
                 try {
                     const { navigate, subspaceData, avatar, type, openDialogContent } = dialogValue.rest
+                    setLinearProgressBar(true);
                     const { status, result } = await dispatch(createSubspace(subspaceData));
                     closeDialog();
                     if (status === 200) {
@@ -127,6 +127,7 @@ export const ConfirmationDialogProvider = ({ children }) => {
                 console.log("Join Subspace");
                 try {
                     const { navigate, subspaceData, subspaceName, handleJoin } = dialogValue.rest;
+                    setLinearProgressBar(true);
                     await handleJoin();
                     closeDialog();
                     navigate("/create-post", { state: { subspaceName, subspaceId: subspaceData?._id } });
@@ -170,6 +171,7 @@ export const ConfirmationDialogProvider = ({ children }) => {
                 console.log("Change Password");
                 try {
                     const { navigate, formData } = dialogValue.rest;
+                    setLinearProgressBar(true);
                     const { status, result } = await dispatch(changePassword(formData));
                     closeDialog();
                     if (status === 200) {
@@ -182,9 +184,9 @@ export const ConfirmationDialogProvider = ({ children }) => {
                 break;
             case 9:
                 console.log("Delete Account");
-                setLinearProgressBar(true);
                 try {
                     const { navigate } = dialogValue.rest;
+                    setLinearProgressBar(true);
                     const { status, result } = await dispatch(deleteProfile());
                     closeDialog();
                     if (status === 200) {

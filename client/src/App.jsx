@@ -2,8 +2,7 @@ import React, { useContext } from "react";
 import { Box } from "@mui/material";
 import {
     BrowserRouter as Router,
-    Routes,
-    Route,
+    Routes, Route
 } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -31,6 +30,8 @@ import PageNotFound from "./pages/PageNotFound/PageNotFound";
 // Importing contexts
 import { SnackBarContext } from "./contexts/SnackBar.context";
 import { ConfirmationDialogContext } from "./contexts/ConfirmationDialog.context";
+import { UserDataProvider } from "./contexts/UserData.context";
+import { SubspaceDataProvider } from "./contexts/SubspaceData.context";
 // Importing styling for toggle theme [for body]
 import "./styles.css";
 
@@ -61,9 +62,14 @@ function App() {
                         <Route exact path="/" element={<Home user={user} />} />
                         <Route path="/Trending" element={<Trending user={user} />} />
                         <Route path="/post/:id" element={<PostContainer user={user} />} />
-                        <Route path="/ss/:subspaceName" element={<Subspace user={user} />} />
-                        {/* <Route path="/ss/:subspaceName/post/:id" element={<PostContainer user={user} />} /> */}
-                        <Route path="/e/:userName" element={<Profile user={user} />} />
+                        <Route element={<SubspaceDataProvider user={user} />} >
+                            <Route path="/ss/:subspaceName" element={<Subspace user={user} />} />
+                            <Route path="/ss/:subspaceName/post/:id" element={<PostContainer user={user} />} />
+                        </Route>
+                        <Route element={<UserDataProvider user={user} />} >
+                            <Route path="/e/:userName" element={<Profile user={user} />} />
+                            <Route path="/e/:userName/post/:id" element={<PostContainer user={user} />} />
+                        </Route>
                         <Route
                             path="/create-post"
                             element={<ProtectedRoute Component={CreatePost} user={user} />}

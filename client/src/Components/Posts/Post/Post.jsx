@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Avatar, Box, Grid, IconButton, Paper, Tooltip, Typography } from "@mui/material";
 import { FiberManualRecordTwoTone, CloseRounded } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Carousel from "react-bootstrap/Carousel";
 import AudioPlayer from "react-h5-audio-player";
@@ -48,9 +48,17 @@ function Post(props) {
     function handleUserProfileClick(userName) {
         navigate("/e/" + userName);
     }
+    const pageParams = useParams();
     function handlePostClick() {
         if (!individual) {
-            navigate("/post/" + _id, { state: { postData: { post }, isPostLikedByUser: postLiked } });
+            if (pageParams.subspaceName) {
+                localStorage.setItem("subspacePageTabIndex", 1);
+                navigate("post/" + _id, { state: { postData: { post }, isPostLikedByUser: postLiked } });
+            } else if (pageParams.userName) {
+                navigate("post/" + _id, { state: { postData: { post }, isPostLikedByUser: postLiked } });
+            } else {
+                navigate("/post/" + _id, { state: { postData: { post }, isPostLikedByUser: postLiked } });
+            }
         }
     }
     function handlePostClose() {

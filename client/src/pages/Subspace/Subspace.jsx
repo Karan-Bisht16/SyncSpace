@@ -13,8 +13,9 @@ import Posts from "../../Components/Posts/Posts";
 import { ReRenderContext } from "../../contexts/ReRender.context";
 import { SnackBarContext } from "../../contexts/SnackBar.context";
 import { ConfirmationDialogContext } from "../../contexts/ConfirmationDialog.context";
+import { SubspaceDataContext } from "../../contexts/SubspaceData.context";
 // Importing actions
-import { fetchSubspaceInfo, joinSubspace, isSubspaceJoined } from "../../actions/subspace";
+import { joinSubspace } from "../../actions/subspace";
 // Importing styling
 import styles from "./styles";
 
@@ -24,6 +25,8 @@ function Subspace(props) {
     const { setReRender } = useContext(ReRenderContext);
     const { setSnackbarValue, setSnackbarState } = useContext(SnackBarContext);
     const { openDialog } = useContext(ConfirmationDialogContext);
+    const { fetchAllSubspaceInfo, subspaceData, primaryLoading, secondaryLoading, noSubspaceFound, canModifySubspace, subspaceDeleted, subspacePostsCount, joined, setJoined } = useContext(SubspaceDataContext);
+
     const classes = styles();
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -31,54 +34,9 @@ function Subspace(props) {
 
     useEffect(() => {
         document.title = "SyncSpace: ss/" + subspaceName;
-    });
-
-    const [primaryLoading, setPrimaryLoading] = useState(true);
-    const [secondaryLoading, setSecondaryLoading] = useState(true);
-    const [noSubspaceFound, setNoSubspaceFound] = useState(false);
-    const [canModifySubspace, setCanModifySubspace] = useState(false);
-    const [subspaceDeleted, setSubspaceDeleted] = useState(false);
-    const [subspacePostsCount, setSubspacePostsCount] = useState(0);
-    const [reRenderSubspacePosts, setReRenderSubspacePosts] = useState({});
-    useEffect(() => {
-        setReRenderSubspacePosts({});
-        setPrimaryLoading(true);
-        setSecondaryLoading(true);
-        setNoSubspaceFound(false);
-        setCanModifySubspace(false);
-        setSubspaceDeleted(false);
-        setSubspacePostsCount(0);
+        fetchAllSubspaceInfo(subspaceName);
     }, [subspaceName]);
-    const [subspaceData, setSubspaceData] = useState(null);
-    useEffect(() => {
-        async function fetchAllSubspaceInfo() {
-            const { status, result } = await dispatch(fetchSubspaceInfo({ subspaceName }));
-            if (status === 200) {
-                const subspace = result;
-                if (subspace.isDeleted) { setSubspaceDeleted(true) }
-                else {
-                    setSubspaceData(subspace);
-                    setReRenderSubspacePosts(subspace._id);
-                    if (user) {
-                        if (user._id === subspace.creator) { setCanModifySubspace(true) }
-                        const { status, result } = await dispatch(isSubspaceJoined({ userId: user._id, subspaceId: subspace._id }));
-                        if (status === 200) { setJoined(result) }
-                    }
-                    setSubspacePostsCount(subspace.postsCount);
-                }
-                setPrimaryLoading(false);
-                setSecondaryLoading(false);
-            } else if (status === 404) {
-                setPrimaryLoading(false);
-                setSecondaryLoading(false);
-                setNoSubspaceFound(true);
-            } else {
-                setSnackbarValue({ message: result.message, status: "error" });
-                setSnackbarState(true);
-            }
-        }
-        fetchAllSubspaceInfo();
-    }, [subspaceName, user, dispatch, setSnackbarValue, setSnackbarState]);
+
     // JS for Menu
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
@@ -89,7 +47,10 @@ function Subspace(props) {
         setAnchorEl(null);
     };
     // Tab Change
-    const [tabIndex, setTabIndex] = useState(0);
+    if (!localStorage.getItem("subspacePageTabIndex")) {
+        localStorage.setItem("subspacePageTabIndex", 0);
+    }
+    const [tabIndex, setTabIndex] = useState(Number(localStorage.getItem("subspacePageTabIndex")));
     function handleTabChange(event, newTabIndex) {
         setTabIndex(newTabIndex);
     };
@@ -124,8 +85,8 @@ function Subspace(props) {
                             :
                             <Box sx={classes.subspacePostContainer}>
                                 <Posts
-                                    key={reRenderSubspacePosts}
-                                    searchQuery={{ subspaceId: reRenderSubspacePosts }}
+                                    key={subspaceData._id}
+                                    searchQuery={{ subspaceId: subspaceData._id }}
                                 />
                             </Box>
                         }
@@ -147,7 +108,6 @@ function Subspace(props) {
             });
         }
     }
-    const [joined, setJoined] = useState(false);
     async function handleJoin() {
         if (user) {
             const tempJoined = joined;
