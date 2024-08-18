@@ -56,9 +56,9 @@ To get a local copy up and running, follow these simple steps.
    ```sh
    npm install
    ```
-4. Create a `.env` file and add your MongoDB URI and JWT secret
+4. Create a `.env` file and add:
    ```env
-   MONGO_URI=your_mongodb_uri
+   MONGO_URI = your_mongodb_uri
    SESSION_SECRET = your_session_secret
    ACCESS_TOKEN_SECRET = your_access_token_secret
    ACCESS_TOKEN_EXPIRY = 30m
@@ -84,7 +84,7 @@ To get a local copy up and running, follow these simple steps.
    ```sh
    npm install
    ```
-3. Create a `.env` file and add your MongoDB URI and JWT secret
+3. Create a `.env` file and add:
    ```env
    REACT_APP_SUBSPACE_AVATAR_SIZE = your_subspace_avatar_size_in_kb
    REACT_APP_POST_FILE_SIZE = your_post_file_size_in_kb
@@ -104,7 +104,7 @@ To get a local copy up and running, follow these simple steps.
 2. Sign up or log in to your account
 3. Create and join subspaces, post content, and interact with the community
 
-<h2 id="libraries-and-tools">Libraries and Tools</h2>
+## Libraries and Tools
 
 - [**Material-UI**](https://mui.com/material-ui/getting-started/): A popular React UI framework for building responsive, modern user interfaces.
 - [**@tansackreact-query**](https://www.npmjs.com/package/@tanstack/react-query): Used to implement infinite scroll queries with scroll recovery.
