@@ -59,13 +59,19 @@ To get a local copy up and running, follow these simple steps.
 4. Create a `.env` file and add your MongoDB URI and JWT secret
    ```env
    MONGO_URI=your_mongodb_uri
-   JWT_SECRET=your_jwt_secret
+   SESSION_SECRET = your_session_secret
+   ACCESS_TOKEN_SECRET = your_access_token_secret
+   ACCESS_TOKEN_EXPIRY = 30m
+   REFRESH_TOKEN_SECRET = your_refresh_token_secret
+   REFRESH_TOKEN_EXPIRY = 1d
+   CLOUDINARY_CLOUD_NAME = your_cloudinary_cloud_name
+   CLOUDINARY_API_KEY = your_cloudinary_api_key
+   CLOUDINARY_API_SECRET = your_cloudinary_api_secret
+   FRONT_END_DOMAIN = http://localhost:3000
    ```
 5. Start the backend server
    ```sh
    node index.js
-   // or
-   npm start
    ```
 
 ### Frontend Setup
@@ -78,7 +84,16 @@ To get a local copy up and running, follow these simple steps.
    ```sh
    npm install
    ```
-3. Start the React app
+3. Create a `.env` file and add your MongoDB URI and JWT secret
+   ```env
+   REACT_APP_SUBSPACE_AVATAR_SIZE = your_subspace_avatar_size_in_kb
+   REACT_APP_POST_FILE_SIZE = your_post_file_size_in_kb
+   REACT_APP_GOOGLE_OAUTH_API_TOKEN = your_google_oauth_api_token
+   REACT_APP_JWT_TOKEN_KEY = your_jwt_token_key
+   REACT_APP_BACKEND_URL = http://localhost:[your_port]
+   REACT_APP_DOMAIN = http://localhost:3000
+   ```
+4. Start the React app
    ```sh
    npm start
    ```
