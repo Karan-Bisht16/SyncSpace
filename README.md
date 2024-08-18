@@ -7,6 +7,7 @@ It allows users to create and join communities, known as subspaces, where they c
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
+- [System Design Overview](#system-design-overview)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Libraries and Tools](#libraries-and-tools)
@@ -26,6 +27,10 @@ It allows users to create and join communities, known as subspaces, where they c
 - **Database:** MongoDB
 - **Authentication:** JWT (JSON Web Tokens)
 - **Deployment:** Vercel
+
+## System Design Overview
+
+[SyncSpace ER Diagram and Technical Architecture](https://app.eraser.io/workspace/dJMjbpJMcqiAW4B3AJRM?origin=share)
 
 ## Installation
 
